@@ -68,15 +68,15 @@ FEATURES = {
 }
 
 META = {
-    "en-US": ("Analyze CSV, Parquet & Excel", "csv,parquet,excel,xlsx,json,sql,database,data,analytics,query,notebook,jupyter,spreadsheet,offline",
+    "en-US": ("Powered by DuckDB · CSV, Excel", "csv,parquet,excel,xlsx,json,sql,database,data,analytics,query,notebook,jupyter,spreadsheet,offline",
               "Query CSV, Parquet, JSON and Excel files with SQL right on your iPhone. A real analytical database runs on the device: fast, private, offline."),
-    "tr": ("CSV, Parquet ve Excel analizi", "csv,parquet,excel,xlsx,json,sql,veritabanı,veri,analiz,sorgu,not defteri,jupyter,tablo,offline",
+    "tr": ("DuckDB ile CSV, Excel analizi", "csv,parquet,excel,xlsx,json,sql,veritabanı,veri,analiz,sorgu,not defteri,jupyter,tablo,offline",
            "CSV, Parquet, JSON ve Excel dosyalarını iPhone'unuzda SQL ile sorgulayın. Gerçek bir analitik veritabanı cihazda çalışır: hızlı, gizli, internetsiz."),
-    "es-MX": ("Analiza CSV, Parquet y Excel", "csv,parquet,excel,xlsx,json,sql,base de datos,datos,análisis,consulta,notebook,jupyter,offline",
+    "es-MX": ("Con DuckDB · CSV, Excel, Parquet", "csv,parquet,excel,xlsx,json,sql,base de datos,datos,análisis,consulta,notebook,jupyter,offline",
               "Consulta archivos CSV, Parquet, JSON y Excel con SQL en tu iPhone. Una base de datos analítica real corre en el dispositivo: rápida, privada, sin conexión."),
-    "pt-BR": ("Analise CSV, Parquet e Excel", "csv,parquet,excel,xlsx,json,sql,banco de dados,dados,análise,consulta,notebook,jupyter,offline",
+    "pt-BR": ("Com DuckDB · CSV, Excel, Parquet", "csv,parquet,excel,xlsx,json,sql,banco de dados,dados,análise,consulta,notebook,jupyter,offline",
               "Consulte arquivos CSV, Parquet, JSON e Excel com SQL no iPhone. Um banco de dados analítico de verdade roda no aparelho: rápido, privado, offline."),
-    "de-DE": ("CSV, Parquet & Excel abfragen", "csv,parquet,excel,xlsx,json,sql,datenbank,daten,analyse,abfrage,notebook,jupyter,tabelle,offline",
+    "de-DE": ("Mit DuckDB · CSV, Excel, Parquet", "csv,parquet,excel,xlsx,json,sql,datenbank,daten,analyse,abfrage,notebook,jupyter,tabelle,offline",
               "Frage CSV-, Parquet-, JSON- und Excel-Dateien mit SQL direkt auf dem iPhone ab. Eine echte analytische Datenbank läuft auf dem Gerät: schnell, privat, offline."),
 }
 

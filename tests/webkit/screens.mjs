@@ -28,14 +28,32 @@ const runCell = (i) => async (p) => { await p.locator('.cell.sql .run').nth(i).c
 const scrollTo = (sel, n = 0) => async (p) => { await p.locator(sel).nth(n).evaluate((e) => e.scrollIntoView({ block: 'start' })); await p.evaluate(() => window.scrollBy(0, -70)); };
 
 await session('dark', [
-  ['1-notebook', async (p) => { await openSample('welcome')(p); await runCell(2)(p); await runCell(3)(p); await scrollTo('.cell.sql', 2)(p); }],
-  ['2-chart', async (p) => { await p.locator('.cell.sql').nth(3).locator('.seg button').nth(1).click(); await scrollTo('.cell.sql', 3)(p); }],
-  ['3-files', async (p) => { await p.evaluate(() => window.__go({ tab: 'files' })); await p.waitForSelector('.kind'); }],
+  ['1-chart', async (p) => { await openSample('welcome')(p); await runCell(3)(p); await p.locator('.cell.sql').nth(3).locator('.seg button').nth(1).click(); await scrollTo('.cell.sql', 3)(p); }],
+  ['2-table', async (p) => { await runCell(2)(p); await scrollTo('.cell.sql', 2)(p); }],
+  ['3-summarize', async (p) => { await runCell(1)(p); await scrollTo('.cell.sql', 1)(p); }],
   ['4-extensions', async (p) => { await p.evaluate(() => window.__go({ tab: 'extensions' })); await p.waitForSelector('.featured'); await p.waitForTimeout(800); }],
+  ['5-files', async (p) => { await p.evaluate(() => window.__go({ tab: 'files' })); await p.waitForSelector('.kind'); }],
 ]);
 await session('light', [
-  ['5-map', async (p) => { await openSample('spatial')(p); await runCell(0)(p); await scrollTo('.cell.sql', 0)(p); }],
-  ['6-lesson', async (p) => { await openSample('learn-7')(p); await runCell(0)(p); await scrollTo('.cell.sql', 0)(p); }],
-  ['7-home', async (p) => { await p.evaluate(() => window.__go({ tab: 'notebooks' })); await p.waitForSelector('.cards'); }],
+  ['6-map', async (p) => { await openSample('spatial')(p); await runCell(0)(p); await scrollTo('.cell.sql', 0)(p); }],
+  ['7-lesson', async (p) => { await openSample('learn-7')(p); await runCell(0)(p); await scrollTo('.cell.sql', 0)(p); }],
+  ['8-home', async (p) => { await p.evaluate(() => window.__go({ tab: 'notebooks' })); await p.waitForSelector('.cards'); }],
 ]);
+
+// In-app purchase review screenshot (1290x2796): the paywall, as a user without Pro sees it.
+{
+  const ctx = await b.newContext({ viewport: { width: 430, height: 932 }, deviceScaleFactor: 3, colorScheme: 'dark', locale: 'en-US' });
+  const p = await ctx.newPage();
+  await p.addInitScript(() => { try { localStorage.setItem('qly-lang', 'en'); localStorage.setItem('qly-pro', '0'); } catch {} });
+  await p.goto(URL_.replace('pro&', '').replace('&pro', ''));
+  await p.waitForFunction(() => window.__engine?.getState().status === 'ready', null, { timeout: 120000 });
+  await p.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
+  await p.evaluate(() => window.__go({ tab: 'database' }));
+  await p.locator('button', { hasText: 'New database' }).click();
+  await p.waitForSelector('.paywall');
+  await p.waitForTimeout(700);
+  await p.screenshot({ path: 'assets/iap-review-1290x2796.png' });
+  console.log('saved paywall');
+  await ctx.close();
+}
 await b.close();

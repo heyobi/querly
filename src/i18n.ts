@@ -1,0 +1,179 @@
+// Interface language (English / Turkish) and appearance (system / light / dark). Both are per-device preferences.
+// Strings are keyed by their English text; a missing translation falls back to English.
+
+export type Lang = 'en' | 'tr';
+export type LangPref = 'system' | Lang;
+export type Theme = 'system' | 'light' | 'dark';
+
+const read = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
+const write = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } };
+
+let langPref = (read('qly-lang') as LangPref) || 'system';
+let themePref = (read('qly-theme') as Theme) || 'system';
+
+export const getLangPref = () => langPref;
+export const getThemePref = () => themePref;
+export const lang = (): Lang => (langPref === 'system' ? (navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en' : langPref);
+
+export function setLangPref(v: LangPref) { langPref = v; write('qly-lang', v); document.documentElement.lang = lang(); }
+export function setThemePref(v: Theme) { themePref = v; write('qly-theme', v); applyTheme(); }
+
+export function isDark(): boolean {
+  if (themePref === 'dark') return true;
+  if (themePref === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+export function applyTheme() {
+  const r = document.documentElement;
+  if (themePref === 'system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', themePref);
+  r.style.colorScheme = isDark() ? 'dark' : 'light';
+}
+applyTheme();
+document.documentElement.lang = lang();
+
+const TR: Record<string, string> = {
+  // tabs & headers
+  'Notebooks': 'Not defterleri', 'Terminal': 'Terminal', 'Extensions': 'Eklentiler', 'Databases': 'Veritabanları',
+  'New notebook': 'Yeni not defteri', 'Import': 'İçe aktar', 'Untitled notebook': 'Adsız not defteri',
+  'No notebooks yet. Start with an example below.': 'Henüz not defteri yok. Aşağıdaki bir örnekle başlayın.',
+  'Learn PostgreSQL': 'PostgreSQL öğren', 'lessons · free': 'ders · ücretsiz',
+  'A short course from your first SELECT to window functions, indexes and transactions. Each lesson explains, runs and ends with an exercise.':
+    'İlk SELECT\'ten pencere fonksiyonlarına, indekslere ve transaction\'lara kısa bir kurs. Her ders anlatır, çalıştırır ve bir alıştırmayla biter.',
+  'in your notebooks': 'not defterlerinizde', 'More examples': 'Diğer örnekler', 'Extension examples': 'Eklenti örnekleri',
+  'Basics': 'Temel', 'Intermediate': 'Orta', 'Advanced': 'İleri',
+  'cell': 'hücre', 'cells': 'hücre', 'Starting…': 'Başlıyor…', 'Error': 'Hata',
+  // notebook
+  'SQL': 'SQL', 'Text': 'Metin', 'Run all': 'Tümünü çalıştır', 'Done': 'Bitti', 'running…': 'çalışıyor…', 'error': 'hata',
+  'SQL cell': 'SQL hücresi', 'Text cell': 'Metin hücresi', 'Edit text': 'Metni düzenle',
+  'Insert SQL cell below': 'Altına SQL hücresi ekle', 'Insert text cell below': 'Altına metin hücresi ekle',
+  'Move up': 'Yukarı taşı', 'Move down': 'Aşağı taşı', 'Duplicate': 'Çoğalt', 'Change to text': 'Metne çevir', 'Change to SQL': 'SQL\'e çevir',
+  'Clear output': 'Çıktıyı temizle', 'Delete cell': 'Hücreyi sil', 'Run all cells': 'Tüm hücreleri çalıştır',
+  'Share as Jupyter notebook (.ipynb)': 'Jupyter not defteri olarak paylaş (.ipynb)', 'Share as SQL script (.sql)': 'SQL betiği olarak paylaş (.sql)',
+  'Duplicate notebook': 'Not defterini çoğalt', 'Delete notebook': 'Not defterini sil', 'Delete notebook?': 'Not defteri silinsin mi?',
+  'Empty text cell — tap to edit': 'Boş metin hücresi — düzenlemek için dokunun',
+  'Write notes in Markdown…': 'Markdown ile not yazın…', 'Notebook title': 'Not defteri başlığı',
+  'These are saved results. Unlock Pro to run and edit it on your own database.': 'Bunlar kayıtlı sonuçlar. Kendi veritabanınızda çalıştırıp düzenlemek için Pro\'yu açın.',
+  'These are saved results. Open it to run and edit the cells.': 'Bunlar kayıtlı sonuçlar. Hücreleri çalıştırıp düzenlemek için açın.',
+  'Example notebook': 'Örnek not defteri', 'Unlock': 'Aç', 'Run': 'Çalıştır', 'Unlock Pro & run': 'Pro\'yu aç ve çalıştır', 'Open & run': 'Aç ve çalıştır',
+  'saved output': 'kayıtlı çıktı',
+  // results
+  'Table': 'Tablo', 'Chart': 'Grafik', 'Map': 'Harita', 'Plot': 'Grafik (vektör)', 'Bar': 'Çubuk', 'Line': 'Çizgi', 'Scatter': 'Dağılım',
+  'Export CSV': 'CSV dışa aktar', 'row': 'satır', 'rows': 'satır', 'first': 'ilk', 'affected': 'etkilendi', 'executed': 'çalıştı',
+  'statement': 'ifade', 'statements': 'ifade', 'No geometries to show.': 'Gösterilecek geometri yok.', 'Need at least two vectors.': 'En az iki vektör gerekli.',
+  'more rows — use Export CSV': 'satır daha — CSV dışa aktarın',
+  // extensions
+  'Search extensions': 'Eklentilerde ara', 'Installed in this database': 'Bu veritabanında kurulu', 'Installed': 'Kurulu', 'Get': 'Al', 'Pro': 'Pro',
+  'Unlock every extension': 'Tüm eklentileri açın', 'PostGIS, pgvector, Apache AGE and 30+ more · one-time purchase': 'PostGIS, pgvector, Apache AGE ve 30\'dan fazlası · tek seferlik',
+  'Category': 'Kategori', 'PostgreSQL': 'PostgreSQL', 'Size': 'Boyut', 'Licence': 'Lisans', 'Project': 'Proje', 'Requires': 'Gerektirir',
+  'Install': 'Kur', 'Install · Pro': 'Kur · Pro', 'Installing…': 'Kuruluyor…', 'Installing… (large, a few seconds)': 'Kuruluyor… (büyük, birkaç saniye)',
+  'Removing…': 'Kaldırılıyor…', 'Remove from database': 'Veritabanından kaldır', 'Remove': 'Kaldır', 'See example notebook': 'Örnek not defterini gör',
+  'DROP EXTENSION … CASCADE also drops columns and objects that use it.': 'DROP EXTENSION … CASCADE, onu kullanan sütunları ve nesneleri de siler.',
+  'Geospatial': 'Coğrafi', 'AI & vectors': 'Yapay zekâ ve vektörler', 'Graph': 'Graf', 'Search & text': 'Arama ve metin', 'Data types': 'Veri tipleri',
+  'Security': 'Güvenlik', 'Indexing': 'İndeksleme', 'Testing & admin': 'Test ve yönetim',
+  // databases
+  'Running': 'Çalışıyor', 'Back up': 'Yedekle', 'Restore': 'Geri yükle', 'Rename': 'Yeniden adlandır', 'Reset': 'Sıfırla', 'All databases': 'Tüm veritabanları',
+  'New database': 'Yeni veritabanı', 'Active': 'Etkin', 'No extensions installed': 'Kurulu eklenti yok', 'not saved yet': 'henüz kaydedilmedi', 'saved': 'kayıtlı',
+  'Switch to': 'Şuna geç:', 'Delete database': 'Veritabanını sil', 'Next': 'İleri', 'PostgreSQL version': 'PostgreSQL sürümü', 'Rename database': 'Veritabanını yeniden adlandır',
+  'Name': 'Ad', 'Restore this backup?': 'Bu yedek geri yüklensin mi?', 'Backup restored': 'Yedek geri yüklendi', 'Database reset': 'Veritabanı sıfırlandı',
+  'Pro is active': 'Pro etkin', 'Unlock Pro': 'Pro\'yu aç', 'Thank you for supporting Tuple': 'Tuple\'ı desteklediğiniz için teşekkürler',
+  'All extensions · one-time purchase': 'Tüm eklentiler · tek seferlik', 'Settings': 'Ayarlar', 'Appearance': 'Görünüm', 'Language': 'Dil',
+  'System': 'Sistem', 'Light': 'Açık', 'Dark': 'Koyu', 'extension': 'eklenti', 'extensions': 'eklenti',
+  'Type a name first.': 'Önce bir ad yazın.', 'Cancel': 'Vazgeç', 'OK': 'Tamam', 'Delete': 'Sil', 'Turn on': 'Aç',
+  'Restore purchase': 'Satın alımı geri yükle', 'Every extension, unlocked': 'Tüm eklentiler açık',
+  'One-time purchase. No subscription, no account.': 'Tek seferlik satın alım. Abonelik yok, hesap yok.',
+  'Maps for PostGIS results, plots for vectors': 'PostGIS sonuçları için harita, vektörler için grafik',
+  'Example notebooks for each extension': 'Her eklenti için örnek not defteri',
+  'PostgreSQL itself, notebooks, the terminal and charts stay free forever.': 'PostgreSQL\'in kendisi, not defterleri, terminal ve grafikler her zaman ücretsiz.',
+  'Pro unlocked — thank you!': 'Pro açıldı — teşekkürler!', 'is part of Pro.': 'Pro\'nun bir parçası.',
+  // Querly
+  "Files": "Dosyalar",
+  "Database": "Veritabanı",
+  "Examples": "Örnekler",
+  "Learn SQL": "SQL öğren",
+  "A short course from your first SELECT to window functions, PIVOT and writing files. Each lesson explains, runs and ends with an exercise.": "İlk SELECT'ten pencere fonksiyonlarına, PIVOT'a ve dosya yazmaya kısa bir kurs. Her ders anlatır, çalıştırır ve bir alıştırmayla biter.",
+  "this example uses Pro features.": "bu örnek Pro özellikleri kullanıyor.",
+  "Import files": "Dosya içe aktar",
+  "CSV, TSV and JSON are free. Parquet, Excel (.xlsx), SQLite and spatial files need Pro. You can also use Share › Querly in other apps, or copy files into Files › On My iPhone › Querly › Data.": "CSV, TSV ve JSON ücretsiz. Parquet, Excel (.xlsx), SQLite ve coğrafi dosyalar Pro gerektirir. Diğer uygulamalarda Paylaş › Querly'yi kullanabilir ya da dosyaları Dosyalar › iPhone'umda › Querly › Data klasörüne kopyalayabilirsiniz.",
+  "No files yet. Import a CSV, Parquet, JSON or Excel file.": "Henüz dosya yok. Bir CSV, Parquet, JSON ya da Excel dosyası içe aktarın.",
+  "Preview": "Önizle",
+  "New notebook from this file": "Bu dosyadan yeni not defteri",
+  "Load into a table": "Tabloya yükle",
+  "Table name": "Tablo adı",
+  "Load": "Yükle",
+  "Share": "Paylaş",
+  "Rename file": "Dosyayı yeniden adlandır",
+  "The file is removed from this iPhone. Tables you created from it are kept.": "Dosya bu iPhone'dan silinir. Ondan oluşturduğunuz tablolar kalır.",
+  "this file type is part of Pro.": "bu dosya türü Pro'ya dahil.",
+  "files over": "şu boyutu aşan dosyalar:",
+  "are part of Pro.": "Pro'ya dahil.",
+  "Importing": "İçe aktarılıyor:",
+  "Saved as": "Şu adla kaydedildi:",
+  "Could not import": "İçe aktarılamadı:",
+  "file imported": "dosya içe aktarıldı",
+  "files imported": "dosya içe aktarıldı",
+  "Could not open this file": "Bu dosya açılamadı",
+  "Tables and views": "Tablolar ve görünümler",
+  "table": "tablo",
+  "view": "görünüm",
+  "No tables yet. Run an example, or load a file into a table from the Files tab.": "Henüz tablo yok. Bir örnek çalıştırın ya da Dosyalar sekmesinden bir dosyayı tabloya yükleyin.",
+  "Columns": "Sütunlar",
+  "Drop": "Sil",
+  "This cannot be undone.": "Bu geri alınamaz.",
+  "Backups and restores are part of Pro.": "Yedekleme ve geri yükleme Pro'ya dahil.",
+  "is replaced by": "şununla değiştirilir:",
+  "Restore failed": "Geri yükleme başarısız",
+  "Restore a backup or reset this database.": "Bir yedeği geri yükleyin ya da bu veritabanını sıfırlayın.",
+  "All tables and views in this database are deleted. Notebooks and files are kept. This cannot be undone.": "Bu veritabanındaki tüm tablolar ve görünümler silinir. Not defterleri ve dosyalar kalır. Bu geri alınamaz.",
+  "The database and all its data are deleted. This cannot be undone.": "Veritabanı ve tüm verileri silinir. Bu geri alınamaz.",
+  "Opening": "Açılıyor:",
+  "More than one database is part of Pro.": "Birden fazla veritabanı Pro'ya dahil.",
+  "Create": "Oluştur",
+  "Thank you for supporting Querly": "Querly'yi desteklediğiniz için teşekkürler",
+  "Parquet, Excel, charts, maps · one-time purchase": "Parquet, Excel, grafikler, haritalar · tek seferlik",
+  "needs Querly Pro": "Querly Pro gerektirir",
+  "will be deleted. Tables and files are not affected.": "silinecek. Tablolar ve dosyalar etkilenmez.",
+  "DuckDB did not start — see Database": "DuckDB başlamadı — Veritabanı sekmesine bakın",
+  "Saved to Files": "Dosyalar'a kaydedildi",
+  "Export": "Dışa aktar",
+  "Export result": "Sonucu dışa aktar",
+  "Exporting…": "Dışa aktarılıyor…",
+  "Parquet, Excel and JSON export are part of Pro": "Parquet, Excel ve JSON dışa aktarma Pro'ya dahil",
+  "Charts are part of Pro": "Grafikler Pro'ya dahil",
+  "Bar, line and scatter charts for any result with numbers.": "Sayı içeren her sonuç için çubuk, çizgi ve dağılım grafikleri.",
+  "All your data, unlocked": "Tüm verileriniz, kilitsiz",
+  "Query and export Parquet files": "Parquet dosyalarını sorgulayın ve dışa aktarın",
+  "Read and write .xlsx sheets": ".xlsx sayfalarını okuyun ve yazın",
+  "Charts": "Grafikler",
+  "Bar, line and scatter charts": "Çubuk, çizgi ve dağılım grafikleri",
+  "Maps": "Haritalar",
+  "Spatial SQL with a map view": "Harita görünümlü coğrafi SQL",
+  "Open .sqlite and .db files": ".sqlite ve .db dosyalarını açın",
+  "Big files": "Büyük dosyalar",
+  "Files over": "Şu boyutu aşan dosyalar:",
+  "Export results as Parquet, Excel or JSON": "Sonuçları Parquet, Excel ya da JSON olarak dışa aktarın",
+  "More databases, backups and restores": "Daha fazla veritabanı, yedekleme ve geri yükleme",
+  "SQL, notebooks, CSV and JSON files and the lessons stay free forever.": "SQL, not defterleri, CSV ve JSON dosyaları ve dersler her zaman ücretsiz.",
+  "Welcome to Querly": "Querly'ye hoş geldiniz",
+  "Query a CSV file in place, aggregate, chart": "CSV dosyasını yerinde sorgulayın, özetleyin, grafiğe dökün",
+  "Friendly SQL": "Kolay SQL",
+  "EXCLUDE, COLUMNS, QUALIFY, PIVOT and more": "EXCLUDE, COLUMNS, QUALIFY, PIVOT ve daha fazlası",
+  "JSON and nested data": "JSON ve iç içe veri",
+  "Structs, lists, unnest, JSON functions": "Struct, liste, unnest, JSON fonksiyonları",
+  "TPC-H benchmark": "TPC-H kıyaslaması",
+  "Generate 60,000 orders and run query 1": "60.000 satır üretin ve 1. sorguyu çalıştırın",
+  "Time series": "Zaman serileri",
+  "generate_series, time_bucket, moving averages": "generate_series, time_bucket, hareketli ortalamalar",
+  "Full-text search": "Tam metin arama",
+  "BM25 ranking with the fts extension": "fts eklentisiyle BM25 sıralaması",
+  "Parquet files": "Parquet dosyaları",
+  "Convert CSV to Parquet, read metadata": "CSV'yi Parquet'e çevirin, üst verileri okuyun",
+  "Excel sheets": "Excel sayfaları",
+  "Write and read .xlsx files": ".xlsx dosyaları yazın ve okuyun",
+  "Spatial SQL": "Coğrafi SQL",
+  "Points, distances and a map": "Noktalar, mesafeler ve harita",
+};
+
+/** Translate an English UI string. */
+export function t(s: string): string {
+  return lang() === 'tr' ? TR[s] ?? s : s;
+}

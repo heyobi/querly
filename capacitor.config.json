@@ -1,0 +1,10 @@
+{
+  "appId": "com.heyobi.querly",
+  "appName": "Querly",
+  "webDir": "dist",
+  "ios": { "contentInset": "never", "scrollEnabled": true },
+  "plugins": {
+    "SplashScreen": { "launchAutoHide": false, "backgroundColor": "#0b0b0f" },
+    "Keyboard": { "resize": "native" }
+  }
+}

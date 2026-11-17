@@ -1,0 +1,43 @@
+{
+  "name": "querly",
+  "private": true,
+  "version": "1.0.0",
+  "description": "SQL notebooks for CSV, Parquet, JSON and Excel files that run entirely on your iPhone (powered by DuckDB-Wasm).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/duckdb-assets.mjs",
+    "dev": "npm run assets && vite",
+    "build": "npm run assets && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:webkit": "node tests/webkit/app.mjs",
+    "cap:sync": "npm run build && cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor-community/in-app-review": "^8.0.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/ios": "^8.6.2",
+    "@capacitor/keyboard": "^8.0.6",
+    "@capacitor/share": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "@capgo/native-purchases": "^8.9.16",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/lang-sql": "^6.10.0",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@duckdb/duckdb-wasm": "1.33.1-dev57.0",
+    "apache-arrow": "17.0.0",
+    "codemirror": "^6.0.2",
+    "marked": "^18.2.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.2",
+    "playwright": "^1.65.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}

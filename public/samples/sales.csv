@@ -1,0 +1,1501 @@
+order_id,order_date,region,customer,product,category,quantity,unit_price
+1,2025-05-28,North,C106,Espresso beans,Coffee,1,14.73
+2,2025-08-09,South,C005,Filter beans,Coffee,1,11.31
+3,2025-02-21,North,C071,Decaf beans,Coffee,2,12.55
+4,2025-07-03,South,C081,Ceramic mug,Gear,1,12.29
+5,2025-09-08,North,C029,Pour-over kit,Gear,4,35.09
+6,2025-02-01,West,C019,Ceramic mug,Gear,2,12.05
+7,2025-08-11,North,C075,Green tea,Tea,1,7.71
+8,2025-08-21,North,C073,Espresso beans,Coffee,1,14.91
+9,2025-02-08,East,C060,Espresso beans,Coffee,4,14.56
+10,2025-08-26,South,C102,Decaf beans,Coffee,2,12.85
+11,2025-04-03,East,C068,Chai,Tea,1,8.3
+12,2025-07-27,East,C078,Filter beans,Coffee,6,11.26
+13,2025-12-25,South,C097,Espresso beans,Coffee,4,15.14
+14,2025-06-04,North,C086,Pour-over kit,Gear,4,34.68
+15,2025-02-17,East,C089,Green tea,Tea,3,7.53
+16,2025-06-07,North,C108,Green tea,Tea,6,7.65
+17,2025-02-24,North,C094,Filter beans,Coffee,1,11.04
+18,2025-10-02,East,C092,Earl Grey,Tea,6,7.15
+19,2025-06-19,West,C046,Earl Grey,Tea,1,7.04
+20,2025-03-29,South,C099,Espresso beans,Coffee,1,14.62
+21,2025-05-15,West,C118,Chai,Tea,4,8.33
+22,2025-11-23,West,C071,Espresso beans,Coffee,6,15.08
+23,2025-05-11,East,C091,Espresso beans,Coffee,4,14.73
+24,2025-06-30,South,C020,Filter beans,Coffee,4,11.22
+25,2025-02-19,North,C063,Espresso beans,Coffee,2,14.56
+26,2025-11-10,North,C019,Espresso beans,Coffee,2,15.08
+27,2025-07-01,South,C089,Filter beans,Coffee,3,11.26
+28,2025-11-19,West,C116,Pour-over kit,Gear,1,35.36
+29,2025-11-22,West,C052,Grinder,Gear,4,92.56
+30,2025-06-22,North,C025,Green tea,Tea,4,7.65
+31,2025-02-12,North,C044,Espresso beans,Coffee,1,14.56
+32,2025-08-31,North,C047,Espresso beans,Coffee,1,14.91
+33,2025-09-04,West,C020,Espresso beans,Coffee,2,14.96
+34,2025-09-10,West,C016,Grinder,Gear,3,91.85
+35,2025-03-06,West,C062,Green tea,Tea,6,7.56
+36,2025-05-24,East,C062,Espresso beans,Coffee,3,14.73
+37,2025-11-10,South,C068,Espresso beans,Coffee,1,15.08
+38,2025-06-11,East,C083,Earl Grey,Tea,1,7.04
+39,2025-11-20,East,C117,Earl Grey,Tea,2,7.18
+40,2025-03-28,South,C079,Chai,Tea,3,8.27
+41,2025-11-04,South,C105,Kettle,Gear,2,61.36
+42,2025-06-25,West,C046,Chai,Tea,2,8.36
+43,2025-10-11,West,C034,Kettle,Gear,2,61.12
+44,2025-04-08,West,C104,Earl Grey,Tea,3,6.98
+45,2025-12-12,North,C029,Kettle,Gear,3,61.6
+46,2025-02-28,South,C062,Green tea,Tea,3,7.53
+47,2025-09-07,West,C117,Ceramic mug,Gear,1,12.38
+48,2025-09-16,North,C117,Chai,Tea,1,8.46
+49,2025-06-20,West,C114,Chai,Tea,2,8.36
+50,2025-04-02,North,C103,Chai,Tea,3,8.3
+51,2025-12-15,West,C096,Chai,Tea,6,8.56
+52,2025-12-15,South,C004,Chai,Tea,1,8.56
+53,2025-03-22,West,C085,Pour-over kit,Gear,1,34.27
+54,2025-12-12,North,C002,Espresso beans,Coffee,1,15.14
+55,2025-11-01,South,C056,Chai,Tea,1,8.53
+56,2025-12-27,North,C033,Espresso beans,Coffee,2,15.14
+57,2025-04-16,East,C070,Green tea,Tea,3,7.59
+58,2025-07-01,West,C085,Espresso beans,Coffee,3,14.85
+59,2025-08-25,South,C069,Pour-over kit,Gear,4,34.95
+60,2025-03-22,South,C078,Green tea,Tea,6,7.56
+61,2025-01-05,South,C061,Chai,Tea,1,8.2
+62,2025-09-06,East,C088,Espresso beans,Coffee,1,14.96
+63,2025-08-04,North,C032,Green tea,Tea,1,7.71
+64,2025-04-07,West,C072,Espresso beans,Coffee,1,14.67
+65,2025-01-21,West,C042,Ceramic mug,Gear,1,12.0
+66,2025-09-03,East,C058,Green tea,Tea,2,7.74
+67,2025-07-31,East,C119,Ceramic mug,Gear,2,12.29
+68,2025-08-17,South,C054,Pour-over kit,Gear,6,34.95
+69,2025-03-09,South,C055,Decaf beans,Coffee,1,12.6
+70,2025-02-14,South,C092,Earl Grey,Tea,1,6.93
+71,2025-09-13,South,C060,Filter beans,Coffee,2,11.35
+72,2025-04-19,West,C021,Grinder,Gear,4,90.07
+73,2025-12-28,West,C066,Ceramic mug,Gear,1,12.53
+74,2025-06-26,East,C012,Decaf beans,Coffee,3,12.75
+75,2025-10-08,West,C091,Espresso beans,Coffee,6,15.02
+76,2025-01-15,North,C015,Filter beans,Coffee,2,11.0
+77,2025-12-26,North,C034,Chai,Tea,1,8.56
+78,2025-05-09,East,C097,Pour-over kit,Gear,1,34.54
+79,2025-03-12,West,C020,Decaf beans,Coffee,2,12.6
+80,2025-08-10,East,C012,Green tea,Tea,6,7.71
+81,2025-05-12,West,C115,Chai,Tea,1,8.33
+82,2025-02-14,East,C011,Pour-over kit,Gear,1,34.14
+83,2025-09-02,North,C059,Filter beans,Coffee,2,11.35
+84,2025-01-11,East,C080,Kettle,Gear,4,59.0
+85,2025-03-12,North,C021,Green tea,Tea,2,7.56
+86,2025-05-05,East,C068,Espresso beans,Coffee,2,14.73
+87,2025-10-20,East,C045,Filter beans,Coffee,1,11.4
+88,2025-11-02,North,C003,Kettle,Gear,1,61.36
+89,2025-10-11,West,C032,Green tea,Tea,2,7.77
+90,2025-12-11,West,C070,Espresso beans,Coffee,4,15.14
+91,2025-11-11,South,C030,Decaf beans,Coffee,2,13.0
+92,2025-06-04,West,C045,Ceramic mug,Gear,1,12.24
+93,2025-12-25,North,C081,Ceramic mug,Gear,1,12.53
+94,2025-10-14,North,C011,Filter beans,Coffee,1,11.4
+95,2025-09-20,South,C089,Filter beans,Coffee,2,11.35
+96,2025-05-17,East,C058,Decaf beans,Coffee,1,12.7
+97,2025-01-05,East,C032,Filter beans,Coffee,3,11.0
+98,2025-01-25,East,C024,Ceramic mug,Gear,2,12.0
+99,2025-01-02,East,C065,Filter beans,Coffee,6,11.0
+100,2025-09-17,North,C034,Filter beans,Coffee,1,11.35
+101,2025-11-06,West,C003,Espresso beans,Coffee,1,15.08
+102,2025-05-19,South,C085,Earl Grey,Tea,1,7.01
+103,2025-11-29,East,C093,Chai,Tea,4,8.53
+104,2025-12-26,North,C106,Espresso beans,Coffee,1,15.14
+105,2025-11-12,South,C117,Ceramic mug,Gear,4,12.48
+106,2025-08-05,South,C011,Green tea,Tea,1,7.71
+107,2025-01-23,North,C049,Espresso beans,Coffee,3,14.5
+108,2025-11-12,South,C063,Green tea,Tea,1,7.8
+109,2025-05-06,North,C085,Decaf beans,Coffee,1,12.7
+110,2025-08-06,East,C104,Chai,Tea,6,8.43
+111,2025-02-15,South,C095,Filter beans,Coffee,2,11.04
+112,2025-09-15,North,C062,Decaf beans,Coffee,4,12.9
+113,2025-12-04,South,C010,Filter beans,Coffee,1,11.48
+114,2025-08-30,South,C002,Filter beans,Coffee,2,11.31
+115,2025-07-23,South,C087,Green tea,Tea,1,7.68
+116,2025-07-25,West,C060,Chai,Tea,2,8.4
+117,2025-07-17,East,C011,Espresso beans,Coffee,2,14.85
+118,2025-12-12,North,C105,Espresso beans,Coffee,6,15.14
+119,2025-07-31,West,C027,Kettle,Gear,2,60.42
+120,2025-12-06,North,C019,Pour-over kit,Gear,1,35.5
+121,2025-10-16,South,C078,Filter beans,Coffee,3,11.4
+122,2025-11-07,East,C030,Green tea,Tea,1,7.8
+123,2025-07-28,North,C021,Ceramic mug,Gear,4,12.29
+124,2025-01-05,West,C039,Green tea,Tea,6,7.5
+125,2025-10-10,East,C016,Decaf beans,Coffee,4,12.95
+126,2025-11-13,West,C016,Espresso beans,Coffee,3,15.08
+127,2025-12-13,East,C033,Espresso beans,Coffee,1,15.14
+128,2025-06-15,East,C119,Decaf beans,Coffee,1,12.75
+129,2025-07-04,East,C014,Filter beans,Coffee,1,11.26
+130,2025-02-03,South,C035,Earl Grey,Tea,1,6.93
+131,2025-07-07,West,C114,Filter beans,Coffee,3,11.26
+132,2025-01-22,South,C093,Chai,Tea,4,8.2
+133,2025-02-18,West,C079,Pour-over kit,Gear,4,34.14
+134,2025-10-17,West,C007,Earl Grey,Tea,2,7.15
+135,2025-12-05,West,C054,Green tea,Tea,1,7.83
+136,2025-06-04,West,C084,Filter beans,Coffee,2,11.22
+137,2025-04-26,North,C022,Green tea,Tea,4,7.59
+138,2025-09-13,South,C058,Espresso beans,Coffee,6,14.96
+139,2025-12-03,West,C018,Kettle,Gear,6,61.6
+140,2025-08-13,East,C072,Filter beans,Coffee,1,11.31
+141,2025-02-23,South,C114,Filter beans,Coffee,2,11.04
+142,2025-01-16,West,C096,Ceramic mug,Gear,4,12.0
+143,2025-08-06,North,C064,Filter beans,Coffee,3,11.31
+144,2025-05-11,South,C012,Grinder,Gear,1,90.42
+145,2025-05-09,West,C056,Filter beans,Coffee,4,11.18
+146,2025-12-17,South,C005,Ceramic mug,Gear,1,12.53
+147,2025-07-03,West,C001,Chai,Tea,6,8.4
+148,2025-02-14,West,C032,Pour-over kit,Gear,6,34.14
+149,2025-10-27,North,C106,Filter beans,Coffee,1,11.4
+150,2025-10-08,North,C071,Earl Grey,Tea,6,7.15
+151,2025-10-25,South,C073,Espresso beans,Coffee,1,15.02
+152,2025-12-07,South,C081,Earl Grey,Tea,2,7.2
+153,2025-05-01,North,C010,Earl Grey,Tea,1,7.01
+154,2025-05-20,West,C034,Pour-over kit,Gear,2,34.54
+155,2025-04-20,East,C059,Earl Grey,Tea,1,6.98
+156,2025-05-11,West,C068,Filter beans,Coffee,2,11.18
+157,2025-04-25,East,C008,Filter beans,Coffee,4,11.13
+158,2025-01-18,North,C033,Green tea,Tea,4,7.5
+159,2025-04-22,South,C064,Decaf beans,Coffee,3,12.65
+160,2025-01-25,East,C088,Filter beans,Coffee,4,11.0
+161,2025-06-23,North,C027,Espresso beans,Coffee,2,14.79
+162,2025-07-27,South,C060,Espresso beans,Coffee,2,14.85
+163,2025-04-19,North,C080,Chai,Tea,2,8.3
+164,2025-07-27,West,C054,Espresso beans,Coffee,2,14.85
+165,2025-12-04,West,C007,Espresso beans,Coffee,1,15.14
+166,2025-04-16,West,C007,Grinder,Gear,1,90.07
+167,2025-10-04,East,C094,Espresso beans,Coffee,6,15.02
+168,2025-03-05,East,C025,Espresso beans,Coffee,1,14.62
+169,2025-04-05,North,C040,Pour-over kit,Gear,6,34.41
+170,2025-09-20,East,C057,Filter beans,Coffee,3,11.35
+171,2025-03-29,North,C045,Espresso beans,Coffee,2,14.62
+172,2025-07-01,West,C046,Ceramic mug,Gear,2,12.29
+173,2025-10-22,North,C007,Filter beans,Coffee,4,11.4
+174,2025-10-03,South,C042,Espresso beans,Coffee,6,15.02
+175,2025-06-12,West,C032,Ceramic mug,Gear,1,12.24
+176,2025-11-05,West,C005,Chai,Tea,1,8.53
+177,2025-07-16,East,C025,Chai,Tea,1,8.4
+178,2025-10-16,East,C035,Ceramic mug,Gear,3,12.43
+179,2025-06-01,East,C096,Grinder,Gear,1,90.78
+180,2025-10-06,East,C001,Filter beans,Coffee,2,11.4
+181,2025-10-08,North,C106,Earl Grey,Tea,1,7.15
+182,2025-04-24,West,C102,Green tea,Tea,6,7.59
+183,2025-05-01,South,C119,Decaf beans,Coffee,6,12.7
+184,2025-07-27,South,C078,Espresso beans,Coffee,2,14.85
+185,2025-04-25,East,C101,Ceramic mug,Gear,6,12.14
+186,2025-10-27,West,C097,Espresso beans,Coffee,2,15.02
+187,2025-03-25,West,C071,Decaf beans,Coffee,1,12.6
+188,2025-08-12,North,C010,Espresso beans,Coffee,4,14.91
+189,2025-05-06,West,C064,Espresso beans,Coffee,1,14.73
+190,2025-12-27,South,C018,Grinder,Gear,1,92.92
+191,2025-06-30,North,C100,Earl Grey,Tea,2,7.04
+192,2025-11-13,East,C033,Filter beans,Coffee,2,11.44
+193,2025-10-13,South,C032,Espresso beans,Coffee,2,15.02
+194,2025-04-25,East,C009,Filter beans,Coffee,2,11.13
+195,2025-06-23,North,C084,Kettle,Gear,2,60.18
+196,2025-07-16,West,C114,Espresso beans,Coffee,1,14.85
+197,2025-11-07,North,C113,Ceramic mug,Gear,3,12.48
+198,2025-05-17,South,C120,Espresso beans,Coffee,2,14.73
+199,2025-02-15,West,C078,Green tea,Tea,1,7.53
+200,2025-05-04,North,C082,Chai,Tea,1,8.33
+201,2025-08-29,North,C048,Earl Grey,Tea,2,7.09
+202,2025-06-03,North,C077,Espresso beans,Coffee,2,14.79
+203,2025-10-11,East,C053,Pour-over kit,Gear,1,35.22
+204,2025-09-24,North,C027,Espresso beans,Coffee,2,14.96
+205,2025-01-23,North,C053,Green tea,Tea,6,7.5
+206,2025-02-28,North,C084,Decaf beans,Coffee,1,12.55
+207,2025-03-27,East,C086,Earl Grey,Tea,4,6.96
+208,2025-05-22,East,C054,Grinder,Gear,2,90.42
+209,2025-06-30,South,C051,Ceramic mug,Gear,3,12.24
+210,2025-10-10,West,C116,Espresso beans,Coffee,1,15.02
+211,2025-03-24,West,C074,Espresso beans,Coffee,1,14.62
+212,2025-11-26,South,C002,Decaf beans,Coffee,1,13.0
+213,2025-02-04,North,C074,Espresso beans,Coffee,4,14.56
+214,2025-09-07,South,C045,Filter beans,Coffee,1,11.35
+215,2025-05-13,North,C050,Green tea,Tea,1,7.62
+216,2025-07-25,East,C017,Chai,Tea,2,8.4
+217,2025-11-12,East,C007,Espresso beans,Coffee,6,15.08
+218,2025-09-02,South,C082,Earl Grey,Tea,1,7.12
+219,2025-10-28,South,C107,Filter beans,Coffee,4,11.4
+220,2025-07-19,West,C067,Green tea,Tea,1,7.68
+221,2025-03-24,South,C093,Filter beans,Coffee,1,11.09
+222,2025-11-06,East,C016,Espresso beans,Coffee,1,15.08
+223,2025-06-21,West,C040,Decaf beans,Coffee,2,12.75
+224,2025-08-25,West,C065,Decaf beans,Coffee,3,12.85
+225,2025-07-08,West,C031,Espresso beans,Coffee,6,14.85
+226,2025-07-11,South,C104,Earl Grey,Tea,6,7.07
+227,2025-07-20,East,C056,Espresso beans,Coffee,1,14.85
+228,2025-06-12,North,C082,Chai,Tea,1,8.36
+229,2025-03-13,North,C007,Pour-over kit,Gear,3,34.27
+230,2025-10-17,North,C110,Ceramic mug,Gear,1,12.43
+231,2025-02-11,South,C017,Earl Grey,Tea,1,6.93
+232,2025-12-25,South,C009,Green tea,Tea,1,7.83
+233,2025-11-11,South,C042,Earl Grey,Tea,2,7.18
+234,2025-11-30,South,C033,Filter beans,Coffee,6,11.44
+235,2025-07-29,East,C079,Pour-over kit,Gear,2,34.82
+236,2025-07-31,South,C024,Filter beans,Coffee,1,11.26
+237,2025-06-26,East,C115,Earl Grey,Tea,2,7.04
+238,2025-06-16,North,C099,Chai,Tea,2,8.36
+239,2025-08-08,West,C072,Earl Grey,Tea,3,7.09
+240,2025-08-05,East,C069,Earl Grey,Tea,1,7.09
+241,2025-09-09,East,C049,Decaf beans,Coffee,3,12.9
+242,2025-12-28,East,C098,Green tea,Tea,3,7.83
+243,2025-02-18,East,C105,Filter beans,Coffee,1,11.04
+244,2025-08-03,North,C096,Filter beans,Coffee,3,11.31
+245,2025-01-25,West,C066,Espresso beans,Coffee,4,14.5
+246,2025-06-12,South,C079,Espresso beans,Coffee,6,14.79
+247,2025-09-16,East,C039,Espresso beans,Coffee,1,14.96
+248,2025-03-02,West,C075,Filter beans,Coffee,2,11.09
+249,2025-05-20,West,C021,Espresso beans,Coffee,3,14.73
+250,2025-03-15,South,C058,Pour-over kit,Gear,2,34.27
+251,2025-02-25,West,C104,Earl Grey,Tea,2,6.93
+252,2025-05-06,West,C078,Espresso beans,Coffee,3,14.73
+253,2025-12-12,South,C116,Chai,Tea,2,8.56
+254,2025-01-01,West,C024,Espresso beans,Coffee,1,14.5
+255,2025-04-26,North,C079,Espresso beans,Coffee,1,14.67
+256,2025-08-14,West,C026,Pour-over kit,Gear,1,34.95
+257,2025-08-04,South,C066,Earl Grey,Tea,4,7.09
+258,2025-05-23,West,C092,Filter beans,Coffee,1,11.18
+259,2025-08-10,West,C011,Filter beans,Coffee,4,11.31
+260,2025-10-14,North,C034,Decaf beans,Coffee,2,12.95
+261,2025-04-24,East,C092,Espresso beans,Coffee,3,14.67
+262,2025-02-04,East,C038,Earl Grey,Tea,4,6.93
+263,2025-09-13,North,C113,Grinder,Gear,2,91.85
+264,2025-07-31,South,C021,Espresso beans,Coffee,2,14.85
+265,2025-10-15,East,C077,Filter beans,Coffee,4,11.4
+266,2025-04-26,West,C108,Pour-over kit,Gear,6,34.41
+267,2025-08-08,West,C093,Espresso beans,Coffee,1,14.91
+268,2025-04-24,West,C080,Ceramic mug,Gear,2,12.14
+269,2025-08-26,South,C005,Green tea,Tea,1,7.71
+270,2025-01-21,East,C019,Espresso beans,Coffee,1,14.5
+271,2025-10-01,North,C090,Espresso beans,Coffee,1,15.02
+272,2025-02-12,South,C105,Espresso beans,Coffee,3,14.56
+273,2025-12-17,West,C014,Green tea,Tea,1,7.83
+274,2025-04-29,North,C109,Espresso beans,Coffee,1,14.67
+275,2025-12-04,East,C062,Chai,Tea,1,8.56
+276,2025-02-27,East,C041,Espresso beans,Coffee,2,14.56
+277,2025-06-02,East,C120,Filter beans,Coffee,3,11.22
+278,2025-05-13,East,C099,Chai,Tea,3,8.33
+279,2025-12-20,North,C101,Green tea,Tea,2,7.83
+280,2025-06-29,East,C061,Decaf beans,Coffee,1,12.75
+281,2025-10-03,North,C074,Green tea,Tea,2,7.77
+282,2025-11-07,South,C037,Espresso beans,Coffee,1,15.08
+283,2025-10-20,East,C063,Kettle,Gear,1,61.12
+284,2025-02-25,West,C076,Earl Grey,Tea,1,6.93
+285,2025-06-06,South,C037,Ceramic mug,Gear,2,12.24
+286,2025-11-06,West,C022,Pour-over kit,Gear,2,35.36
+287,2025-03-04,West,C101,Earl Grey,Tea,1,6.96
+288,2025-12-28,East,C046,Green tea,Tea,1,7.83
+289,2025-02-25,West,C114,Pour-over kit,Gear,1,34.14
+290,2025-09-14,East,C055,Filter beans,Coffee,2,11.35
+291,2025-12-01,South,C059,Green tea,Tea,4,7.83
+292,2025-03-11,East,C075,Earl Grey,Tea,1,6.96
+293,2025-05-29,East,C022,Espresso beans,Coffee,6,14.73
+294,2025-07-16,South,C017,Earl Grey,Tea,2,7.07
+295,2025-06-01,South,C035,Earl Grey,Tea,2,7.04
+296,2025-05-20,South,C032,Earl Grey,Tea,1,7.01
+297,2025-10-08,South,C031,Earl Grey,Tea,3,7.15
+298,2025-05-30,South,C085,Espresso beans,Coffee,1,14.73
+299,2025-02-28,East,C094,Filter beans,Coffee,1,11.04
+300,2025-05-18,North,C036,Filter beans,Coffee,1,11.18
+301,2025-04-14,North,C052,Filter beans,Coffee,1,11.13
+302,2025-11-17,East,C060,Decaf beans,Coffee,2,13.0
+303,2025-01-18,North,C095,Filter beans,Coffee,4,11.0
+304,2025-04-28,South,C086,Ceramic mug,Gear,4,12.14
+305,2025-10-08,South,C083,Ceramic mug,Gear,2,12.43
+306,2025-03-10,North,C115,Decaf beans,Coffee,2,12.6
+307,2025-07-01,East,C109,Chai,Tea,1,8.4
+308,2025-07-03,South,C115,Decaf beans,Coffee,4,12.8
+309,2025-09-17,West,C117,Chai,Tea,4,8.46
+310,2025-12-23,South,C092,Espresso beans,Coffee,2,15.14
+311,2025-10-26,North,C109,Pour-over kit,Gear,3,35.22
+312,2025-08-22,North,C082,Green tea,Tea,6,7.71
+313,2025-10-30,West,C095,Filter beans,Coffee,3,11.4
+314,2025-12-15,West,C066,Espresso beans,Coffee,1,15.14
+315,2025-10-21,North,C033,Espresso beans,Coffee,3,15.02
+316,2025-05-10,North,C054,Decaf beans,Coffee,1,12.7
+317,2025-12-06,East,C014,Earl Grey,Tea,3,7.2
+318,2025-04-21,West,C060,Chai,Tea,2,8.3
+319,2025-04-16,South,C061,Espresso beans,Coffee,1,14.67
+320,2025-09-13,East,C086,Chai,Tea,1,8.46
+321,2025-09-12,West,C038,Ceramic mug,Gear,4,12.38
+322,2025-10-20,East,C101,Earl Grey,Tea,6,7.15
+323,2025-11-16,East,C055,Filter beans,Coffee,4,11.44
+324,2025-09-24,East,C032,Green tea,Tea,2,7.74
+325,2025-09-17,West,C080,Filter beans,Coffee,6,11.35
+326,2025-09-11,South,C119,Earl Grey,Tea,3,7.12
+327,2025-05-21,East,C101,Filter beans,Coffee,1,11.18
+328,2025-12-14,North,C085,Green tea,Tea,3,7.83
+329,2025-01-11,East,C078,Grinder,Gear,2,89.0
+330,2025-02-28,South,C100,Espresso beans,Coffee,2,14.56
+331,2025-07-12,West,C102,Chai,Tea,2,8.4
+332,2025-08-09,East,C026,Earl Grey,Tea,1,7.09
+333,2025-07-27,West,C086,Espresso beans,Coffee,1,14.85
+334,2025-11-26,West,C030,Green tea,Tea,2,7.8
+335,2025-11-09,West,C060,Green tea,Tea,1,7.8
+336,2025-12-03,West,C022,Earl Grey,Tea,2,7.2
+337,2025-08-11,South,C108,Ceramic mug,Gear,1,12.34
+338,2025-05-27,East,C108,Earl Grey,Tea,6,7.01
+339,2025-07-17,South,C082,Decaf beans,Coffee,1,12.8
+340,2025-06-10,North,C088,Earl Grey,Tea,1,7.04
+341,2025-10-13,West,C063,Kettle,Gear,1,61.12
+342,2025-10-19,West,C081,Espresso beans,Coffee,2,15.02
+343,2025-03-11,East,C061,Espresso beans,Coffee,3,14.62
+344,2025-10-25,East,C056,Green tea,Tea,2,7.77
+345,2025-06-04,East,C038,Filter beans,Coffee,1,11.22
+346,2025-06-09,East,C112,Green tea,Tea,3,7.65
+347,2025-07-31,North,C043,Grinder,Gear,6,91.14
+348,2025-04-08,North,C101,Chai,Tea,1,8.3
+349,2025-12-29,North,C052,Decaf beans,Coffee,4,13.05
+350,2025-05-20,West,C078,Espresso beans,Coffee,2,14.73
+351,2025-10-22,South,C081,Espresso beans,Coffee,4,15.02
+352,2025-09-23,South,C006,Earl Grey,Tea,1,7.12
+353,2025-09-21,North,C085,Decaf beans,Coffee,1,12.9
+354,2025-04-03,North,C048,Espresso beans,Coffee,1,14.67
+355,2025-11-23,East,C111,Espresso beans,Coffee,2,15.08
+356,2025-05-20,North,C056,Decaf beans,Coffee,3,12.7
+357,2025-08-19,West,C073,Green tea,Tea,1,7.71
+358,2025-08-05,West,C058,Ceramic mug,Gear,4,12.34
+359,2025-02-11,West,C099,Earl Grey,Tea,1,6.93
+360,2025-06-29,South,C115,Espresso beans,Coffee,6,14.79
+361,2025-03-22,North,C088,Espresso beans,Coffee,1,14.62
+362,2025-09-22,South,C112,Kettle,Gear,1,60.89
+363,2025-03-09,South,C058,Green tea,Tea,2,7.56
+364,2025-10-12,East,C100,Espresso beans,Coffee,1,15.02
+365,2025-10-16,North,C038,Earl Grey,Tea,1,7.15
+366,2025-09-09,East,C117,Chai,Tea,6,8.46
+367,2025-12-20,North,C002,Chai,Tea,1,8.56
+368,2025-11-26,West,C040,Earl Grey,Tea,1,7.18
+369,2025-05-24,North,C041,Earl Grey,Tea,6,7.01
+370,2025-06-13,West,C087,Green tea,Tea,6,7.65
+371,2025-03-28,East,C083,Grinder,Gear,1,89.71
+372,2025-03-27,West,C100,Chai,Tea,6,8.27
+373,2025-10-28,East,C036,Pour-over kit,Gear,3,35.22
+374,2025-02-08,North,C107,Grinder,Gear,3,89.36
+375,2025-03-22,South,C049,Ceramic mug,Gear,4,12.1
+376,2025-06-20,West,C037,Filter beans,Coffee,2,11.22
+377,2025-09-28,West,C021,Filter beans,Coffee,2,11.35
+378,2025-08-26,East,C107,Ceramic mug,Gear,1,12.34
+379,2025-03-17,East,C109,Ceramic mug,Gear,1,12.1
+380,2025-10-31,East,C069,Green tea,Tea,6,7.77
+381,2025-02-20,South,C101,Green tea,Tea,4,7.53
+382,2025-10-17,East,C078,Pour-over kit,Gear,2,35.22
+383,2025-02-07,East,C076,Decaf beans,Coffee,2,12.55
+384,2025-10-17,North,C069,Chai,Tea,6,8.5
+385,2025-11-03,West,C075,Chai,Tea,2,8.53
+386,2025-08-05,West,C065,Filter beans,Coffee,3,11.31
+387,2025-08-27,North,C024,Espresso beans,Coffee,2,14.91
+388,2025-11-03,West,C100,Filter beans,Coffee,3,11.44
+389,2025-08-03,West,C048,Espresso beans,Coffee,1,14.91
+390,2025-11-21,North,C020,Filter beans,Coffee,6,11.44
+391,2025-05-25,North,C013,Espresso beans,Coffee,2,14.73
+392,2025-01-25,South,C034,Kettle,Gear,6,59.0
+393,2025-12-09,West,C099,Filter beans,Coffee,1,11.48
+394,2025-08-28,East,C108,Earl Grey,Tea,1,7.09
+395,2025-01-27,West,C011,Espresso beans,Coffee,1,14.5
+396,2025-01-21,West,C063,Espresso beans,Coffee,3,14.5
+397,2025-12-15,West,C119,Pour-over kit,Gear,1,35.5
+398,2025-03-08,East,C073,Grinder,Gear,2,89.71
+399,2025-04-24,South,C058,Espresso beans,Coffee,4,14.67
+400,2025-11-16,South,C023,Filter beans,Coffee,2,11.44
+401,2025-01-27,North,C116,Filter beans,Coffee,3,11.0
+402,2025-08-15,East,C101,Espresso beans,Coffee,1,14.91
+403,2025-08-02,North,C013,Chai,Tea,6,8.43
+404,2025-03-19,East,C076,Chai,Tea,2,8.27
+405,2025-08-28,West,C042,Chai,Tea,1,8.43
+406,2025-06-14,West,C049,Filter beans,Coffee,3,11.22
+407,2025-03-29,North,C060,Filter beans,Coffee,1,11.09
+408,2025-10-07,South,C119,Espresso beans,Coffee,1,15.02
+409,2025-11-11,South,C100,Espresso beans,Coffee,3,15.08
+410,2025-07-11,North,C081,Espresso beans,Coffee,4,14.85
+411,2025-02-15,South,C062,Grinder,Gear,3,89.36
+412,2025-03-06,South,C095,Filter beans,Coffee,3,11.09
+413,2025-02-06,West,C112,Chai,Tea,1,8.23
+414,2025-03-21,South,C004,Decaf beans,Coffee,2,12.6
+415,2025-05-09,South,C034,Ceramic mug,Gear,3,12.19
+416,2025-07-26,North,C020,Filter beans,Coffee,6,11.26
+417,2025-12-24,West,C107,Espresso beans,Coffee,2,15.14
+418,2025-05-14,East,C056,Filter beans,Coffee,2,11.18
+419,2025-12-28,North,C050,Kettle,Gear,2,61.6
+420,2025-05-16,East,C019,Ceramic mug,Gear,1,12.19
+421,2025-12-24,South,C057,Espresso beans,Coffee,3,15.14
+422,2025-01-03,South,C047,Ceramic mug,Gear,2,12.0
+423,2025-07-07,East,C074,Pour-over kit,Gear,2,34.82
+424,2025-04-03,South,C026,Ceramic mug,Gear,2,12.14
+425,2025-08-31,East,C023,Ceramic mug,Gear,6,12.34
+426,2025-04-13,East,C026,Earl Grey,Tea,2,6.98
+427,2025-01-10,North,C067,Earl Grey,Tea,4,6.9
+428,2025-11-04,North,C002,Filter beans,Coffee,6,11.44
+429,2025-06-28,East,C032,Chai,Tea,1,8.36
+430,2025-04-05,North,C021,Ceramic mug,Gear,3,12.14
+431,2025-10-02,East,C067,Green tea,Tea,1,7.77
+432,2025-12-11,North,C046,Grinder,Gear,1,92.92
+433,2025-10-06,West,C074,Ceramic mug,Gear,3,12.43
+434,2025-10-17,West,C058,Espresso beans,Coffee,1,15.02
+435,2025-08-02,North,C032,Green tea,Tea,1,7.71
+436,2025-12-21,South,C014,Filter beans,Coffee,1,11.48
+437,2025-05-24,North,C013,Green tea,Tea,1,7.62
+438,2025-12-09,North,C108,Chai,Tea,2,8.56
+439,2025-08-30,West,C014,Green tea,Tea,2,7.71
+440,2025-06-07,North,C035,Espresso beans,Coffee,1,14.79
+441,2025-03-10,North,C016,Green tea,Tea,2,7.56
+442,2025-03-09,South,C019,Ceramic mug,Gear,2,12.1
+443,2025-09-21,South,C106,Decaf beans,Coffee,4,12.9
+444,2025-01-15,North,C051,Earl Grey,Tea,4,6.9
+445,2025-12-22,East,C052,Espresso beans,Coffee,3,15.14
+446,2025-04-27,East,C105,Filter beans,Coffee,4,11.13
+447,2025-06-25,South,C088,Green tea,Tea,3,7.65
+448,2025-12-11,North,C047,Filter beans,Coffee,4,11.48
+449,2025-03-03,West,C026,Espresso beans,Coffee,3,14.62
+450,2025-07-30,West,C051,Espresso beans,Coffee,1,14.85
+451,2025-10-25,North,C005,Pour-over kit,Gear,1,35.22
+452,2025-11-21,North,C080,Earl Grey,Tea,2,7.18
+453,2025-02-27,West,C031,Espresso beans,Coffee,1,14.56
+454,2025-12-16,East,C083,Filter beans,Coffee,2,11.48
+455,2025-03-28,North,C060,Espresso beans,Coffee,2,14.62
+456,2025-08-27,North,C066,Pour-over kit,Gear,6,34.95
+457,2025-03-13,East,C036,Filter beans,Coffee,4,11.09
+458,2025-04-28,West,C079,Espresso beans,Coffee,2,14.67
+459,2025-09-30,South,C071,Filter beans,Coffee,4,11.35
+460,2025-10-04,West,C061,Decaf beans,Coffee,2,12.95
+461,2025-11-07,South,C025,Espresso beans,Coffee,3,15.08
+462,2025-08-02,North,C119,Filter beans,Coffee,4,11.31
+463,2025-06-08,East,C072,Ceramic mug,Gear,2,12.24
+464,2025-05-29,East,C008,Filter beans,Coffee,2,11.18
+465,2025-10-23,East,C057,Espresso beans,Coffee,1,15.02
+466,2025-09-18,East,C095,Green tea,Tea,6,7.74
+467,2025-10-21,West,C044,Green tea,Tea,1,7.77
+468,2025-09-21,East,C106,Espresso beans,Coffee,2,14.96
+469,2025-11-13,East,C101,Espresso beans,Coffee,6,15.08
+470,2025-09-09,West,C112,Earl Grey,Tea,1,7.12
+471,2025-03-01,West,C051,Decaf beans,Coffee,1,12.6
+472,2025-12-20,East,C112,Green tea,Tea,4,7.83
+473,2025-09-06,West,C037,Espresso beans,Coffee,6,14.96
+474,2025-10-08,West,C083,Filter beans,Coffee,4,11.4
+475,2025-05-28,West,C057,Chai,Tea,6,8.33
+476,2025-05-19,West,C074,Green tea,Tea,1,7.62
+477,2025-06-16,East,C108,Filter beans,Coffee,3,11.22
+478,2025-09-02,South,C055,Filter beans,Coffee,3,11.35
+479,2025-11-28,North,C033,Grinder,Gear,1,92.56
+480,2025-08-19,West,C067,Green tea,Tea,2,7.71
+481,2025-11-09,West,C060,Chai,Tea,4,8.53
+482,2025-06-09,West,C002,Earl Grey,Tea,3,7.04
+483,2025-09-24,West,C048,Green tea,Tea,1,7.74
+484,2025-07-29,South,C054,Earl Grey,Tea,1,7.07
+485,2025-07-24,North,C022,Decaf beans,Coffee,3,12.8
+486,2025-06-11,East,C066,Filter beans,Coffee,1,11.22
+487,2025-04-01,East,C106,Earl Grey,Tea,2,6.98
+488,2025-12-12,South,C068,Green tea,Tea,4,7.83
+489,2025-05-16,West,C024,Green tea,Tea,2,7.62
+490,2025-02-08,East,C073,Green tea,Tea,1,7.53
+491,2025-12-29,West,C002,Earl Grey,Tea,1,7.2
+492,2025-10-28,East,C051,Filter beans,Coffee,1,11.4
+493,2025-11-14,South,C023,Earl Grey,Tea,1,7.18
+494,2025-07-28,South,C074,Green tea,Tea,2,7.68
+495,2025-04-10,South,C067,Earl Grey,Tea,1,6.98
+496,2025-10-20,North,C022,Espresso beans,Coffee,1,15.02
+497,2025-12-15,West,C104,Green tea,Tea,6,7.83
+498,2025-11-01,South,C092,Earl Grey,Tea,3,7.18
+499,2025-04-26,East,C081,Filter beans,Coffee,1,11.13
+500,2025-02-27,East,C025,Pour-over kit,Gear,1,34.14
+501,2025-07-12,South,C114,Filter beans,Coffee,1,11.26
+502,2025-06-23,West,C007,Chai,Tea,1,8.36
+503,2025-09-06,South,C120,Filter beans,Coffee,1,11.35
+504,2025-08-26,West,C039,Espresso beans,Coffee,1,14.91
+505,2025-07-01,North,C032,Filter beans,Coffee,6,11.26
+506,2025-09-24,West,C040,Earl Grey,Tea,2,7.12
+507,2025-06-24,South,C012,Chai,Tea,1,8.36
+508,2025-03-31,North,C113,Filter beans,Coffee,1,11.09
+509,2025-05-16,East,C069,Green tea,Tea,1,7.62
+510,2025-11-23,North,C055,Filter beans,Coffee,1,11.44
+511,2025-11-09,West,C025,Filter beans,Coffee,2,11.44
+512,2025-07-17,North,C036,Filter beans,Coffee,4,11.26
+513,2025-09-20,South,C091,Filter beans,Coffee,1,11.35
+514,2025-03-13,West,C060,Espresso beans,Coffee,1,14.62
+515,2025-11-12,East,C046,Ceramic mug,Gear,1,12.48
+516,2025-04-18,East,C061,Decaf beans,Coffee,2,12.65
+517,2025-07-30,South,C091,Filter beans,Coffee,6,11.26
+518,2025-12-30,East,C069,Earl Grey,Tea,6,7.2
+519,2025-04-29,South,C112,Earl Grey,Tea,2,6.98
+520,2025-10-17,East,C095,Earl Grey,Tea,1,7.15
+521,2025-10-23,East,C002,Filter beans,Coffee,1,11.4
+522,2025-06-21,South,C042,Espresso beans,Coffee,1,14.79
+523,2025-04-06,East,C104,Ceramic mug,Gear,1,12.14
+524,2025-07-29,East,C012,Filter beans,Coffee,1,11.26
+525,2025-04-21,East,C046,Espresso beans,Coffee,4,14.67
+526,2025-06-26,East,C023,Pour-over kit,Gear,1,34.68
+527,2025-01-22,West,C004,Earl Grey,Tea,3,6.9
+528,2025-09-18,West,C046,Earl Grey,Tea,2,7.12
+529,2025-12-03,North,C035,Espresso beans,Coffee,2,15.14
+530,2025-12-05,West,C006,Chai,Tea,1,8.56
+531,2025-09-02,South,C049,Decaf beans,Coffee,2,12.9
+532,2025-10-13,South,C073,Green tea,Tea,1,7.77
+533,2025-07-28,East,C120,Green tea,Tea,4,7.68
+534,2025-01-02,North,C113,Ceramic mug,Gear,2,12.0
+535,2025-11-17,South,C088,Earl Grey,Tea,1,7.18
+536,2025-03-04,East,C096,Chai,Tea,2,8.27
+537,2025-12-05,South,C036,Decaf beans,Coffee,4,13.05
+538,2025-08-07,West,C120,Filter beans,Coffee,4,11.31
+539,2025-06-03,North,C087,Green tea,Tea,6,7.65
+540,2025-10-01,West,C098,Decaf beans,Coffee,1,12.95
+541,2025-04-07,South,C070,Grinder,Gear,2,90.07
+542,2025-03-27,East,C032,Chai,Tea,2,8.27
+543,2025-12-20,West,C012,Espresso beans,Coffee,3,15.14
+544,2025-04-12,West,C086,Filter beans,Coffee,1,11.13
+545,2025-07-23,West,C018,Earl Grey,Tea,1,7.07
+546,2025-12-12,South,C114,Filter beans,Coffee,2,11.48
+547,2025-10-04,East,C081,Earl Grey,Tea,2,7.15
+548,2025-11-06,South,C077,Green tea,Tea,1,7.8
+549,2025-12-24,South,C015,Ceramic mug,Gear,4,12.53
+550,2025-09-28,South,C006,Espresso beans,Coffee,6,14.96
+551,2025-02-08,North,C090,Filter beans,Coffee,2,11.04
+552,2025-05-23,East,C057,Grinder,Gear,1,90.42
+553,2025-07-18,North,C006,Filter beans,Coffee,1,11.26
+554,2025-01-10,North,C096,Kettle,Gear,6,59.0
+555,2025-10-06,North,C083,Kettle,Gear,2,61.12
+556,2025-07-25,East,C002,Decaf beans,Coffee,2,12.8
+557,2025-06-10,East,C084,Espresso beans,Coffee,2,14.79
+558,2025-04-29,North,C100,Espresso beans,Coffee,1,14.67
+559,2025-06-23,South,C082,Espresso beans,Coffee,3,14.79
+560,2025-08-06,North,C101,Ceramic mug,Gear,1,12.34
+561,2025-10-07,West,C024,Filter beans,Coffee,3,11.4
+562,2025-09-15,East,C018,Filter beans,Coffee,2,11.35
+563,2025-08-14,South,C008,Filter beans,Coffee,2,11.31
+564,2025-01-29,North,C028,Green tea,Tea,4,7.5
+565,2025-07-27,East,C078,Green tea,Tea,1,7.68
+566,2025-08-24,South,C018,Espresso beans,Coffee,2,14.91
+567,2025-07-09,North,C109,Grinder,Gear,1,91.14
+568,2025-07-08,North,C005,Espresso beans,Coffee,3,14.85
+569,2025-11-13,South,C037,Ceramic mug,Gear,4,12.48
+570,2025-02-14,East,C009,Espresso beans,Coffee,4,14.56
+571,2025-07-08,South,C049,Earl Grey,Tea,1,7.07
+572,2025-05-18,South,C061,Decaf beans,Coffee,3,12.7
+573,2025-02-20,West,C069,Filter beans,Coffee,6,11.04
+574,2025-12-04,North,C104,Ceramic mug,Gear,4,12.53
+575,2025-11-04,East,C073,Chai,Tea,3,8.53
+576,2025-08-21,South,C039,Grinder,Gear,6,91.49
+577,2025-11-21,South,C029,Green tea,Tea,1,7.8
+578,2025-09-24,South,C085,Decaf beans,Coffee,1,12.9
+579,2025-08-24,East,C068,Green tea,Tea,4,7.71
+580,2025-04-27,North,C030,Decaf beans,Coffee,2,12.65
+581,2025-04-03,South,C111,Ceramic mug,Gear,1,12.14
+582,2025-11-12,East,C091,Earl Grey,Tea,2,7.18
+583,2025-07-25,North,C095,Green tea,Tea,2,7.68
+584,2025-08-02,West,C087,Earl Grey,Tea,1,7.09
+585,2025-02-15,North,C059,Decaf beans,Coffee,1,12.55
+586,2025-11-10,South,C073,Decaf beans,Coffee,1,13.0
+587,2025-07-20,North,C052,Espresso beans,Coffee,3,14.85
+588,2025-04-26,South,C059,Filter beans,Coffee,1,11.13
+589,2025-05-19,North,C080,Chai,Tea,4,8.33
+590,2025-12-27,East,C022,Espresso beans,Coffee,1,15.14
+591,2025-06-13,East,C016,Ceramic mug,Gear,1,12.24
+592,2025-04-26,West,C006,Green tea,Tea,3,7.59
+593,2025-11-06,East,C103,Filter beans,Coffee,3,11.44
+594,2025-08-31,East,C046,Espresso beans,Coffee,2,14.91
+595,2025-04-08,North,C102,Decaf beans,Coffee,6,12.65
+596,2025-01-17,South,C020,Espresso beans,Coffee,2,14.5
+597,2025-08-16,South,C076,Filter beans,Coffee,4,11.31
+598,2025-11-24,West,C002,Green tea,Tea,2,7.8
+599,2025-01-19,West,C112,Kettle,Gear,6,59.0
+600,2025-01-23,South,C080,Ceramic mug,Gear,1,12.0
+601,2025-11-07,West,C021,Earl Grey,Tea,4,7.18
+602,2025-09-29,North,C047,Decaf beans,Coffee,2,12.9
+603,2025-05-30,North,C028,Espresso beans,Coffee,1,14.73
+604,2025-03-30,East,C074,Filter beans,Coffee,6,11.09
+605,2025-07-18,North,C043,Pour-over kit,Gear,3,34.82
+606,2025-08-24,South,C059,Filter beans,Coffee,1,11.31
+607,2025-11-24,South,C035,Earl Grey,Tea,1,7.18
+608,2025-06-19,East,C073,Espresso beans,Coffee,2,14.79
+609,2025-08-22,North,C118,Green tea,Tea,1,7.71
+610,2025-08-18,West,C082,Chai,Tea,2,8.43
+611,2025-08-21,South,C112,Espresso beans,Coffee,2,14.91
+612,2025-10-31,East,C098,Espresso beans,Coffee,1,15.02
+613,2025-06-04,East,C112,Filter beans,Coffee,2,11.22
+614,2025-08-14,East,C086,Decaf beans,Coffee,1,12.85
+615,2025-05-28,East,C115,Kettle,Gear,6,59.94
+616,2025-04-28,South,C018,Filter beans,Coffee,3,11.13
+617,2025-04-13,West,C058,Ceramic mug,Gear,6,12.14
+618,2025-06-23,North,C019,Chai,Tea,1,8.36
+619,2025-05-20,North,C118,Filter beans,Coffee,3,11.18
+620,2025-04-07,East,C075,Pour-over kit,Gear,1,34.41
+621,2025-06-08,North,C108,Green tea,Tea,4,7.65
+622,2025-07-23,East,C070,Ceramic mug,Gear,2,12.29
+623,2025-01-18,South,C091,Espresso beans,Coffee,2,14.5
+624,2025-01-16,South,C115,Espresso beans,Coffee,6,14.5
+625,2025-08-31,South,C031,Ceramic mug,Gear,1,12.34
+626,2025-10-12,North,C010,Grinder,Gear,1,92.2
+627,2025-11-04,South,C001,Ceramic mug,Gear,3,12.48
+628,2025-04-06,East,C119,Green tea,Tea,1,7.59
+629,2025-01-21,West,C052,Filter beans,Coffee,1,11.0
+630,2025-09-03,North,C111,Chai,Tea,1,8.46
+631,2025-06-29,West,C077,Espresso beans,Coffee,3,14.79
+632,2025-06-24,North,C119,Pour-over kit,Gear,1,34.68
+633,2025-05-26,North,C054,Earl Grey,Tea,3,7.01
+634,2025-09-04,South,C012,Chai,Tea,3,8.46
+635,2025-01-16,East,C105,Espresso beans,Coffee,1,14.5
+636,2025-06-11,East,C030,Filter beans,Coffee,1,11.22
+637,2025-10-14,North,C100,Filter beans,Coffee,6,11.4
+638,2025-09-15,East,C047,Earl Grey,Tea,6,7.12
+639,2025-08-05,East,C002,Pour-over kit,Gear,1,34.95
+640,2025-08-17,South,C081,Espresso beans,Coffee,3,14.91
+641,2025-04-22,North,C080,Chai,Tea,1,8.3
+642,2025-03-14,South,C034,Espresso beans,Coffee,2,14.62
+643,2025-12-13,South,C112,Filter beans,Coffee,1,11.48
+644,2025-10-13,North,C045,Pour-over kit,Gear,1,35.22
+645,2025-10-25,South,C082,Filter beans,Coffee,6,11.4
+646,2025-12-05,West,C028,Ceramic mug,Gear,4,12.53
+647,2025-05-28,North,C009,Pour-over kit,Gear,1,34.54
+648,2025-11-03,North,C030,Pour-over kit,Gear,3,35.36
+649,2025-08-19,South,C004,Decaf beans,Coffee,4,12.85
+650,2025-05-01,South,C030,Filter beans,Coffee,4,11.18
+651,2025-06-08,East,C039,Filter beans,Coffee,4,11.22
+652,2025-11-25,West,C111,Green tea,Tea,1,7.8
+653,2025-12-11,East,C037,Chai,Tea,1,8.56
+654,2025-02-22,South,C041,Espresso beans,Coffee,2,14.56
+655,2025-09-26,South,C075,Earl Grey,Tea,6,7.12
+656,2025-02-04,North,C100,Chai,Tea,3,8.23
+657,2025-10-24,South,C120,Decaf beans,Coffee,4,12.95
+658,2025-05-19,South,C117,Espresso beans,Coffee,1,14.73
+659,2025-01-09,East,C013,Pour-over kit,Gear,1,34.0
+660,2025-10-17,North,C054,Green tea,Tea,4,7.77
+661,2025-06-03,East,C115,Pour-over kit,Gear,4,34.68
+662,2025-01-24,North,C018,Filter beans,Coffee,1,11.0
+663,2025-07-30,North,C094,Filter beans,Coffee,4,11.26
+664,2025-01-16,North,C113,Kettle,Gear,3,59.0
+665,2025-03-04,West,C001,Grinder,Gear,1,89.71
+666,2025-04-02,North,C068,Earl Grey,Tea,1,6.98
+667,2025-06-08,East,C028,Green tea,Tea,1,7.65
+668,2025-11-17,North,C035,Grinder,Gear,2,92.56
+669,2025-10-02,North,C006,Espresso beans,Coffee,2,15.02
+670,2025-04-10,East,C002,Espresso beans,Coffee,3,14.67
+671,2025-05-29,East,C071,Espresso beans,Coffee,6,14.73
+672,2025-05-31,West,C055,Decaf beans,Coffee,2,12.7
+673,2025-05-26,West,C098,Decaf beans,Coffee,1,12.7
+674,2025-06-19,North,C031,Decaf beans,Coffee,1,12.75
+675,2025-09-02,West,C031,Pour-over kit,Gear,2,35.09
+676,2025-11-09,North,C117,Earl Grey,Tea,1,7.18
+677,2025-10-06,West,C071,Decaf beans,Coffee,3,12.95
+678,2025-09-21,West,C096,Decaf beans,Coffee,1,12.9
+679,2025-09-15,West,C031,Green tea,Tea,3,7.74
+680,2025-11-09,East,C092,Chai,Tea,4,8.53
+681,2025-02-10,East,C010,Kettle,Gear,2,59.24
+682,2025-09-09,East,C034,Green tea,Tea,2,7.74
+683,2025-12-04,West,C074,Green tea,Tea,3,7.83
+684,2025-04-19,South,C068,Espresso beans,Coffee,3,14.67
+685,2025-03-29,South,C106,Filter beans,Coffee,1,11.09
+686,2025-09-19,East,C049,Espresso beans,Coffee,1,14.96
+687,2025-06-11,North,C053,Ceramic mug,Gear,4,12.24
+688,2025-03-23,East,C046,Filter beans,Coffee,1,11.09
+689,2025-09-20,West,C085,Green tea,Tea,2,7.74
+690,2025-02-22,North,C058,Decaf beans,Coffee,6,12.55
+691,2025-09-11,South,C001,Chai,Tea,1,8.46
+692,2025-09-25,East,C067,Filter beans,Coffee,2,11.35
+693,2025-06-03,South,C001,Filter beans,Coffee,1,11.22
+694,2025-08-21,East,C092,Espresso beans,Coffee,1,14.91
+695,2025-08-12,South,C034,Pour-over kit,Gear,2,34.95
+696,2025-11-11,North,C026,Espresso beans,Coffee,6,15.08
+697,2025-03-12,East,C118,Grinder,Gear,2,89.71
+698,2025-01-30,North,C092,Decaf beans,Coffee,3,12.5
+699,2025-10-18,East,C046,Grinder,Gear,4,92.2
+700,2025-04-26,South,C110,Ceramic mug,Gear,1,12.14
+701,2025-10-05,East,C111,Filter beans,Coffee,2,11.4
+702,2025-02-13,West,C068,Chai,Tea,4,8.23
+703,2025-06-30,North,C076,Pour-over kit,Gear,1,34.68
+704,2025-08-19,West,C061,Pour-over kit,Gear,4,34.95
+705,2025-04-01,West,C018,Espresso beans,Coffee,4,14.67
+706,2025-08-01,South,C052,Ceramic mug,Gear,2,12.34
+707,2025-08-11,East,C099,Pour-over kit,Gear,2,34.95
+708,2025-06-20,South,C109,Decaf beans,Coffee,1,12.75
+709,2025-02-16,West,C012,Ceramic mug,Gear,1,12.05
+710,2025-11-16,North,C106,Espresso beans,Coffee,6,15.08
+711,2025-09-25,North,C071,Chai,Tea,6,8.46
+712,2025-09-28,West,C105,Decaf beans,Coffee,1,12.9
+713,2025-02-03,East,C025,Earl Grey,Tea,3,6.93
+714,2025-08-04,East,C012,Espresso beans,Coffee,2,14.91
+715,2025-05-24,West,C066,Filter beans,Coffee,2,11.18
+716,2025-11-27,East,C032,Earl Grey,Tea,2,7.18
+717,2025-11-21,East,C026,Chai,Tea,2,8.53
+718,2025-03-13,West,C085,Espresso beans,Coffee,3,14.62
+719,2025-07-25,East,C026,Green tea,Tea,3,7.68
+720,2025-07-14,East,C002,Earl Grey,Tea,1,7.07
+721,2025-08-09,North,C036,Decaf beans,Coffee,3,12.85
+722,2025-04-19,South,C103,Decaf beans,Coffee,2,12.65
+723,2025-12-23,West,C027,Earl Grey,Tea,4,7.2
+724,2025-11-25,North,C007,Espresso beans,Coffee,4,15.08
+725,2025-03-16,South,C002,Ceramic mug,Gear,6,12.1
+726,2025-12-08,West,C029,Green tea,Tea,1,7.83
+727,2025-09-23,South,C069,Earl Grey,Tea,2,7.12
+728,2025-11-13,North,C060,Espresso beans,Coffee,2,15.08
+729,2025-02-25,West,C029,Chai,Tea,1,8.23
+730,2025-09-18,West,C020,Filter beans,Coffee,6,11.35
+731,2025-11-22,North,C021,Pour-over kit,Gear,1,35.36
+732,2025-11-12,East,C091,Filter beans,Coffee,2,11.44
+733,2025-08-18,East,C071,Espresso beans,Coffee,2,14.91
+734,2025-11-14,West,C005,Espresso beans,Coffee,2,15.08
+735,2025-05-30,South,C084,Espresso beans,Coffee,2,14.73
+736,2025-08-13,South,C094,Espresso beans,Coffee,6,14.91
+737,2025-04-04,North,C005,Filter beans,Coffee,4,11.13
+738,2025-11-10,North,C038,Espresso beans,Coffee,2,15.08
+739,2025-07-25,North,C026,Espresso beans,Coffee,6,14.85
+740,2025-07-23,South,C018,Ceramic mug,Gear,1,12.29
+741,2025-07-19,East,C005,Chai,Tea,2,8.4
+742,2025-08-24,East,C025,Espresso beans,Coffee,1,14.91
+743,2025-12-14,South,C043,Earl Grey,Tea,1,7.2
+744,2025-06-07,East,C023,Green tea,Tea,3,7.65
+745,2025-03-04,West,C013,Ceramic mug,Gear,1,12.1
+746,2025-10-16,West,C060,Espresso beans,Coffee,1,15.02
+747,2025-01-26,West,C083,Espresso beans,Coffee,1,14.5
+748,2025-09-30,North,C048,Decaf beans,Coffee,3,12.9
+749,2025-10-10,South,C085,Chai,Tea,3,8.5
+750,2025-12-13,East,C020,Filter beans,Coffee,6,11.48
+751,2025-05-05,North,C020,Espresso beans,Coffee,2,14.73
+752,2025-07-27,East,C060,Green tea,Tea,1,7.68
+753,2025-04-29,East,C047,Green tea,Tea,1,7.59
+754,2025-12-16,South,C117,Filter beans,Coffee,2,11.48
+755,2025-04-27,North,C002,Ceramic mug,Gear,2,12.14
+756,2025-03-02,South,C012,Espresso beans,Coffee,2,14.62
+757,2025-10-17,North,C055,Espresso beans,Coffee,2,15.02
+758,2025-06-22,North,C011,Green tea,Tea,2,7.65
+759,2025-09-20,North,C106,Espresso beans,Coffee,2,14.96
+760,2025-04-29,North,C028,Earl Grey,Tea,1,6.98
+761,2025-09-05,East,C011,Earl Grey,Tea,2,7.12
+762,2025-11-04,North,C041,Decaf beans,Coffee,1,13.0
+763,2025-12-13,North,C012,Decaf beans,Coffee,4,13.05
+764,2025-10-29,South,C103,Espresso beans,Coffee,1,15.02
+765,2025-06-05,South,C088,Espresso beans,Coffee,2,14.79
+766,2025-05-31,West,C005,Kettle,Gear,1,59.94
+767,2025-07-28,North,C026,Chai,Tea,1,8.4
+768,2025-11-21,West,C012,Espresso beans,Coffee,3,15.08
+769,2025-09-16,West,C087,Grinder,Gear,1,91.85
+770,2025-10-23,East,C116,Green tea,Tea,2,7.77
+771,2025-02-04,West,C050,Green tea,Tea,1,7.53
+772,2025-11-09,North,C009,Chai,Tea,2,8.53
+773,2025-12-21,South,C031,Chai,Tea,2,8.56
+774,2025-04-10,West,C074,Decaf beans,Coffee,2,12.65
+775,2025-12-03,West,C085,Earl Grey,Tea,1,7.2
+776,2025-10-27,West,C052,Chai,Tea,3,8.5
+777,2025-12-15,West,C102,Filter beans,Coffee,3,11.48
+778,2025-05-21,North,C113,Filter beans,Coffee,1,11.18
+779,2025-11-05,West,C019,Decaf beans,Coffee,2,13.0
+780,2025-06-01,West,C109,Espresso beans,Coffee,3,14.79
+781,2025-07-17,North,C035,Espresso beans,Coffee,3,14.85
+782,2025-04-06,South,C016,Ceramic mug,Gear,4,12.14
+783,2025-04-17,South,C050,Earl Grey,Tea,4,6.98
+784,2025-05-09,South,C029,Grinder,Gear,3,90.42
+785,2025-06-07,East,C064,Ceramic mug,Gear,4,12.24
+786,2025-05-26,South,C051,Ceramic mug,Gear,2,12.19
+787,2025-08-07,North,C032,Espresso beans,Coffee,1,14.91
+788,2025-07-13,East,C087,Ceramic mug,Gear,2,12.29
+789,2025-02-28,South,C119,Green tea,Tea,4,7.53
+790,2025-10-18,North,C066,Filter beans,Coffee,4,11.4
+791,2025-09-07,East,C040,Decaf beans,Coffee,2,12.9
+792,2025-09-19,North,C117,Earl Grey,Tea,4,7.12
+793,2025-09-17,North,C113,Green tea,Tea,1,7.74
+794,2025-11-12,West,C040,Earl Grey,Tea,4,7.18
+795,2025-10-17,North,C042,Ceramic mug,Gear,6,12.43
+796,2025-07-23,South,C025,Espresso beans,Coffee,2,14.85
+797,2025-08-26,West,C023,Green tea,Tea,1,7.71
+798,2025-10-16,South,C038,Earl Grey,Tea,2,7.15
+799,2025-10-24,North,C104,Espresso beans,Coffee,4,15.02
+800,2025-12-16,East,C089,Earl Grey,Tea,6,7.2
+801,2025-12-02,North,C102,Filter beans,Coffee,6,11.48
+802,2025-08-08,North,C021,Ceramic mug,Gear,2,12.34
+803,2025-05-22,North,C076,Green tea,Tea,2,7.62
+804,2025-05-19,South,C035,Filter beans,Coffee,3,11.18
+805,2025-05-23,East,C119,Pour-over kit,Gear,2,34.54
+806,2025-07-08,East,C051,Espresso beans,Coffee,2,14.85
+807,2025-05-27,East,C015,Chai,Tea,6,8.33
+808,2025-04-13,West,C082,Pour-over kit,Gear,6,34.41
+809,2025-03-25,South,C036,Ceramic mug,Gear,1,12.1
+810,2025-10-19,North,C036,Green tea,Tea,4,7.77
+811,2025-06-21,East,C109,Chai,Tea,4,8.36
+812,2025-09-09,North,C069,Filter beans,Coffee,1,11.35
+813,2025-11-09,East,C034,Green tea,Tea,3,7.8
+814,2025-12-25,West,C107,Ceramic mug,Gear,1,12.53
+815,2025-11-03,South,C083,Espresso beans,Coffee,2,15.08
+816,2025-04-01,West,C051,Chai,Tea,1,8.3
+817,2025-11-14,West,C051,Chai,Tea,3,8.53
+818,2025-07-28,South,C069,Filter beans,Coffee,1,11.26
+819,2025-10-12,South,C028,Decaf beans,Coffee,2,12.95
+820,2025-06-03,North,C065,Espresso beans,Coffee,4,14.79
+821,2025-01-04,West,C052,Green tea,Tea,2,7.5
+822,2025-04-17,South,C029,Chai,Tea,1,8.3
+823,2025-09-22,East,C116,Chai,Tea,1,8.46
+824,2025-01-25,East,C017,Grinder,Gear,4,89.0
+825,2025-09-15,East,C092,Ceramic mug,Gear,4,12.38
+826,2025-02-12,South,C116,Earl Grey,Tea,2,6.93
+827,2025-04-20,East,C003,Espresso beans,Coffee,1,14.67
+828,2025-10-01,South,C001,Espresso beans,Coffee,3,15.02
+829,2025-07-14,East,C065,Chai,Tea,6,8.4
+830,2025-02-07,North,C069,Decaf beans,Coffee,1,12.55
+831,2025-11-09,East,C081,Espresso beans,Coffee,2,15.08
+832,2025-12-12,South,C072,Grinder,Gear,2,92.92
+833,2025-10-30,South,C100,Espresso beans,Coffee,1,15.02
+834,2025-03-31,West,C048,Ceramic mug,Gear,2,12.1
+835,2025-02-09,North,C052,Earl Grey,Tea,1,6.93
+836,2025-06-21,South,C086,Grinder,Gear,4,90.78
+837,2025-11-21,East,C085,Kettle,Gear,3,61.36
+838,2025-12-26,South,C056,Espresso beans,Coffee,6,15.14
+839,2025-07-13,South,C044,Earl Grey,Tea,6,7.07
+840,2025-09-04,East,C098,Espresso beans,Coffee,1,14.96
+841,2025-04-09,West,C100,Chai,Tea,1,8.3
+842,2025-04-10,East,C026,Earl Grey,Tea,2,6.98
+843,2025-08-17,North,C118,Earl Grey,Tea,2,7.09
+844,2025-10-13,North,C046,Earl Grey,Tea,1,7.15
+845,2025-04-13,East,C081,Espresso beans,Coffee,2,14.67
+846,2025-03-27,East,C014,Earl Grey,Tea,3,6.96
+847,2025-01-31,West,C116,Espresso beans,Coffee,3,14.5
+848,2025-01-22,East,C014,Chai,Tea,1,8.2
+849,2025-11-19,West,C011,Filter beans,Coffee,6,11.44
+850,2025-12-05,South,C109,Chai,Tea,6,8.56
+851,2025-03-03,South,C046,Green tea,Tea,4,7.56
+852,2025-05-01,East,C105,Espresso beans,Coffee,2,14.73
+853,2025-12-25,South,C104,Decaf beans,Coffee,4,13.05
+854,2025-11-30,North,C015,Decaf beans,Coffee,1,13.0
+855,2025-04-17,North,C002,Green tea,Tea,4,7.59
+856,2025-11-05,West,C100,Grinder,Gear,1,92.56
+857,2025-01-30,East,C044,Ceramic mug,Gear,1,12.0
+858,2025-09-07,South,C001,Ceramic mug,Gear,6,12.38
+859,2025-04-28,North,C013,Pour-over kit,Gear,4,34.41
+860,2025-08-28,West,C059,Espresso beans,Coffee,2,14.91
+861,2025-08-21,North,C073,Pour-over kit,Gear,6,34.95
+862,2025-10-09,South,C052,Espresso beans,Coffee,6,15.02
+863,2025-09-16,West,C089,Ceramic mug,Gear,2,12.38
+864,2025-11-25,West,C077,Earl Grey,Tea,1,7.18
+865,2025-06-18,North,C051,Earl Grey,Tea,2,7.04
+866,2025-08-19,North,C032,Chai,Tea,2,8.43
+867,2025-02-24,North,C060,Kettle,Gear,1,59.24
+868,2025-02-02,North,C120,Filter beans,Coffee,2,11.04
+869,2025-08-16,East,C006,Green tea,Tea,4,7.71
+870,2025-03-23,North,C024,Espresso beans,Coffee,1,14.62
+871,2025-03-18,North,C066,Green tea,Tea,3,7.56
+872,2025-10-28,North,C109,Ceramic mug,Gear,1,12.43
+873,2025-01-22,North,C091,Earl Grey,Tea,1,6.9
+874,2025-02-05,West,C051,Green tea,Tea,2,7.53
+875,2025-09-22,North,C024,Green tea,Tea,2,7.74
+876,2025-11-10,South,C016,Ceramic mug,Gear,6,12.48
+877,2025-10-04,North,C079,Chai,Tea,4,8.5
+878,2025-12-24,North,C012,Green tea,Tea,3,7.83
+879,2025-10-11,North,C048,Ceramic mug,Gear,1,12.43
+880,2025-05-10,South,C064,Filter beans,Coffee,2,11.18
+881,2025-09-01,North,C011,Kettle,Gear,2,60.89
+882,2025-02-15,West,C059,Espresso beans,Coffee,2,14.56
+883,2025-12-26,North,C117,Pour-over kit,Gear,2,35.5
+884,2025-01-17,South,C109,Espresso beans,Coffee,1,14.5
+885,2025-12-04,South,C080,Chai,Tea,1,8.56
+886,2025-12-14,East,C101,Decaf beans,Coffee,1,13.05
+887,2025-05-20,West,C013,Filter beans,Coffee,3,11.18
+888,2025-03-26,East,C036,Espresso beans,Coffee,6,14.62
+889,2025-11-02,East,C030,Espresso beans,Coffee,1,15.08
+890,2025-08-12,North,C099,Filter beans,Coffee,3,11.31
+891,2025-10-23,North,C069,Filter beans,Coffee,3,11.4
+892,2025-03-26,West,C081,Espresso beans,Coffee,3,14.62
+893,2025-06-02,West,C021,Espresso beans,Coffee,1,14.79
+894,2025-04-16,West,C120,Espresso beans,Coffee,2,14.67
+895,2025-12-05,South,C028,Earl Grey,Tea,1,7.2
+896,2025-05-15,East,C056,Pour-over kit,Gear,1,34.54
+897,2025-10-06,West,C079,Kettle,Gear,1,61.12
+898,2025-09-27,West,C032,Earl Grey,Tea,2,7.12
+899,2025-06-04,South,C083,Grinder,Gear,1,90.78
+900,2025-05-04,North,C077,Grinder,Gear,1,90.42
+901,2025-02-12,North,C094,Decaf beans,Coffee,1,12.55
+902,2025-02-11,North,C019,Espresso beans,Coffee,3,14.56
+903,2025-08-17,West,C023,Chai,Tea,2,8.43
+904,2025-12-01,West,C090,Filter beans,Coffee,4,11.48
+905,2025-09-28,West,C044,Decaf beans,Coffee,1,12.9
+906,2025-05-28,South,C014,Espresso beans,Coffee,4,14.73
+907,2025-11-18,East,C080,Chai,Tea,3,8.53
+908,2025-01-10,South,C101,Espresso beans,Coffee,1,14.5
+909,2025-09-18,South,C006,Earl Grey,Tea,2,7.12
+910,2025-03-19,West,C033,Espresso beans,Coffee,1,14.62
+911,2025-09-16,North,C009,Green tea,Tea,2,7.74
+912,2025-05-18,East,C047,Filter beans,Coffee,1,11.18
+913,2025-08-12,East,C048,Espresso beans,Coffee,3,14.91
+914,2025-06-12,South,C117,Green tea,Tea,1,7.65
+915,2025-10-31,North,C029,Filter beans,Coffee,4,11.4
+916,2025-09-15,East,C031,Ceramic mug,Gear,4,12.38
+917,2025-09-13,North,C013,Green tea,Tea,1,7.74
+918,2025-09-20,East,C004,Ceramic mug,Gear,2,12.38
+919,2025-07-19,West,C072,Green tea,Tea,1,7.68
+920,2025-10-05,West,C062,Espresso beans,Coffee,1,15.02
+921,2025-12-08,West,C008,Pour-over kit,Gear,4,35.5
+922,2025-03-07,West,C061,Espresso beans,Coffee,3,14.62
+923,2025-04-26,North,C066,Filter beans,Coffee,1,11.13
+924,2025-04-20,North,C008,Chai,Tea,4,8.3
+925,2025-12-14,South,C066,Green tea,Tea,2,7.83
+926,2025-11-21,West,C034,Espresso beans,Coffee,1,15.08
+927,2025-07-18,North,C104,Pour-over kit,Gear,1,34.82
+928,2025-07-13,East,C085,Filter beans,Coffee,2,11.26
+929,2025-10-29,West,C033,Espresso beans,Coffee,6,15.02
+930,2025-04-03,West,C088,Espresso beans,Coffee,1,14.67
+931,2025-10-14,West,C086,Green tea,Tea,2,7.77
+932,2025-09-01,West,C103,Earl Grey,Tea,1,7.12
+933,2025-11-27,East,C085,Filter beans,Coffee,1,11.44
+934,2025-12-02,North,C077,Espresso beans,Coffee,2,15.14
+935,2025-07-15,South,C109,Chai,Tea,6,8.4
+936,2025-01-26,South,C039,Decaf beans,Coffee,1,12.5
+937,2025-10-16,West,C004,Green tea,Tea,1,7.77
+938,2025-09-25,South,C009,Espresso beans,Coffee,6,14.96
+939,2025-07-21,South,C080,Green tea,Tea,6,7.68
+940,2025-12-03,South,C040,Espresso beans,Coffee,6,15.14
+941,2025-12-30,East,C005,Decaf beans,Coffee,2,13.05
+942,2025-06-27,East,C099,Filter beans,Coffee,1,11.22
+943,2025-03-26,South,C078,Ceramic mug,Gear,1,12.1
+944,2025-11-05,West,C018,Earl Grey,Tea,6,7.18
+945,2025-05-05,West,C020,Green tea,Tea,2,7.62
+946,2025-12-04,East,C114,Kettle,Gear,1,61.6
+947,2025-10-18,South,C011,Espresso beans,Coffee,4,15.02
+948,2025-08-26,East,C114,Decaf beans,Coffee,4,12.85
+949,2025-08-21,East,C092,Filter beans,Coffee,1,11.31
+950,2025-06-27,North,C116,Espresso beans,Coffee,1,14.79
+951,2025-05-16,South,C054,Filter beans,Coffee,1,11.18
+952,2025-02-15,North,C058,Filter beans,Coffee,2,11.04
+953,2025-04-28,South,C056,Earl Grey,Tea,3,6.98
+954,2025-02-16,South,C111,Ceramic mug,Gear,4,12.05
+955,2025-09-29,West,C047,Filter beans,Coffee,2,11.35
+956,2025-12-18,North,C080,Filter beans,Coffee,1,11.48
+957,2025-09-26,North,C057,Espresso beans,Coffee,3,14.96
+958,2025-07-20,West,C042,Earl Grey,Tea,1,7.07
+959,2025-10-28,North,C027,Filter beans,Coffee,4,11.4
+960,2025-08-12,South,C048,Decaf beans,Coffee,1,12.85
+961,2025-10-12,East,C017,Filter beans,Coffee,6,11.4
+962,2025-12-30,North,C005,Earl Grey,Tea,2,7.2
+963,2025-08-01,North,C061,Ceramic mug,Gear,4,12.34
+964,2025-08-25,East,C091,Pour-over kit,Gear,3,34.95
+965,2025-10-19,North,C087,Filter beans,Coffee,6,11.4
+966,2025-09-24,North,C081,Espresso beans,Coffee,3,14.96
+967,2025-10-22,South,C091,Ceramic mug,Gear,2,12.43
+968,2025-08-28,East,C084,Chai,Tea,3,8.43
+969,2025-05-03,North,C026,Ceramic mug,Gear,6,12.19
+970,2025-11-30,East,C004,Earl Grey,Tea,4,7.18
+971,2025-02-13,North,C090,Espresso beans,Coffee,1,14.56
+972,2025-04-30,East,C116,Espresso beans,Coffee,1,14.67
+973,2025-10-05,North,C015,Kettle,Gear,1,61.12
+974,2025-02-19,South,C061,Espresso beans,Coffee,2,14.56
+975,2025-06-01,East,C054,Green tea,Tea,3,7.65
+976,2025-10-16,North,C119,Ceramic mug,Gear,3,12.43
+977,2025-02-20,North,C080,Espresso beans,Coffee,1,14.56
+978,2025-02-04,East,C044,Grinder,Gear,1,89.36
+979,2025-07-29,South,C108,Espresso beans,Coffee,1,14.85
+980,2025-09-29,South,C040,Filter beans,Coffee,1,11.35
+981,2025-10-31,North,C076,Chai,Tea,1,8.5
+982,2025-03-22,West,C102,Chai,Tea,6,8.27
+983,2025-11-05,West,C018,Earl Grey,Tea,6,7.18
+984,2025-01-12,North,C108,Pour-over kit,Gear,2,34.0
+985,2025-09-10,West,C067,Filter beans,Coffee,2,11.35
+986,2025-08-09,South,C093,Chai,Tea,1,8.43
+987,2025-01-19,West,C079,Green tea,Tea,2,7.5
+988,2025-04-08,East,C017,Espresso beans,Coffee,2,14.67
+989,2025-03-24,East,C051,Filter beans,Coffee,3,11.09
+990,2025-05-25,East,C012,Chai,Tea,1,8.33
+991,2025-05-17,South,C023,Filter beans,Coffee,2,11.18
+992,2025-12-10,North,C026,Ceramic mug,Gear,6,12.53
+993,2025-05-27,West,C068,Chai,Tea,3,8.33
+994,2025-05-23,West,C056,Espresso beans,Coffee,1,14.73
+995,2025-07-23,West,C041,Filter beans,Coffee,2,11.26
+996,2025-11-17,East,C069,Pour-over kit,Gear,4,35.36
+997,2025-07-11,North,C014,Pour-over kit,Gear,3,34.82
+998,2025-10-23,South,C005,Espresso beans,Coffee,2,15.02
+999,2025-11-19,North,C060,Pour-over kit,Gear,1,35.36
+1000,2025-09-26,East,C056,Espresso beans,Coffee,1,14.96
+1001,2025-08-04,North,C005,Espresso beans,Coffee,1,14.91
+1002,2025-05-15,North,C090,Chai,Tea,1,8.33
+1003,2025-02-13,South,C031,Espresso beans,Coffee,4,14.56
+1004,2025-03-31,East,C047,Chai,Tea,4,8.27
+1005,2025-03-10,North,C034,Filter beans,Coffee,1,11.09
+1006,2025-12-14,West,C029,Pour-over kit,Gear,4,35.5
+1007,2025-12-18,West,C051,Earl Grey,Tea,2,7.2
+1008,2025-10-06,South,C118,Chai,Tea,1,8.5
+1009,2025-12-18,South,C004,Espresso beans,Coffee,3,15.14
+1010,2025-05-03,East,C041,Green tea,Tea,1,7.62
+1011,2025-03-31,South,C085,Chai,Tea,3,8.27
+1012,2025-07-01,East,C002,Ceramic mug,Gear,2,12.29
+1013,2025-10-28,North,C042,Filter beans,Coffee,1,11.4
+1014,2025-04-22,East,C039,Filter beans,Coffee,2,11.13
+1015,2025-06-15,East,C015,Filter beans,Coffee,4,11.22
+1016,2025-12-14,South,C105,Espresso beans,Coffee,4,15.14
+1017,2025-12-07,South,C105,Chai,Tea,1,8.56
+1018,2025-05-22,West,C056,Green tea,Tea,3,7.62
+1019,2025-11-13,North,C045,Espresso beans,Coffee,3,15.08
+1020,2025-11-30,South,C110,Espresso beans,Coffee,3,15.08
+1021,2025-12-12,West,C044,Chai,Tea,1,8.56
+1022,2025-07-19,East,C047,Decaf beans,Coffee,2,12.8
+1023,2025-04-30,North,C116,Espresso beans,Coffee,3,14.67
+1024,2025-10-31,North,C064,Filter beans,Coffee,1,11.4
+1025,2025-10-14,West,C040,Espresso beans,Coffee,6,15.02
+1026,2025-11-02,West,C041,Grinder,Gear,2,92.56
+1027,2025-12-01,East,C074,Chai,Tea,2,8.56
+1028,2025-12-05,West,C058,Earl Grey,Tea,1,7.2
+1029,2025-06-30,South,C027,Ceramic mug,Gear,2,12.24
+1030,2025-06-11,North,C060,Filter beans,Coffee,1,11.22
+1031,2025-08-27,West,C012,Decaf beans,Coffee,1,12.85
+1032,2025-04-04,North,C029,Filter beans,Coffee,3,11.13
+1033,2025-10-30,South,C047,Earl Grey,Tea,1,7.15
+1034,2025-11-26,South,C049,Kettle,Gear,4,61.36
+1035,2025-09-11,South,C042,Espresso beans,Coffee,4,14.96
+1036,2025-05-20,West,C070,Filter beans,Coffee,1,11.18
+1037,2025-10-17,West,C107,Espresso beans,Coffee,1,15.02
+1038,2025-08-18,North,C117,Chai,Tea,1,8.43
+1039,2025-09-15,East,C007,Ceramic mug,Gear,1,12.38
+1040,2025-12-08,South,C066,Espresso beans,Coffee,1,15.14
+1041,2025-07-16,South,C020,Espresso beans,Coffee,2,14.85
+1042,2025-09-09,South,C078,Chai,Tea,4,8.46
+1043,2025-09-27,West,C028,Earl Grey,Tea,2,7.12
+1044,2025-08-02,North,C103,Green tea,Tea,1,7.71
+1045,2025-06-03,East,C030,Chai,Tea,2,8.36
+1046,2025-08-03,South,C075,Espresso beans,Coffee,1,14.91
+1047,2025-10-08,South,C035,Espresso beans,Coffee,6,15.02
+1048,2025-11-12,West,C001,Decaf beans,Coffee,1,13.0
+1049,2025-07-09,West,C019,Espresso beans,Coffee,1,14.85
+1050,2025-05-27,East,C053,Espresso beans,Coffee,2,14.73
+1051,2025-10-22,South,C021,Filter beans,Coffee,2,11.4
+1052,2025-11-22,East,C040,Filter beans,Coffee,4,11.44
+1053,2025-03-26,South,C025,Espresso beans,Coffee,1,14.62
+1054,2025-08-27,South,C054,Espresso beans,Coffee,2,14.91
+1055,2025-07-22,West,C036,Decaf beans,Coffee,6,12.8
+1056,2025-07-19,South,C030,Espresso beans,Coffee,1,14.85
+1057,2025-02-14,West,C013,Earl Grey,Tea,1,6.93
+1058,2025-06-08,West,C083,Decaf beans,Coffee,3,12.75
+1059,2025-03-22,North,C109,Ceramic mug,Gear,1,12.1
+1060,2025-10-27,West,C080,Green tea,Tea,4,7.77
+1061,2025-05-19,South,C081,Green tea,Tea,1,7.62
+1062,2025-06-12,South,C044,Ceramic mug,Gear,3,12.24
+1063,2025-11-01,South,C037,Espresso beans,Coffee,4,15.08
+1064,2025-03-06,East,C104,Ceramic mug,Gear,1,12.1
+1065,2025-07-22,North,C045,Green tea,Tea,3,7.68
+1066,2025-08-14,West,C015,Chai,Tea,3,8.43
+1067,2025-05-31,North,C048,Filter beans,Coffee,2,11.18
+1068,2025-11-01,East,C115,Espresso beans,Coffee,1,15.08
+1069,2025-05-31,West,C003,Ceramic mug,Gear,1,12.19
+1070,2025-02-16,South,C040,Espresso beans,Coffee,1,14.56
+1071,2025-04-22,North,C094,Espresso beans,Coffee,2,14.67
+1072,2025-12-22,South,C071,Pour-over kit,Gear,1,35.5
+1073,2025-08-14,West,C108,Grinder,Gear,1,91.49
+1074,2025-04-08,West,C012,Chai,Tea,4,8.3
+1075,2025-09-09,South,C039,Chai,Tea,1,8.46
+1076,2025-01-27,North,C003,Espresso beans,Coffee,1,14.5
+1077,2025-05-30,North,C060,Earl Grey,Tea,1,7.01
+1078,2025-03-26,South,C047,Espresso beans,Coffee,3,14.62
+1079,2025-03-09,West,C053,Ceramic mug,Gear,3,12.1
+1080,2025-05-02,South,C022,Filter beans,Coffee,1,11.18
+1081,2025-04-03,North,C058,Espresso beans,Coffee,3,14.67
+1082,2025-08-08,West,C071,Earl Grey,Tea,1,7.09
+1083,2025-10-29,West,C113,Green tea,Tea,6,7.77
+1084,2025-01-18,South,C111,Earl Grey,Tea,4,6.9
+1085,2025-02-02,West,C023,Chai,Tea,1,8.23
+1086,2025-09-27,North,C109,Espresso beans,Coffee,1,14.96
+1087,2025-10-31,West,C094,Decaf beans,Coffee,2,12.95
+1088,2025-09-19,South,C041,Filter beans,Coffee,6,11.35
+1089,2025-11-30,North,C075,Espresso beans,Coffee,2,15.08
+1090,2025-09-27,East,C021,Filter beans,Coffee,2,11.35
+1091,2025-08-22,North,C063,Green tea,Tea,2,7.71
+1092,2025-12-10,West,C098,Chai,Tea,1,8.56
+1093,2025-02-19,West,C091,Decaf beans,Coffee,2,12.55
+1094,2025-12-11,North,C049,Espresso beans,Coffee,1,15.14
+1095,2025-05-11,West,C113,Espresso beans,Coffee,4,14.73
+1096,2025-10-09,East,C013,Filter beans,Coffee,6,11.4
+1097,2025-01-26,South,C009,Ceramic mug,Gear,2,12.0
+1098,2025-09-17,South,C118,Filter beans,Coffee,3,11.35
+1099,2025-07-31,East,C059,Green tea,Tea,4,7.68
+1100,2025-09-13,North,C006,Filter beans,Coffee,6,11.35
+1101,2025-10-16,North,C078,Espresso beans,Coffee,2,15.02
+1102,2025-12-27,East,C082,Green tea,Tea,1,7.83
+1103,2025-11-17,North,C057,Ceramic mug,Gear,2,12.48
+1104,2025-07-21,South,C060,Espresso beans,Coffee,1,14.85
+1105,2025-08-31,East,C044,Ceramic mug,Gear,1,12.34
+1106,2025-11-13,North,C083,Earl Grey,Tea,1,7.18
+1107,2025-04-05,South,C021,Green tea,Tea,3,7.59
+1108,2025-12-03,East,C034,Filter beans,Coffee,2,11.48
+1109,2025-12-05,North,C081,Filter beans,Coffee,2,11.48
+1110,2025-06-18,South,C013,Earl Grey,Tea,6,7.04
+1111,2025-06-30,North,C096,Green tea,Tea,3,7.65
+1112,2025-06-19,South,C119,Earl Grey,Tea,6,7.04
+1113,2025-05-04,East,C052,Green tea,Tea,1,7.62
+1114,2025-11-28,West,C064,Pour-over kit,Gear,6,35.36
+1115,2025-12-11,West,C098,Green tea,Tea,1,7.83
+1116,2025-12-23,North,C048,Filter beans,Coffee,3,11.48
+1117,2025-06-17,West,C075,Espresso beans,Coffee,1,14.79
+1118,2025-05-13,East,C099,Filter beans,Coffee,1,11.18
+1119,2025-01-22,East,C059,Espresso beans,Coffee,1,14.5
+1120,2025-09-09,West,C119,Green tea,Tea,3,7.74
+1121,2025-09-10,East,C025,Green tea,Tea,1,7.74
+1122,2025-09-01,North,C054,Filter beans,Coffee,2,11.35
+1123,2025-01-10,North,C097,Green tea,Tea,2,7.5
+1124,2025-11-12,North,C025,Earl Grey,Tea,2,7.18
+1125,2025-09-24,East,C007,Chai,Tea,1,8.46
+1126,2025-12-23,East,C115,Espresso beans,Coffee,2,15.14
+1127,2025-08-20,East,C116,Espresso beans,Coffee,4,14.91
+1128,2025-10-04,North,C074,Green tea,Tea,1,7.77
+1129,2025-04-12,North,C027,Espresso beans,Coffee,2,14.67
+1130,2025-12-11,West,C052,Filter beans,Coffee,3,11.48
+1131,2025-12-28,North,C107,Espresso beans,Coffee,4,15.14
+1132,2025-10-16,West,C047,Filter beans,Coffee,1,11.4
+1133,2025-11-22,North,C055,Espresso beans,Coffee,1,15.08
+1134,2025-09-07,East,C093,Earl Grey,Tea,1,7.12
+1135,2025-06-12,East,C070,Espresso beans,Coffee,3,14.79
+1136,2025-03-18,North,C076,Espresso beans,Coffee,1,14.62
+1137,2025-10-31,North,C072,Espresso beans,Coffee,2,15.02
+1138,2025-07-27,North,C031,Decaf beans,Coffee,1,12.8
+1139,2025-07-02,South,C115,Filter beans,Coffee,1,11.26
+1140,2025-11-08,West,C076,Filter beans,Coffee,1,11.44
+1141,2025-06-20,South,C086,Filter beans,Coffee,1,11.22
+1142,2025-12-28,North,C078,Espresso beans,Coffee,2,15.14
+1143,2025-12-09,North,C100,Espresso beans,Coffee,2,15.14
+1144,2025-05-31,West,C097,Espresso beans,Coffee,1,14.73
+1145,2025-05-23,South,C088,Green tea,Tea,6,7.62
+1146,2025-03-23,North,C091,Filter beans,Coffee,3,11.09
+1147,2025-08-02,West,C016,Pour-over kit,Gear,1,34.95
+1148,2025-12-28,North,C037,Chai,Tea,1,8.56
+1149,2025-07-31,South,C066,Filter beans,Coffee,1,11.26
+1150,2025-06-26,West,C034,Filter beans,Coffee,2,11.22
+1151,2025-09-19,North,C090,Espresso beans,Coffee,6,14.96
+1152,2025-04-20,West,C012,Decaf beans,Coffee,2,12.65
+1153,2025-08-10,East,C032,Filter beans,Coffee,3,11.31
+1154,2025-05-07,North,C052,Earl Grey,Tea,2,7.01
+1155,2025-06-30,South,C011,Ceramic mug,Gear,1,12.24
+1156,2025-02-13,North,C049,Green tea,Tea,2,7.53
+1157,2025-07-29,North,C086,Green tea,Tea,2,7.68
+1158,2025-12-08,East,C009,Green tea,Tea,6,7.83
+1159,2025-12-11,South,C019,Ceramic mug,Gear,6,12.53
+1160,2025-02-11,South,C075,Decaf beans,Coffee,1,12.55
+1161,2025-12-26,North,C103,Chai,Tea,1,8.56
+1162,2025-05-28,East,C022,Espresso beans,Coffee,2,14.73
+1163,2025-09-30,South,C057,Filter beans,Coffee,2,11.35
+1164,2025-07-08,West,C111,Espresso beans,Coffee,1,14.85
+1165,2025-04-25,North,C015,Pour-over kit,Gear,2,34.41
+1166,2025-11-03,North,C020,Espresso beans,Coffee,2,15.08
+1167,2025-01-29,East,C109,Filter beans,Coffee,2,11.0
+1168,2025-12-04,South,C040,Chai,Tea,6,8.56
+1169,2025-08-04,South,C048,Green tea,Tea,3,7.71
+1170,2025-06-08,East,C085,Green tea,Tea,2,7.65
+1171,2025-07-30,West,C086,Green tea,Tea,4,7.68
+1172,2025-08-30,East,C016,Espresso beans,Coffee,2,14.91
+1173,2025-10-23,West,C032,Earl Grey,Tea,3,7.15
+1174,2025-10-03,East,C038,Ceramic mug,Gear,4,12.43
+1175,2025-06-25,West,C042,Chai,Tea,2,8.36
+1176,2025-10-11,East,C091,Espresso beans,Coffee,6,15.02
+1177,2025-05-22,South,C106,Filter beans,Coffee,3,11.18
+1178,2025-04-24,East,C089,Chai,Tea,2,8.3
+1179,2025-01-14,East,C053,Green tea,Tea,3,7.5
+1180,2025-01-24,South,C044,Grinder,Gear,2,89.0
+1181,2025-06-02,West,C014,Espresso beans,Coffee,1,14.79
+1182,2025-06-14,North,C092,Filter beans,Coffee,6,11.22
+1183,2025-03-13,West,C037,Filter beans,Coffee,4,11.09
+1184,2025-07-02,South,C046,Filter beans,Coffee,1,11.26
+1185,2025-05-12,East,C005,Pour-over kit,Gear,2,34.54
+1186,2025-11-17,West,C025,Ceramic mug,Gear,4,12.48
+1187,2025-03-22,North,C116,Chai,Tea,1,8.27
+1188,2025-05-09,North,C051,Green tea,Tea,2,7.62
+1189,2025-06-21,East,C015,Filter beans,Coffee,1,11.22
+1190,2025-10-20,South,C027,Filter beans,Coffee,1,11.4
+1191,2025-01-17,East,C013,Earl Grey,Tea,2,6.9
+1192,2025-04-11,South,C061,Ceramic mug,Gear,2,12.14
+1193,2025-08-26,North,C005,Green tea,Tea,3,7.71
+1194,2025-08-21,West,C016,Green tea,Tea,1,7.71
+1195,2025-04-26,East,C002,Decaf beans,Coffee,4,12.65
+1196,2025-12-02,South,C084,Espresso beans,Coffee,4,15.14
+1197,2025-11-18,West,C082,Filter beans,Coffee,2,11.44
+1198,2025-01-27,East,C061,Chai,Tea,2,8.2
+1199,2025-10-25,North,C085,Green tea,Tea,1,7.77
+1200,2025-06-17,West,C071,Filter beans,Coffee,1,11.22
+1201,2025-12-18,East,C098,Espresso beans,Coffee,1,15.14
+1202,2025-10-17,East,C060,Decaf beans,Coffee,1,12.95
+1203,2025-11-22,North,C116,Earl Grey,Tea,1,7.18
+1204,2025-02-23,West,C065,Filter beans,Coffee,4,11.04
+1205,2025-07-14,East,C092,Pour-over kit,Gear,3,34.82
+1206,2025-03-29,North,C048,Green tea,Tea,6,7.56
+1207,2025-05-16,West,C046,Green tea,Tea,2,7.62
+1208,2025-11-15,East,C098,Earl Grey,Tea,2,7.18
+1209,2025-02-20,North,C047,Grinder,Gear,3,89.36
+1210,2025-09-17,South,C043,Green tea,Tea,3,7.74
+1211,2025-09-23,West,C003,Espresso beans,Coffee,1,14.96
+1212,2025-12-18,North,C021,Filter beans,Coffee,4,11.48
+1213,2025-12-30,East,C052,Espresso beans,Coffee,6,15.14
+1214,2025-05-04,South,C107,Espresso beans,Coffee,6,14.73
+1215,2025-12-06,North,C049,Ceramic mug,Gear,1,12.53
+1216,2025-04-19,North,C064,Grinder,Gear,4,90.07
+1217,2025-08-13,North,C083,Chai,Tea,1,8.43
+1218,2025-04-01,South,C085,Espresso beans,Coffee,1,14.67
+1219,2025-08-01,West,C094,Filter beans,Coffee,1,11.31
+1220,2025-09-05,East,C087,Espresso beans,Coffee,2,14.96
+1221,2025-04-11,West,C096,Grinder,Gear,2,90.07
+1222,2025-11-10,West,C058,Green tea,Tea,3,7.8
+1223,2025-08-14,North,C011,Espresso beans,Coffee,1,14.91
+1224,2025-09-03,East,C104,Espresso beans,Coffee,1,14.96
+1225,2025-11-15,North,C080,Espresso beans,Coffee,1,15.08
+1226,2025-11-28,South,C111,Decaf beans,Coffee,6,13.0
+1227,2025-04-04,North,C017,Filter beans,Coffee,3,11.13
+1228,2025-06-02,North,C080,Espresso beans,Coffee,1,14.79
+1229,2025-10-07,East,C039,Espresso beans,Coffee,2,15.02
+1230,2025-12-07,West,C078,Pour-over kit,Gear,2,35.5
+1231,2025-10-31,North,C094,Filter beans,Coffee,1,11.4
+1232,2025-05-14,South,C049,Filter beans,Coffee,6,11.18
+1233,2025-10-01,South,C029,Green tea,Tea,6,7.77
+1234,2025-05-12,South,C089,Chai,Tea,2,8.33
+1235,2025-05-22,South,C057,Espresso beans,Coffee,1,14.73
+1236,2025-12-17,West,C004,Filter beans,Coffee,3,11.48
+1237,2025-09-07,West,C027,Chai,Tea,3,8.46
+1238,2025-03-26,South,C068,Green tea,Tea,4,7.56
+1239,2025-10-21,West,C065,Decaf beans,Coffee,1,12.95
+1240,2025-04-15,East,C074,Pour-over kit,Gear,2,34.41
+1241,2025-11-05,East,C082,Espresso beans,Coffee,2,15.08
+1242,2025-03-09,East,C056,Filter beans,Coffee,2,11.09
+1243,2025-11-03,East,C102,Ceramic mug,Gear,2,12.48
+1244,2025-11-10,South,C038,Green tea,Tea,1,7.8
+1245,2025-09-22,West,C056,Espresso beans,Coffee,4,14.96
+1246,2025-11-11,South,C109,Chai,Tea,4,8.53
+1247,2025-02-28,East,C029,Decaf beans,Coffee,1,12.55
+1248,2025-09-14,South,C013,Decaf beans,Coffee,2,12.9
+1249,2025-04-04,South,C061,Green tea,Tea,2,7.59
+1250,2025-08-26,North,C003,Espresso beans,Coffee,6,14.91
+1251,2025-12-25,North,C114,Ceramic mug,Gear,6,12.53
+1252,2025-10-22,South,C109,Green tea,Tea,4,7.77
+1253,2025-10-26,South,C083,Filter beans,Coffee,2,11.4
+1254,2025-06-05,South,C089,Espresso beans,Coffee,1,14.79
+1255,2025-05-22,North,C108,Filter beans,Coffee,1,11.18
+1256,2025-08-21,South,C027,Ceramic mug,Gear,2,12.34
+1257,2025-02-20,East,C063,Filter beans,Coffee,1,11.04
+1258,2025-04-04,South,C048,Espresso beans,Coffee,6,14.67
+1259,2025-04-28,North,C097,Ceramic mug,Gear,4,12.14
+1260,2025-04-20,North,C058,Espresso beans,Coffee,3,14.67
+1261,2025-09-30,South,C045,Chai,Tea,2,8.46
+1262,2025-01-26,West,C029,Chai,Tea,4,8.2
+1263,2025-05-24,West,C075,Espresso beans,Coffee,6,14.73
+1264,2025-10-22,East,C023,Ceramic mug,Gear,6,12.43
+1265,2025-11-09,South,C085,Pour-over kit,Gear,4,35.36
+1266,2025-02-02,North,C011,Espresso beans,Coffee,2,14.56
+1267,2025-09-26,North,C002,Ceramic mug,Gear,4,12.38
+1268,2025-05-04,South,C061,Green tea,Tea,1,7.62
+1269,2025-11-06,South,C019,Ceramic mug,Gear,4,12.48
+1270,2025-09-13,North,C049,Earl Grey,Tea,2,7.12
+1271,2025-07-09,East,C009,Filter beans,Coffee,2,11.26
+1272,2025-03-12,North,C102,Earl Grey,Tea,2,6.96
+1273,2025-05-18,North,C012,Chai,Tea,1,8.33
+1274,2025-10-11,North,C100,Espresso beans,Coffee,2,15.02
+1275,2025-10-09,West,C082,Filter beans,Coffee,1,11.4
+1276,2025-07-29,North,C067,Decaf beans,Coffee,1,12.8
+1277,2025-07-16,West,C014,Green tea,Tea,6,7.68
+1278,2025-07-07,East,C062,Filter beans,Coffee,2,11.26
+1279,2025-09-14,East,C107,Ceramic mug,Gear,4,12.38
+1280,2025-03-04,East,C112,Espresso beans,Coffee,6,14.62
+1281,2025-12-08,East,C047,Espresso beans,Coffee,4,15.14
+1282,2025-03-22,South,C035,Green tea,Tea,4,7.56
+1283,2025-11-30,West,C011,Filter beans,Coffee,1,11.44
+1284,2025-01-25,West,C091,Decaf beans,Coffee,2,12.5
+1285,2025-10-21,West,C039,Espresso beans,Coffee,1,15.02
+1286,2025-07-31,East,C017,Ceramic mug,Gear,4,12.29
+1287,2025-11-01,South,C065,Espresso beans,Coffee,1,15.08
+1288,2025-04-20,South,C078,Espresso beans,Coffee,1,14.67
+1289,2025-08-03,West,C033,Espresso beans,Coffee,4,14.91
+1290,2025-08-26,North,C070,Filter beans,Coffee,1,11.31
+1291,2025-12-14,North,C013,Decaf beans,Coffee,1,13.05
+1292,2025-07-04,East,C087,Green tea,Tea,2,7.68
+1293,2025-07-28,North,C037,Espresso beans,Coffee,4,14.85
+1294,2025-07-14,North,C013,Filter beans,Coffee,2,11.26
+1295,2025-11-01,East,C015,Green tea,Tea,2,7.8
+1296,2025-05-26,East,C048,Ceramic mug,Gear,2,12.19
+1297,2025-04-30,South,C056,Pour-over kit,Gear,2,34.41
+1298,2025-12-14,South,C071,Filter beans,Coffee,2,11.48
+1299,2025-09-15,North,C033,Ceramic mug,Gear,1,12.38
+1300,2025-11-20,South,C052,Espresso beans,Coffee,2,15.08
+1301,2025-07-16,East,C085,Chai,Tea,1,8.4
+1302,2025-11-01,North,C115,Espresso beans,Coffee,4,15.08
+1303,2025-04-07,West,C026,Grinder,Gear,4,90.07
+1304,2025-06-15,West,C085,Earl Grey,Tea,2,7.04
+1305,2025-08-21,West,C019,Green tea,Tea,2,7.71
+1306,2025-12-20,North,C108,Chai,Tea,6,8.56
+1307,2025-02-19,South,C107,Earl Grey,Tea,1,6.93
+1308,2025-06-10,West,C043,Chai,Tea,6,8.36
+1309,2025-05-24,South,C022,Filter beans,Coffee,1,11.18
+1310,2025-02-22,West,C044,Ceramic mug,Gear,2,12.05
+1311,2025-11-21,South,C109,Green tea,Tea,1,7.8
+1312,2025-11-05,East,C011,Grinder,Gear,2,92.56
+1313,2025-05-07,West,C029,Decaf beans,Coffee,1,12.7
+1314,2025-06-17,North,C013,Espresso beans,Coffee,4,14.79
+1315,2025-12-19,South,C004,Filter beans,Coffee,2,11.48
+1316,2025-08-28,North,C032,Decaf beans,Coffee,4,12.85
+1317,2025-07-11,East,C074,Espresso beans,Coffee,1,14.85
+1318,2025-12-27,North,C081,Ceramic mug,Gear,1,12.53
+1319,2025-10-05,South,C105,Ceramic mug,Gear,6,12.43
+1320,2025-06-24,East,C045,Ceramic mug,Gear,6,12.24
+1321,2025-06-24,West,C119,Espresso beans,Coffee,3,14.79
+1322,2025-04-08,North,C119,Filter beans,Coffee,3,11.13
+1323,2025-07-29,East,C033,Green tea,Tea,1,7.68
+1324,2025-10-03,East,C120,Pour-over kit,Gear,2,35.22
+1325,2025-07-05,West,C060,Green tea,Tea,6,7.68
+1326,2025-10-20,South,C104,Filter beans,Coffee,1,11.4
+1327,2025-03-05,South,C018,Chai,Tea,1,8.27
+1328,2025-04-15,East,C094,Earl Grey,Tea,2,6.98
+1329,2025-07-10,North,C023,Chai,Tea,1,8.4
+1330,2025-07-10,North,C114,Espresso beans,Coffee,1,14.85
+1331,2025-07-22,West,C030,Decaf beans,Coffee,1,12.8
+1332,2025-11-16,South,C044,Chai,Tea,4,8.53
+1333,2025-05-21,North,C083,Green tea,Tea,4,7.62
+1334,2025-11-26,West,C026,Espresso beans,Coffee,1,15.08
+1335,2025-04-19,North,C108,Kettle,Gear,1,59.71
+1336,2025-02-05,West,C048,Decaf beans,Coffee,6,12.55
+1337,2025-11-12,North,C050,Earl Grey,Tea,3,7.18
+1338,2025-09-08,West,C070,Decaf beans,Coffee,1,12.9
+1339,2025-08-07,West,C085,Espresso beans,Coffee,1,14.91
+1340,2025-02-28,North,C094,Chai,Tea,1,8.23
+1341,2025-08-30,North,C078,Ceramic mug,Gear,2,12.34
+1342,2025-11-25,North,C106,Earl Grey,Tea,2,7.18
+1343,2025-07-20,West,C049,Ceramic mug,Gear,3,12.29
+1344,2025-03-01,East,C040,Earl Grey,Tea,1,6.96
+1345,2025-08-12,North,C056,Pour-over kit,Gear,4,34.95
+1346,2025-07-15,West,C039,Green tea,Tea,1,7.68
+1347,2025-09-10,North,C019,Green tea,Tea,2,7.74
+1348,2025-05-27,South,C004,Ceramic mug,Gear,1,12.19
+1349,2025-12-04,South,C094,Espresso beans,Coffee,2,15.14
+1350,2025-06-18,South,C104,Filter beans,Coffee,3,11.22
+1351,2025-10-26,West,C067,Grinder,Gear,2,92.2
+1352,2025-11-27,West,C023,Grinder,Gear,1,92.56
+1353,2025-11-14,East,C003,Grinder,Gear,2,92.56
+1354,2025-08-07,North,C021,Chai,Tea,1,8.43
+1355,2025-11-13,East,C043,Espresso beans,Coffee,1,15.08
+1356,2025-02-13,North,C075,Filter beans,Coffee,2,11.04
+1357,2025-11-25,South,C063,Ceramic mug,Gear,6,12.48
+1358,2025-11-07,South,C104,Ceramic mug,Gear,2,12.48
+1359,2025-05-22,East,C013,Ceramic mug,Gear,1,12.19
+1360,2025-12-01,East,C107,Espresso beans,Coffee,6,15.14
+1361,2025-03-12,South,C109,Espresso beans,Coffee,4,14.62
+1362,2025-09-24,South,C018,Decaf beans,Coffee,2,12.9
+1363,2025-09-04,South,C089,Filter beans,Coffee,1,11.35
+1364,2025-09-30,South,C100,Earl Grey,Tea,1,7.12
+1365,2025-05-22,North,C095,Espresso beans,Coffee,3,14.73
+1366,2025-05-13,South,C057,Chai,Tea,6,8.33
+1367,2025-03-02,South,C027,Filter beans,Coffee,1,11.09
+1368,2025-02-15,West,C011,Chai,Tea,1,8.23
+1369,2025-03-11,West,C081,Decaf beans,Coffee,1,12.6
+1370,2025-07-12,South,C031,Espresso beans,Coffee,3,14.85
+1371,2025-08-26,West,C069,Decaf beans,Coffee,3,12.85
+1372,2025-06-11,North,C038,Ceramic mug,Gear,4,12.24
+1373,2025-07-01,South,C056,Filter beans,Coffee,1,11.26
+1374,2025-05-29,East,C049,Filter beans,Coffee,6,11.18
+1375,2025-09-07,West,C009,Espresso beans,Coffee,1,14.96
+1376,2025-08-20,West,C034,Ceramic mug,Gear,2,12.34
+1377,2025-06-23,West,C025,Filter beans,Coffee,1,11.22
+1378,2025-12-28,East,C049,Green tea,Tea,4,7.83
+1379,2025-09-13,West,C085,Green tea,Tea,1,7.74
+1380,2025-03-24,East,C042,Decaf beans,Coffee,1,12.6
+1381,2025-07-10,South,C023,Green tea,Tea,6,7.68
+1382,2025-12-07,West,C091,Earl Grey,Tea,1,7.2
+1383,2025-12-28,East,C113,Espresso beans,Coffee,6,15.14
+1384,2025-11-10,West,C053,Espresso beans,Coffee,1,15.08
+1385,2025-10-10,North,C082,Earl Grey,Tea,1,7.15
+1386,2025-12-24,South,C054,Filter beans,Coffee,4,11.48
+1387,2025-06-14,West,C047,Earl Grey,Tea,6,7.04
+1388,2025-06-21,North,C075,Filter beans,Coffee,2,11.22
+1389,2025-10-16,East,C074,Chai,Tea,4,8.5
+1390,2025-07-01,East,C033,Espresso beans,Coffee,4,14.85
+1391,2025-06-19,North,C064,Kettle,Gear,6,60.18
+1392,2025-08-18,South,C008,Espresso beans,Coffee,1,14.91
+1393,2025-06-05,South,C064,Chai,Tea,2,8.36
+1394,2025-10-26,North,C006,Decaf beans,Coffee,4,12.95
+1395,2025-10-11,North,C049,Espresso beans,Coffee,2,15.02
+1396,2025-03-22,East,C009,Green tea,Tea,2,7.56
+1397,2025-03-18,South,C016,Filter beans,Coffee,4,11.09
+1398,2025-01-30,West,C081,Green tea,Tea,1,7.5
+1399,2025-10-10,East,C024,Filter beans,Coffee,2,11.4
+1400,2025-07-18,East,C098,Espresso beans,Coffee,6,14.85
+1401,2025-11-03,North,C025,Earl Grey,Tea,4,7.18
+1402,2025-05-21,South,C082,Filter beans,Coffee,2,11.18
+1403,2025-11-04,South,C080,Green tea,Tea,4,7.8
+1404,2025-11-14,West,C101,Espresso beans,Coffee,6,15.08
+1405,2025-09-10,South,C074,Filter beans,Coffee,6,11.35
+1406,2025-10-02,West,C074,Filter beans,Coffee,3,11.4
+1407,2025-06-09,North,C111,Earl Grey,Tea,4,7.04
+1408,2025-01-10,West,C081,Ceramic mug,Gear,1,12.0
+1409,2025-10-23,West,C101,Filter beans,Coffee,2,11.4
+1410,2025-09-15,West,C005,Earl Grey,Tea,2,7.12
+1411,2025-07-18,West,C100,Ceramic mug,Gear,3,12.29
+1412,2025-01-01,West,C103,Filter beans,Coffee,1,11.0
+1413,2025-10-11,East,C069,Earl Grey,Tea,2,7.15
+1414,2025-07-26,East,C051,Espresso beans,Coffee,2,14.85
+1415,2025-06-04,South,C074,Espresso beans,Coffee,3,14.79
+1416,2025-03-20,North,C048,Decaf beans,Coffee,2,12.6
+1417,2025-10-17,East,C033,Espresso beans,Coffee,1,15.02
+1418,2025-10-20,East,C098,Decaf beans,Coffee,6,12.95
+1419,2025-10-17,East,C085,Earl Grey,Tea,3,7.15
+1420,2025-12-16,South,C043,Grinder,Gear,1,92.92
+1421,2025-04-23,East,C115,Chai,Tea,4,8.3
+1422,2025-06-04,East,C002,Chai,Tea,2,8.36
+1423,2025-08-02,South,C047,Grinder,Gear,1,91.49
+1424,2025-03-07,South,C055,Filter beans,Coffee,1,11.09
+1425,2025-05-01,West,C040,Green tea,Tea,6,7.62
+1426,2025-06-12,East,C054,Green tea,Tea,1,7.65
+1427,2025-12-06,West,C064,Chai,Tea,1,8.56
+1428,2025-05-30,North,C031,Espresso beans,Coffee,2,14.73
+1429,2025-12-09,South,C090,Ceramic mug,Gear,1,12.53
+1430,2025-08-05,East,C111,Espresso beans,Coffee,6,14.91
+1431,2025-07-28,South,C055,Earl Grey,Tea,2,7.07
+1432,2025-08-03,East,C006,Green tea,Tea,1,7.71
+1433,2025-02-20,South,C066,Filter beans,Coffee,6,11.04
+1434,2025-08-07,South,C111,Espresso beans,Coffee,1,14.91
+1435,2025-06-16,West,C011,Filter beans,Coffee,3,11.22
+1436,2025-12-11,South,C099,Filter beans,Coffee,4,11.48
+1437,2025-06-04,South,C026,Grinder,Gear,6,90.78
+1438,2025-08-13,West,C100,Pour-over kit,Gear,1,34.95
+1439,2025-12-21,East,C020,Filter beans,Coffee,1,11.48
+1440,2025-02-28,East,C088,Chai,Tea,3,8.23
+1441,2025-02-17,East,C120,Espresso beans,Coffee,1,14.56
+1442,2025-09-08,West,C035,Ceramic mug,Gear,6,12.38
+1443,2025-11-05,South,C063,Filter beans,Coffee,1,11.44
+1444,2025-04-02,West,C025,Espresso beans,Coffee,3,14.67
+1445,2025-12-23,North,C078,Pour-over kit,Gear,1,35.5
+1446,2025-03-11,West,C077,Green tea,Tea,6,7.56
+1447,2025-09-19,West,C119,Filter beans,Coffee,1,11.35
+1448,2025-08-19,South,C060,Green tea,Tea,2,7.71
+1449,2025-12-29,South,C019,Chai,Tea,2,8.56
+1450,2025-01-21,South,C063,Earl Grey,Tea,2,6.9
+1451,2025-06-29,West,C054,Pour-over kit,Gear,1,34.68
+1452,2025-09-30,West,C075,Green tea,Tea,1,7.74
+1453,2025-11-13,West,C090,Chai,Tea,1,8.53
+1454,2025-03-15,South,C100,Chai,Tea,1,8.27
+1455,2025-08-02,West,C036,Chai,Tea,1,8.43
+1456,2025-05-07,East,C073,Filter beans,Coffee,6,11.18
+1457,2025-02-26,South,C018,Ceramic mug,Gear,1,12.05
+1458,2025-01-14,South,C016,Filter beans,Coffee,3,11.0
+1459,2025-02-01,West,C062,Espresso beans,Coffee,1,14.56
+1460,2025-11-22,West,C039,Earl Grey,Tea,2,7.18
+1461,2025-10-17,West,C100,Earl Grey,Tea,1,7.15
+1462,2025-07-19,East,C116,Espresso beans,Coffee,2,14.85
+1463,2025-03-07,North,C093,Espresso beans,Coffee,1,14.62
+1464,2025-10-16,North,C084,Filter beans,Coffee,1,11.4
+1465,2025-05-08,North,C017,Espresso beans,Coffee,4,14.73
+1466,2025-05-30,West,C031,Earl Grey,Tea,1,7.01
+1467,2025-08-18,South,C055,Filter beans,Coffee,4,11.31
+1468,2025-05-05,West,C003,Filter beans,Coffee,1,11.18
+1469,2025-05-28,West,C023,Espresso beans,Coffee,6,14.73
+1470,2025-08-28,North,C020,Filter beans,Coffee,2,11.31
+1471,2025-11-23,West,C087,Pour-over kit,Gear,2,35.36
+1472,2025-05-28,South,C058,Espresso beans,Coffee,2,14.73
+1473,2025-05-02,West,C050,Earl Grey,Tea,6,7.01
+1474,2025-03-07,North,C045,Espresso beans,Coffee,3,14.62
+1475,2025-08-28,South,C008,Kettle,Gear,6,60.65
+1476,2025-07-03,West,C101,Espresso beans,Coffee,6,14.85
+1477,2025-11-29,North,C090,Pour-over kit,Gear,1,35.36
+1478,2025-08-27,North,C076,Decaf beans,Coffee,2,12.85
+1479,2025-04-22,North,C057,Filter beans,Coffee,3,11.13
+1480,2025-09-03,North,C042,Ceramic mug,Gear,3,12.38
+1481,2025-11-23,West,C120,Espresso beans,Coffee,2,15.08
+1482,2025-09-07,North,C058,Earl Grey,Tea,3,7.12
+1483,2025-03-10,East,C069,Green tea,Tea,1,7.56
+1484,2025-09-05,East,C117,Ceramic mug,Gear,2,12.38
+1485,2025-08-26,East,C034,Filter beans,Coffee,1,11.31
+1486,2025-10-02,South,C057,Espresso beans,Coffee,1,15.02
+1487,2025-03-13,South,C051,Espresso beans,Coffee,3,14.62
+1488,2025-11-07,West,C020,Filter beans,Coffee,6,11.44
+1489,2025-10-24,East,C023,Pour-over kit,Gear,4,35.22
+1490,2025-12-24,West,C035,Green tea,Tea,2,7.83
+1491,2025-11-09,West,C066,Espresso beans,Coffee,3,15.08
+1492,2025-08-06,East,C088,Espresso beans,Coffee,1,14.91
+1493,2025-10-23,South,C009,Filter beans,Coffee,4,11.4
+1494,2025-12-19,East,C071,Espresso beans,Coffee,1,15.14
+1495,2025-07-28,East,C101,Earl Grey,Tea,2,7.07
+1496,2025-06-05,North,C074,Chai,Tea,1,8.36
+1497,2025-01-31,North,C106,Espresso beans,Coffee,2,14.5
+1498,2025-09-09,South,C063,Ceramic mug,Gear,2,12.38
+1499,2025-12-25,West,C006,Chai,Tea,3,8.56
+1500,2025-11-16,West,C084,Filter beans,Coffee,1,11.44

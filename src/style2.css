@@ -208,3 +208,6 @@ body.kb-open:not(.in-notebook) .page { padding-bottom: 16px; }
 .progress > i { display: block; height: 100%; background: var(--accent, #5b8cff); width: 0; transition: width .2s; }
 .preview-modal .out { margin-top: 8px; }
 .preview-modal h1 { font-size: 20px; margin: 4px 0 2px; word-break: break-all; }
+
+.ext-example { font: 13px/1.5 var(--mono); background: rgba(127,127,127,.1); padding: 10px 12px; border-radius: 10px; white-space: pre-wrap; word-break: break-word; margin: 0 0 12px; }
+.cat-file-formats { --cat: #5b8cff; } .cat-text-time { --cat: #f59e0b; } .cat-benchmarks { --cat: #ef4444; } .cat-tools { --cat: #64748b; }

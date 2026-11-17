@@ -21,6 +21,7 @@ import { initPro, isPro, onPro, requirePro } from './pro';
 import { errorBox, renderResult } from './results';
 import { CORE_SAMPLES, SAMPLE_FILES, sampleNotebook, type Sample } from './samples';
 import { LESSONS } from './lessons';
+import { EXTENSIONS, EXT_CATEGORIES, type ExtInfo } from './extensions';
 import { applyTheme, getLangPref, getThemePref, lang, setLangPref, setThemePref, t, type LangPref, type Theme } from './i18n';
 import { querySucceeded } from './review';
 import { confirmBox, dark, fmtBytes, fmtDate, fmtMs, h, icon, modal, native, pickFiles, promptBox, safeName, sheet, shareFile, toast } from './ui';
@@ -33,7 +34,7 @@ let files: DataFile[] = [];
 const schemaComp = new Compartment();
 const editors = new Set<EditorView>();
 
-type Tab = 'notebooks' | 'files' | 'database';
+type Tab = 'notebooks' | 'files' | 'extensions' | 'database';
 type Route = { tab: Tab; notebook?: string };
 let route: Route = { tab: 'notebooks' };
 
@@ -74,7 +75,7 @@ function statusPill() {
 }
 
 function tabBar() {
-  const tabs: [Tab, string, string][] = [['notebooks', 'Notebooks', 'doc'], ['files', 'Files', 'folder'], ['database', 'Database', 'db']];
+  const tabs: [Tab, string, string][] = [['notebooks', 'Notebooks', 'doc'], ['files', 'Files', 'folder'], ['extensions', 'Extensions', 'puzzle'], ['database', 'Database', 'db']];
   return h('nav', { class: 'tabbar' }, tabs.map(([tb, label, ic]) =>
     h('button', { class: route.tab === tb && !route.notebook ? 'on' : '', onclick: () => go({ tab: tb }) }, icon(ic), h('span', {}, t(label)))));
 }
@@ -96,7 +97,7 @@ function render() {
     if (nb) { app.append(notebookView(nb)); return; }
     route = { tab: 'notebooks' };
   }
-  const page = route.tab === 'files' ? filesPage() : route.tab === 'database' ? databasePage() : homePage();
+  const page = route.tab === 'files' ? filesPage() : route.tab === 'extensions' ? extensionsPage() : route.tab === 'database' ? databasePage() : homePage();
   app.append(page, tabBar());
 }
 
@@ -287,6 +288,96 @@ function filesPage() {
   const offPro = onPro(() => render());
   new MutationObserver(() => { if (!page.isConnected) offPro(); }).observe(document.body, { childList: true, subtree: true });
   return page;
+}
+
+// ---------------- extensions ----------------
+const slug = (x: string) => x.toLowerCase().replace(/[^a-z]+/g, '-');
+function catIcon(c: string) {
+  return ({ 'File formats': 'doc', Geospatial: 'globe', 'Text & time': 'search', 'Data types': 'shapes', 'AI & vectors': 'spark', Benchmarks: 'bolt', Tools: 'wrench' } as Record<string, string>)[c] ?? 'puzzle';
+}
+let extLoaded: Record<string, boolean> = {};
+
+function extBadge(e: ExtInfo) {
+  if (extLoaded[e.id]) return { label: t('Loaded'), cls: 'on' };
+  if (e.pro && !isPro()) return { label: 'Pro', cls: 'get' };
+  return { label: e.autoload ? t('Auto') : t('Ready'), cls: 'na' };
+}
+
+function extensionsPage() {
+  const listEl = h('div');
+  const draw = () => {
+    const parts: (HTMLElement | false)[] = [
+      h('div', { class: 'featured' }, ['parquet', 'excel', 'spatial', 'json'].map((id) => {
+        const e = EXTENSIONS.find((x) => x.id === id)!;
+        const b = extBadge(e);
+        return h('button', { class: `feat cat-${slug(e.category)}`, onclick: () => extDetail(e, draw) },
+          h('div', { class: 'feat-ico' }, icon(catIcon(e.category))),
+          h('div', { class: 'feat-title' }, e.title),
+          h('div', { class: 'feat-sub' }, t(e.tagline)),
+          h('span', { class: `badge ${b.cls}` }, b.label));
+      })),
+      ...EXT_CATEGORIES.flatMap((c) => [
+        h('h3', { class: 'group' }, icon(catIcon(c)), t(c)),
+        h('div', { class: 'list' }, EXTENSIONS.filter((e) => e.category === c).map((e) => {
+          const b = extBadge(e);
+          return h('button', { class: 'row', onclick: () => extDetail(e, draw) },
+            h('div', { class: `row-icon cat-${slug(e.category)}` }, icon(catIcon(e.category))),
+            h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, e.title), h('div', { class: 'row-sub' }, t(e.tagline))),
+            h('span', { class: `badge ${b.cls}` }, b.label));
+        })),
+      ]),
+    ];
+    listEl.replaceChildren(...(parts.filter(Boolean) as HTMLElement[]));
+  };
+  draw();
+  void engine.extensionStatus().then((st) => { extLoaded = st; if (listEl.isConnected) draw(); }).catch(() => {});
+  const offPro = onPro(() => render());
+  new MutationObserver(() => { if (!listEl.isConnected) offPro(); }).observe(document.body, { childList: true, subtree: true });
+  return h('div', { class: 'page' },
+    header(t('Extensions'), statusPill()),
+    h('p', { class: 'muted small drop-hint' }, `${EXTENSIONS.length} ${t('DuckDB extensions are built into the app and load offline, without downloading anything. Most load automatically the first time a query needs them.')}`),
+    !isPro() && h('button', { class: 'pro-banner', onclick: () => requirePro().then(() => render()) },
+      h('div', {}, h('b', {}, t('Unlock Parquet, Excel, SQLite and Spatial')), h('div', { class: 'small' }, t('Charts, maps and big files too · one-time purchase'))),
+      h('span', { class: 'pro-tag big' }, 'PRO')),
+    listEl);
+}
+
+function extDetail(e: ExtInfo, redraw: () => void) {
+  const loaded = !!extLoaded[e.id];
+  const loadBtn = h('button', { class: 'btn big primary', disabled: loaded }, loaded ? t('Loaded') : e.pro && !isPro() ? t('Load · Pro') : t('Load'));
+  loadBtn.onclick = async () => {
+    if (e.pro && !(await requirePro(`${e.title} ${t('is part of Pro.')}`))) return;
+    loadBtn.setAttribute('disabled', '');
+    loadBtn.textContent = t('Loading…');
+    try {
+      await engine.loadExtension(e.id);
+      extLoaded = await engine.extensionStatus();
+      toast(`${e.title} ${t('loaded')}`);
+      close(); redraw();
+    } catch (err) { toast((err as PgError).message, 'err'); loadBtn.removeAttribute('disabled'); loadBtn.textContent = t('Load'); }
+  };
+  const sample = e.sample ? CORE_SAMPLES.find((x) => x.key === e.sample) : undefined;
+  const content = h('div', { class: 'ext-detail' },
+    h('div', { class: `ext-hero cat-${slug(e.category)}` }, h('div', { class: 'feat-ico big' }, icon(catIcon(e.category)))),
+    h('h1', {}, e.title),
+    h('div', { class: 'muted center' }, t(e.tagline)),
+    h('p', {}, e.about),
+    h('div', { class: 'kv' },
+      h('div', {}, h('span', {}, t('Category')), h('b', {}, t(e.category))),
+      h('div', {}, h('span', {}, 'LOAD'), h('code', {}, e.id)),
+      h('div', {}, h('span', {}, t('Size')), h('b', {}, e.sizeKb >= 1024 ? `${(e.sizeKb / 1024).toFixed(1)} MB` : `${e.sizeKb} KB`)),
+      h('div', {}, h('span', {}, t('Licence')), h('b', {}, e.license)),
+      h('div', {}, h('span', {}, t('Version')), h('b', {}, `DuckDB ${engine.duckdbVersion() || 'v1.5.4'}`)),
+      h('div', {}, h('span', {}, t('Plan')), h('b', {}, e.pro ? 'Pro' : t('Free')))),
+    e.example && h('pre', { class: 'ext-example' }, e.example),
+    loadBtn,
+    e.example && h('button', { class: 'btn big', onclick: async () => {
+      if (e.pro && !(await requirePro(`${e.title} ${t('is part of Pro.')}`))) return;
+      close();
+      await newNotebook([{ id: uid(), type: 'markdown', source: `# ${e.title}\n${e.about}` }, { id: uid(), type: 'sql', source: e.example! }], e.title);
+    } }, icon('plus'), t('Try it in a notebook')),
+    sample && h('button', { class: 'btn big', onclick: () => { close(); void openSample(sample); } }, icon('doc'), t('See example notebook')));
+  const close = modal(content);
 }
 
 // ---------------- database ----------------

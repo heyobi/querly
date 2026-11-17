@@ -376,6 +376,19 @@ export async function exportQuery(sql: string, format: 'csv' | 'parquet' | 'json
   });
 }
 
+/** Bundled extensions DuckDB knows about, and whether each is loaded in the running database. */
+export async function extensionStatus(): Promise<Record<string, boolean>> {
+  await ready();
+  const r = await serial(() => runQuery(`SELECT extension_name, loaded FROM duckdb_extensions()`, 1000));
+  return Object.fromEntries((r.rows as [string, boolean][]).map(([n, l]) => [n, l]));
+}
+
+export async function loadExtension(id: string): Promise<void> {
+  await ready();
+  await serial(async () => { try { await conn!.query(`LOAD ${id}`); } catch (e) { throw errMsg(e); } });
+  void refreshMeta();
+}
+
 export async function refreshMeta(): Promise<Meta> {
   if (!conn) return meta;
   try {

@@ -15,7 +15,7 @@ async function session(scheme, shots) {
   await p.addInitScript((l) => { try { localStorage.setItem('qly-lang', l); } catch {} }, lang);
   await p.goto(URL_);
   await p.waitForFunction(() => window.__engine?.getState().status === 'ready', null, { timeout: 120000 });
-  await p.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
+  await p.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important} .bar{background:var(--bg)!important}' });
   for (const [name, fn] of shots) { await fn(p); await p.waitForTimeout(700); await p.screenshot({ path: `${out}/${name}.png` }); console.log('saved', name); }
   await ctx.close();
 }
@@ -31,11 +31,11 @@ await session('dark', [
   ['1-notebook', async (p) => { await openSample('welcome')(p); await runCell(2)(p); await runCell(3)(p); await scrollTo('.cell.sql', 2)(p); }],
   ['2-chart', async (p) => { await p.locator('.cell.sql').nth(3).locator('.seg button').nth(1).click(); await scrollTo('.cell.sql', 3)(p); }],
   ['3-files', async (p) => { await p.evaluate(() => window.__go({ tab: 'files' })); await p.waitForSelector('.kind'); }],
-  ['4-home', async (p) => { await p.evaluate(() => window.__go({ tab: 'notebooks' })); await p.waitForSelector('.cards'); await scrollTo('.section', 0)(p); }],
+  ['4-extensions', async (p) => { await p.evaluate(() => window.__go({ tab: 'extensions' })); await p.waitForSelector('.featured'); await p.waitForTimeout(800); }],
 ]);
 await session('light', [
   ['5-map', async (p) => { await openSample('spatial')(p); await runCell(0)(p); await scrollTo('.cell.sql', 0)(p); }],
   ['6-lesson', async (p) => { await openSample('learn-7')(p); await runCell(0)(p); await scrollTo('.cell.sql', 0)(p); }],
-  ['7-database', async (p) => { await p.evaluate(() => window.__go({ tab: 'database' })); await p.waitForTimeout(1500); }],
+  ['7-home', async (p) => { await p.evaluate(() => window.__go({ tab: 'notebooks' })); await p.waitForSelector('.cards'); }],
 ]);
 await b.close();

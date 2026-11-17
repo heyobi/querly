@@ -85,6 +85,7 @@ const log = await p.evaluate(async () => {
     return `${r.rows[0][0]} rows after restart`;
   });
   await step('snapshot export/import', async () => { const b = await E.exportSnapshot(); await E.importSnapshot(b); return (await one(`SELECT count(*) FROM persist_check`)).rows[0][0]; });
+  await step('extension status', async () => { const st = await E.extensionStatus(); const miss = ['parquet','json','excel','spatial','fts','icu','tpch','sqlite_scanner','vss','inet'].filter((x) => !(x in st)); if (miss.length) throw new Error('unknown: ' + miss); if (!st.parquet) throw new Error('parquet not loaded after restore'); return Object.values(st).filter(Boolean).length + ' loaded'; });
   await step('meta', async () => { const m = await E.refreshMeta(); return `${m.tables.length} tables, ${m.functions.length} functions`; });
   return log;
 });

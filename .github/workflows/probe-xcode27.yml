@@ -8,9 +8,15 @@ jobs:
     runs-on: xcode-27
     steps:
       - run: |
-          sw_vers; ls /Applications | grep -i xcode; xcodebuild -version; xcodebuild -showsdks | grep -i ios
-          xcrun simctl list runtimes
-          xcrun simctl list devicetypes | grep -iE "duo|fold|ipad pro 13|ipad air 13|iphone 17 pro"
-          xcrun simctl list devices available | grep -iE "duo|ipad pro 13|iphone 17 pro" | head -20
-          xcrun simctl io 2>&1 | head -40 || true
-          xcrun simctl help io 2>&1 | head -60 || true
+          xcrun simctl help io 2>&1 | sed -n 40,140p
+          xcrun simctl help 2>&1 | head -60
+          xcrun simctl help ui 2>&1 | head -60
+          DEV=$(xcrun simctl list devices available | grep "iPhone Duo" | head -1 | grep -oE '[0-9A-F-]{36}')
+          xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV" -b
+          xcrun simctl io "$DEV" enumerate 2>&1 | head -80
+          xcrun simctl ui "$DEV" 2>&1 | head -20 || true
+          mkdir -p out; xcrun simctl io "$DEV" screenshot out/default.png 2>&1 || true
+          for d in internal external 1 2 primary; do xcrun simctl io "$DEV" screenshot --display=$d out/d-$d.png 2>&1 || true; done
+          sips -g pixelWidth -g pixelHeight out/*.png 2>&1 || true
+      - uses: actions/upload-artifact@v4
+        with: { name: probe, path: out/ }

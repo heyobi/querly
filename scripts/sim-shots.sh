@@ -20,15 +20,24 @@ for r in rts:
             print(x['udid']); sys.exit()
 " "$NAME_DEV")
 if [ -z "$DEV" ]; then
-  # Not preinstalled on this runner image: create it on the iOS runtime that matches the SDK (27.1), else the newest.
-  TYPE=$(xcrun simctl list devicetypes -j | python3 -c "
-import json, sys
-print(next(t['identifier'] for t in json.load(sys.stdin)['devicetypes'] if t['name'] == sys.argv[1]))" "$NAME_DEV")
-  RT=$(xcrun simctl list runtimes -j | python3 -c "
-import json, sys
-rs = [r for r in json.load(sys.stdin)['runtimes'] if r['platform'] == 'iOS' and r.get('isAvailable') and r['identifier'].count('-') <= 4]
-pick = [r for r in rs if r['version'].startswith('27.1')] or sorted(rs, key=lambda r: [int(x) for x in r['version'].split('.')])[-1:]
-print(pick[0]['identifier'])")
+  # Not preinstalled on this runner image: create it on the iOS 27.1 runtime (the SDK we build with), else the
+  # newest. If that runtime does not support the named model, take its newest iPhone of the same family
+  # ("iPhone NN Pro", not Max) – same 6.3" screenshot slot.
+  read -r TYPE RT < <(xcrun simctl list runtimes -j | python3 -c "
+import json, re, sys
+name = sys.argv[1]
+rs = [r for r in json.load(sys.stdin)['runtimes'] if r['platform'] == 'iOS' and r.get('isAvailable')]
+rs.sort(key=lambda r: (not r['version'].startswith('27.1'), [-int(x) for x in r['version'].split('.')]))
+for r in rs:
+    types = r.get('supportedDeviceTypes', [])
+    exact = [t for t in types if t['name'] == name]
+    fam = re.sub('[0-9]+', lambda m: '[0-9]+', name)
+    similar = sorted([t for t in types if re.fullmatch(fam, t['name'])], key=lambda t: t['name'])
+    pick = exact or similar[-1:]
+    if pick:
+        print(pick[0]['identifier'], r['identifier']); break
+" "$NAME_DEV")
+  echo "creating $TYPE on $RT"
   DEV=$(xcrun simctl create "$NAME_DEV" "$TYPE" "$RT")
 fi
 echo "simulator $NAME_DEV $DEV"

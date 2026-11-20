@@ -29,6 +29,7 @@ jobs:
             -derivedDataPath build/sim \
             CODE_SIGNING_ALLOWED=NO | tail -n 60
       - name: iPhone 6.3" screenshots
+        continue-on-error: true
         run: bash scripts/sim-shots.sh "iPhone 17 Pro" shots/iphone
       - name: iPad 13" screenshots
         continue-on-error: true

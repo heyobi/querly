@@ -217,6 +217,12 @@ public class NativeShellPlugin: CAPPlugin, CAPBridgedPlugin {
         notifyListeners(event, data: data)
     }
 
+    /// For state the web app needs even if it starts listening later (the fold): the last value is kept until a
+    /// listener is added.
+    func emitRetained(_ event: String, _ data: [String: Any]) {
+        notifyListeners(event, data: data, retainUntilConsumed: true)
+    }
+
     @objc func setMode(_ call: CAPPluginCall) {
         let mode = call.getString("mode") ?? "web"
         let tab = call.getString("tab") ?? "files"
@@ -650,7 +656,7 @@ struct FoldProbe: View {
             default: status = "unknown"
             }
         }
-        NativeShellPlugin.shared?.emit("fold", [
+        NativeShellPlugin.shared?.emitRetained("fold", [
             "status": status,
             "angle": hinge?.angle.degrees ?? 0,
             "x": Double(fold.minX), "y": Double(fold.minY), "w": Double(fold.width), "h": Double(fold.height),

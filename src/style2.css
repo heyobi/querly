@@ -357,7 +357,7 @@ body.in-viewer { overflow: hidden; }
 
 /* Wide screens (iPad, the open iPhone Duo): notebooks use the whole width, each SQL block shows its code on the
    left and its result (table, chart, map) on the right, the way notebooks look on a tablet. */
-@media (min-width: 900px) {
+@media (min-width: 900px), (orientation: landscape) and (min-width: 640px) {
   .page.nb { max-width: 1500px; }
   .cell.sql { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr); grid-template-rows: auto 1fr; align-items: start; }
   .cell.sql > .cell-head, .cell.sql > .editor { grid-column: 1; }

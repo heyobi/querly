@@ -62,7 +62,7 @@ for i in $(seq 1 900); do
     [ "$NAME" = "done" ] && { echo "tour finished"; break; }
     if [ ! -f "$OUT/$NAME.png" ]; then
       sleep 1
-      xcrun simctl io "$DEV" screenshot "${DARG[@]}" "$OUT/$NAME.png" || echo "screenshot failed for $NAME"
+      xcrun simctl io "$DEV" screenshot ${DARG[@]+"${DARG[@]}"} "$OUT/$NAME.png" || echo "screenshot failed for $NAME"
       echo "saved $NAME"
     fi
     printf '%s' "$NAME" > "$DATA/Documents/shots/next"

@@ -36,9 +36,35 @@ def rounded(img, r):
     return out
 
 
-def compose(raw: Path, title: str, sub: str, out: Path, dark: bool):
+def mark_fold(shot, fold: float, label: str):
+    """A dashed line where the iPhone Duo folds, with a small label, to show the layout splits at the fold."""
+    w, h = shot.size
+    x = int(w * fold)
+    layer = Image.new('RGBA', shot.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    dash, gap, lw = int(h * 0.022), int(h * 0.014), max(4, int(w * 0.0022))
+    y = int(h * 0.10)
+    while y < h:
+        d.rectangle((x - lw // 2 - 2, y - 2, x + lw // 2 + 2, min(y + dash, h) + 2), fill=(0, 0, 0, 90))
+        d.rectangle((x - lw // 2, y, x + lw // 2, min(y + dash, h)), fill=(255, 255, 255, 200))
+        y += dash + gap
+    f = ImageFont.truetype(SEMI, int(h * 0.024))
+    tw = d.textlength(label, font=f)
+    px, py = int(h * 0.014), int(h * 0.007)
+    top = int(h * 0.045)
+    box = (x - tw / 2 - px, top, x + tw / 2 + px, top + f.size + 2 * py)
+    d.rounded_rectangle(box, radius=(box[3] - box[1]) / 2, fill=(255, 255, 255, 235))
+    d.text((x - tw / 2, top + py - int(f.size * 0.12)), label, font=f, fill=(40, 40, 60, 255))
+    out = shot.convert('RGBA')
+    out.alpha_composite(layer)
+    return out.convert('RGB')
+
+
+def compose(raw: Path, title: str, sub: str, out: Path, dark: bool, fold: float | None = None):
     """Same size as the raw screenshot (iPhone, iPad or iPhone Duo); type and margins scale with the width."""
     shot = Image.open(raw).convert('RGB')
+    if fold:
+        shot = mark_fold(shot, fold, 'Fold')
     w, h = shot.size
     k = min(w, h) / 1206 * (1 if h >= w else 0.8)  # landscape (iPhone Duo inner display): scale by height
     bg = gradient((30, 38, 92), (88, 64, 200), w, h) if dark else gradient((92, 132, 255), (120, 96, 245), w, h)
@@ -72,16 +98,26 @@ def compose(raw: Path, title: str, sub: str, out: Path, dark: bool):
 
 
 def main():
-    raw, out = Path(sys.argv[1]), Path(sys.argv[2])
+    """compose-screens.py <raw> <out> [--fold 0.5 --fold-raw <dir> --fold-names chart,trend,map,log]
+    With --fold, the named screens come from --fold-raw (half-open iPhone Duo) and get the fold line."""
+    args = sys.argv[1:]
+    raw, out = Path(args[0]), Path(args[1])
+    opt = dict(zip(args[2::2], args[3::2]))
+    fold = float(opt['--fold']) if '--fold' in opt else None
+    fold_raw = Path(opt.get('--fold-raw', raw))
+    fold_names = set(opt.get('--fold-names', '').split(',')) if fold else set()
     out.mkdir(parents=True, exist_ok=True)
     for i, (name, title, sub) in enumerate(ORDER, 1):
-        src = raw / f'{name}.png'
+        use_fold = name in fold_names
+        src = (fold_raw if use_fold else raw) / f'{name}.png'
         if not src.exists():
             print('missing', name)
             continue
         dark = name in ('files', 'viewer', 'stats', 'chart', 'log')
-        compose(src, title, sub, out / f'{i}-{name}.png', dark)
-        print('saved', i, name)
+        if use_fold and name == 'chart':
+            sub = 'Code and chart meet at the fold'
+        compose(src, title, sub, out / f'{i}-{name}.png', dark, fold if use_fold else None)
+        print('saved', i, name, '(fold)' if use_fold else '')
 
 
 if __name__ == '__main__':

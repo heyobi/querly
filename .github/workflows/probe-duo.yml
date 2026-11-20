@@ -1,0 +1,35 @@
+name: Probe iPhone Duo unfold
+on:
+  push:
+    branches: [duo-ipad]
+    paths: ['.github/workflows/probe-duo.yml']
+jobs:
+  probe:
+    runs-on: xcode-27
+    timeout-minutes: 25
+    steps:
+      - run: |
+          set -x
+          DEV=$(xcrun simctl create probe-duo com.apple.CoreSimulator.SimDeviceType.iPhone-Duo com.apple.CoreSimulator.SimRuntime.iOS-27-1 || xcrun simctl create probe-duo com.apple.CoreSimulator.SimDeviceType.iPhone-Duo com.apple.CoreSimulator.SimRuntime.iOS-27-2-iPhone19-4)
+          xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV" -b; sleep 20
+          mkdir -p out
+          xcrun simctl io "$DEV" screenshot --display=1 out/a-outer.png || true
+          timeout 60 xcrun simctl io "$DEV" screenshot --display=3 out/a-inner.png || true
+          # try 1: power the inner display on only
+          xcrun simctl io "$DEV" screenConfig --display=3 power on || true; sleep 15
+          timeout 60 xcrun simctl io "$DEV" screenshot --display=3 out/b-inner.png || true
+          xcrun simctl io "$DEV" screenshot --display=1 out/b-outer.png || true
+          # try 2: outer off, wait for SpringBoard to settle
+          xcrun simctl io "$DEV" screenConfig --display=1 power off || true; sleep 45
+          timeout 60 xcrun simctl io "$DEV" screenshot --display=3 out/c-inner.png || true
+          xcrun simctl launch "$DEV" com.apple.Preferences || true; sleep 10
+          timeout 60 xcrun simctl io "$DEV" screenshot --display=3 out/d-inner-settings.png || true
+          xcrun simctl io "$DEV" enumerate | grep -E "Power state|Default width" || true
+          ls /Applications/Xcode_27.1.app/Contents/Developer/Applications/ || true
+          xcrun simctl list devicetypes -j | python3 -c "import json,sys;[print(t) for t in json.load(sys.stdin)['devicetypes'] if 'Duo' in t['name']]"
+          defaults read com.apple.iphonesimulator 2>/dev/null | grep -iE "fold|posture|hinge" || true
+          strings "$(xcrun -f simctl)" | grep -iE "posture|fold|hinge" | head -20 || true
+          sips -g pixelWidth -g pixelHeight out/*.png || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: probe-duo, path: out/ }

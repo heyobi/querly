@@ -36,7 +36,7 @@ let files: DataFile[] = [];
 const schemaComp = new Compartment();
 const editors = new Set<EditorView>();
 
-type Tab = 'notebooks' | 'files' | 'extensions' | 'database';
+type Tab = 'notebooks' | 'files' | 'extensions' | 'database' | 'settings';
 type Route = { tab: Tab; notebook?: string };
 let route: Route = { tab: 'files' };
 
@@ -78,8 +78,8 @@ function statusPill() {
 
 function tabBar() {
   // Files first: most people come to open a file. SQL and the database are there for those who want more.
-  const tabs: [Tab, string, string][] = [['files', 'Files', 'folder'], ['notebooks', 'SQL', 'term'], ['database', 'Database', 'db']];
-  const cur = route.tab === 'extensions' ? 'database' : route.tab;
+  const tabs: [Tab, string, string][] = [['files', 'Files', 'folder'], ['notebooks', 'Analyze', 'graph'], ['settings', 'Settings', 'gear']];
+  const cur = route.tab === 'extensions' || route.tab === 'database' ? 'settings' : route.tab;
   return h('nav', { class: 'tabbar' }, tabs.map(([tb, label, ic]) =>
     h('button', { class: cur === tb && !route.notebook ? 'on' : '', onclick: () => go({ tab: tb }) }, icon(ic), h('span', {}, t(label)))));
 }
@@ -101,18 +101,17 @@ function render() {
     if (nb) { app.append(notebookView(nb)); return; }
     route = { tab: 'notebooks' };
   }
-  const page = route.tab === 'files' ? filesPage() : route.tab === 'extensions' ? extensionsPage() : route.tab === 'database' ? databasePage() : homePage();
+  const page = route.tab === 'files' ? filesPage() : route.tab === 'extensions' ? extensionsPage() : route.tab === 'database' ? databasePage()
+    : route.tab === 'settings' ? settingsPage() : homePage();
   app.append(page, tabBar());
 }
 
 const header = (title: string, ...right: (HTMLElement | false)[]) =>
-  h('header', { class: 'bar' }, h('div', { class: 'bar-title big' }, title), ...right.filter(Boolean) as HTMLElement[],
-    h('button', { class: 'gear', 'aria-label': t('Settings'), onclick: openSettings }, icon('gear')));
+  h('header', { class: 'bar' }, h('div', { class: 'bar-title big' }, title), ...right.filter(Boolean) as HTMLElement[]);
 
 /** Settings live at the bottom of the Database tab; the gear in every header jumps there. */
 function openSettings() {
-  go({ tab: 'database' });
-  requestAnimationFrame(() => document.getElementById('settings')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  go({ tab: 'settings' });
 }
 
 // ---------------- notebooks home ----------------
@@ -145,8 +144,10 @@ async function importNotebookFile(f: File) {
 
 function homePage() {
   return h('div', { class: 'page' },
-    header(t('SQL'), statusPill()),
-    h('p', { class: 'muted small drop-hint' }, t('Notebooks for asking questions of your files with SQL: filter, join, group and chart. New to SQL? The free lessons below start from zero.')),
+    header(t('Analyze'), statusPill()),
+    h('div', { class: 'intro' },
+      h('div', { class: 'intro-title' }, t('Go further with your data')),
+      h('div', { class: 'intro-sub' }, t('Totals, groups, joins and charts with SQL notebooks. Optional: viewing and editing files never needs it. New to SQL? The free lessons start from zero.'))),
     h('div', { class: 'actions' },
       h('button', { class: 'btn primary', onclick: () => newNotebook() }, icon('plus'), t('New notebook')),
       h('button', { class: 'btn', onclick: () => void importFlow() }, icon('import'), t('Import'))),
@@ -307,26 +308,30 @@ async function previewModal(title: string, query: string) {
 
 function filesPage() {
   const sample = files.find((f) => f.name === 'sales.csv') ?? files.find((f) => viewableKind(kindOf(f.name)));
-  const page = h('div', { class: 'page' },
-    header(t('Files')),
-    h('div', { class: 'hero' },
-      h('div', { class: 'hero-ico' }, icon('table')),
-      h('div', { class: 'hero-title' }, t('Open any data file')),
-      h('div', { class: 'hero-kinds' }, ['CSV', 'TSV', 'TXT', 'Excel', 'JSON', 'Parquet', 'SQLite'].map((k) => h('span', {}, k))),
-      h('button', { class: 'btn primary big', onclick: () => void importFlow() }, icon('folder'), t('Open a file')),
-      h('div', { class: 'hero-tip' }, t('From the Files app: touch and hold a file, then Open With › Querly. Or use Share › Querly in Mail and other apps.'))),
-    h('h2', { class: 'section' }, t('Recent files'), files.length > 0 && h('span', { class: 'section-note' }, String(files.length))),
+  const tip = h('details', { class: 'tip' },
+    h('summary', {}, icon('folder'), h('span', { class: 'tip-title' }, t('Open files from other apps')), icon('chevron')),
+    h('ol', {},
+      h('li', {}, t('In the Files app, touch and hold a file.')),
+      h('li', {}, t('Choose Open With, then Querly.')),
+      h('li', {}, t('In Mail, Messages or Safari, use Share › Querly.'))));
+  const page = h('div', { class: 'page files-home' },
+    h('header', { class: 'brand' },
+      h('div', { class: 'brand-name' }, 'Querly'),
+      h('div', { class: 'brand-sub' }, t('View and edit data files'))),
+    h('button', { class: 'open-card', onclick: () => void importFlow() },
+      h('div', { class: 'open-ico' }, icon('plus')),
+      h('div', { class: 'open-main' },
+        h('div', { class: 'open-title' }, t('Open a file')),
+        h('div', { class: 'open-kinds' }, 'CSV · Excel · JSON · TXT · Parquet · SQLite'))),
+    tip,
+    h('h2', { class: 'section' }, t('Recent')),
     files.length
       ? h('div', { class: 'list' }, files.map(fileRow))
       : h('div', { class: 'empty' }, t('Files you open appear here.')),
-    h('p', { class: 'muted small drop-hint' }, t('Tap a file to see it as a table: sort, search and filter. CSV, TSV and TXT files can be edited and saved back to Files. Files stay on this iPhone.')),
-    h('div', { class: 'cards' },
-      sample && h('button', { class: 'card', onclick: () => openFile(sample.name) },
-        h('div', { class: 'card-title' }, icon('play'), ' ', t('Try a sample file')),
-        h('div', { class: 'card-sub' }, sample.name)),
-      h('button', { class: 'card', onclick: () => go({ tab: 'notebooks' }) },
-        h('div', { class: 'card-title' }, icon('term'), ' ', t('Ask questions with SQL')),
-        h('div', { class: 'card-sub' }, t('Notebooks, charts and free lessons')))));
+    h('div', { class: 'perks' },
+      [['search', t('Sort, search, filter')], ['wrench', t('Edit CSV and save')], ['lock', t('Stays on your iPhone')]].map(([ic, label]) =>
+        h('div', { class: 'perk' }, icon(ic), h('span', {}, label)))),
+    sample && files.length <= 2 && h('button', { class: 'link-btn', onclick: () => openFile(sample.name) }, icon('play'), `${t('Try a sample file')} (${sample.name})`));
   const offPro = onPro(() => render());
   new MutationObserver(() => { if (!page.isConnected) offPro(); }).observe(document.body, { childList: true, subtree: true });
   return page;
@@ -376,7 +381,7 @@ function extensionsPage() {
   const offPro = onPro(() => render());
   new MutationObserver(() => { if (!listEl.isConnected) offPro(); }).observe(document.body, { childList: true, subtree: true });
   return h('div', { class: 'page' },
-    h('button', { class: 'back', onclick: () => go({ tab: 'database' }) }, icon('back'), t('Database')),
+    h('button', { class: 'back', onclick: () => go({ tab: 'settings' }) }, icon('back'), t('Settings')),
     header(t('Extensions')),
     h('p', { class: 'muted small drop-hint' }, `${EXTENSIONS.length} ${t('DuckDB extensions are built into the app and load offline, without downloading anything. Most load automatically the first time a query needs them.')}`),
     !isPro() && h('button', { class: 'pro-banner', onclick: () => requirePro().then(() => render()) },
@@ -454,6 +459,7 @@ function databasePage() {
   const tables = engine.getMeta().tables;
 
   const page = h('div', { class: 'page' },
+    h('button', { class: 'back', onclick: () => go({ tab: 'settings' }) }, icon('back'), t('Settings')),
     header(t('Database'), statusPill()),
     st.status === 'error' && errorBox({ message: `DuckDB did not start: ${st.error}` }, h('div', { class: 'muted' }, t('Restore a backup or reset this database.'))),
     cur && h('div', { class: 'db-hero' },
@@ -479,10 +485,6 @@ function databasePage() {
           h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, x.name), h('div', { class: 'row-sub' }, x.kind === 'view' ? t('view') : `${t('table')}${x.rows !== null ? ` · ~${Number(x.rows).toLocaleString()} ${t('rows')}` : ''}`)),
           icon('chevron'))))
       : h('div', { class: 'empty' }, t('No tables yet. Run an example, or load a file into a table from the Files tab.')),
-    h('div', { class: 'list' }, h('button', { class: 'row', onclick: () => go({ tab: 'extensions' }) },
-      h('div', { class: 'row-icon' }, icon('puzzle')),
-      h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, t('Extensions')), h('div', { class: 'row-sub' }, `${EXTENSIONS.length} ${t('built in, work offline')}`)),
-      icon('chevron'))),
     h('h2', { class: 'section' }, t('All databases')),
     h('div', { class: 'list' }, engine.databases().map((d) => h('button', { class: `row${d.id === cur?.id ? ' current' : ''}`, onclick: async () => {
       if (d.id === cur?.id) return;
@@ -498,7 +500,19 @@ function databasePage() {
       h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, d.name), h('div', { class: 'row-sub' }, fmtDate(d.created))),
       d.id === cur?.id ? h('span', { class: 'badge on' }, t('Active')) : icon('chevron')))),
     h('div', { class: 'actions' }, h('button', { class: 'btn primary', onclick: newDatabase }, icon('plus'), t('New database'), !isPro() && h('span', { class: 'pro-tag' }, 'PRO'))),
-    h('h2', { class: 'section', id: 'settings' }, t('Settings')),
+    h('div'));
+  const offPro = onPro(() => render());
+  new MutationObserver(() => { if (!page.isConnected) offPro(); }).observe(document.body, { childList: true, subtree: true });
+  return page;
+}
+
+
+let appVersion = '';
+void CapApp.getInfo().then((i) => { appVersion = `${i.version} (${i.build})`; }).catch(() => { appVersion = 'web'; });
+
+function settingsPage() {
+  const page = h('div', { class: 'page' },
+    header(t('Settings')),
     h('div', { class: 'list' },
       settingRow('sun', t('Appearance'), { system: t('System'), light: t('Light'), dark: t('Dark') }, getThemePref(), (v) => { setThemePref(v as Theme); applyStatusBar(); render(); }),
       settingRow('globe', t('Language'), { system: t('System'), en: 'English', tr: 'Türkçe' }, getLangPref(), (v) => { setLangPref(v as LangPref); render(); })),
@@ -508,7 +522,18 @@ function databasePage() {
         h('div', { class: 'row-icon' }, icon('spark')),
         h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, isPro() ? t('Pro is active') : t('Unlock Pro')), h('div', { class: 'row-sub' }, isPro() ? t('Thank you for supporting Querly') : t('Parquet, Excel, charts, maps · one-time purchase'))),
         isPro() ? h('span', { class: 'badge on' }, 'PRO') : icon('chevron'))),
+    h('h2', { class: 'section' }, t('Advanced')),
+    h('div', { class: 'list' },
+      h('button', { class: 'row', onclick: () => go({ tab: 'database' }) },
+        h('div', { class: 'row-icon' }, icon('db')),
+        h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, t('Database')), h('div', { class: 'row-sub' }, t('Tables, backups, more databases'))),
+        icon('chevron')),
+      h('button', { class: 'row', onclick: () => go({ tab: 'extensions' }) },
+        h('div', { class: 'row-icon' }, icon('puzzle')),
+        h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, t('Extensions')), h('div', { class: 'row-sub' }, `${EXTENSIONS.length} ${t('built in, work offline')}`)),
+        icon('chevron'))),
     h('div', { class: 'info muted small' },
+      h('div', {}, `Querly ${appVersion}`),
       h('div', {}, 'Open source (MIT): github.com/heyobi/querly'),
       h('div', {}, `Powered by DuckDB ${engine.duckdbVersion()} (MIT) via DuckDB-Wasm. Spatial extension uses GDAL, GEOS and PROJ (MIT/LGPL). Map data: Natural Earth (public domain). DuckDB is a trademark of the DuckDB Foundation; Querly is an independent app, not affiliated with or endorsed by the DuckDB Foundation.`)));
   const offPro = onPro(() => render());
@@ -800,6 +825,16 @@ async function openSharedUrl(url: string) {
   }
 }
 
+let lastErr = 0;
+function showError(msg: string) {
+  console.error(msg);
+  if (Date.now() - lastErr < 3000) return;
+  lastErr = Date.now();
+  toast(`${t('Something went wrong')}: ${msg.slice(0, 160)}`, 'err');
+}
+window.addEventListener('error', (e) => showError(e.message || String(e.error)));
+window.addEventListener('unhandledrejection', (e) => showError((e.reason as Error)?.message ?? String(e.reason)));
+
 async function boot() {
   trackKeyboard();
   dismissKeyboardOnTapOutside();
@@ -812,11 +847,6 @@ async function boot() {
   try { seeded = localStorage.getItem('qly-seeded') === '1'; } catch { /* ignore */ }
   if (!seeded) {
     await ensureSampleFiles();
-    if (!notebooks.length) {
-      const nb = sampleNotebook(CORE_SAMPLES[0], uid());
-      await saveNotebook(nb);
-      notebooks = [nb];
-    }
     try { localStorage.setItem('qly-seeded', '1'); } catch { /* ignore */ }
   }
   await refreshFiles();

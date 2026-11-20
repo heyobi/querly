@@ -1,7 +1,7 @@
 // Result rendering: Table, Chart, Map (spatial) and Plot (embedding arrays) views, plus export.
 import type { ExecOk, PgError, ResultSet } from './engine';
 import { exportQuery, MAX_ROWS } from './engine';
-import { h, sheet, shareFile, toast } from './ui';
+import { h, haptic, icon, sheet, shareFile, toast } from './ui';
 import { isPro, requirePro } from './pro';
 import { parseHexWkb, type Geom } from './wkb';
 import { LAND } from './world';
@@ -138,6 +138,13 @@ function chart(rs: ResultSet, numCols: number[]): HTMLElement {
   let kind = numCols.length >= 2 && labelCol < 0 ? 'Scatter' : rs.rows.length > 40 ? 'Line' : 'Bar';
   const wrap = h('div', { class: 'chart' });
   const bar = h('div', { class: 'chips' });
+  // "Total quantity — Region": what the chart shows, in words.
+  const pretty = (s: string) => { const w = s.replace(/[_-]+/g, ' ').trim(); return w.charAt(0).toUpperCase() + w.slice(1); };
+  const title = kind === 'Scatter' || numCols.length > 1
+    ? numCols.slice(0, 3).map((c) => pretty(rs.fields[c].name)).join(', ')
+    : `${pretty(rs.fields[numCols[0]].name)}${labelCol >= 0 ? ` — ${pretty(rs.fields[labelCol].name)}` : ''}`;
+  const share = h('button', { class: 'chart-share', 'aria-label': t('Share chart'), onclick: () => void shareChart(wrap, title) }, icon('share'));
+  wrap.append(h('div', { class: 'chart-head' }, h('div', { class: 'chart-title' }, title), share));
   const draw = () => {
     [...bar.children].forEach((c, i) => c.classList.toggle('on', kinds[i] === kind));
     wrap.querySelector('svg')?.remove();
@@ -146,13 +153,49 @@ function chart(rs: ResultSet, numCols: number[]): HTMLElement {
     if (kind !== 'Scatter' && numCols.length > 1)
       wrap.append(h('div', { class: 'legend' }, numCols.slice(0, 6).map((c, i) => h('span', {}, h('i', { style: { background: PALETTE[i] } }), rs.fields[c].name))));
   };
-  kinds.forEach((k) => bar.append(h('button', { onclick: () => { kind = k; draw(); } }, t(k))));
+  kinds.forEach((k) => bar.append(h('button', { onclick: () => { if (kind !== k) haptic.tap(); kind = k; draw(); } }, t(k))));
   wrap.append(bar);
   draw();
   return wrap;
 }
 
 const W = 640, H = 300, PAD = { l: 52, r: 12, t: 12, b: 46 };
+/** The chart as a PNG (title, axes, colours as on screen) through the share sheet. */
+async function shareChart(wrap: HTMLElement, title: string) {
+  const svg = wrap.querySelector('svg');
+  if (!svg) return;
+  try {
+    const clone = svg.cloneNode(true) as SVGSVGElement;
+    // Inline the computed colours and fonts: the image is drawn outside the page's style sheets.
+    const live = svg.querySelectorAll('*'), copy = clone.querySelectorAll('*');
+    live.forEach((el, i) => {
+      const cs = getComputedStyle(el), c = copy[i] as SVGElement;
+      for (const p of ['fill', 'stroke', 'stroke-width', 'opacity', 'font-size', 'font-weight', 'font-family']) c.style.setProperty(p, cs.getPropertyValue(p));
+    });
+    const scale = 2, top = 56, w = W * scale, hgt = H * scale + top;
+    clone.setAttribute('width', String(W * scale)); clone.setAttribute('height', String(H * scale));
+    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
+    const img = new Image();
+    await new Promise((ok, bad) => { img.onload = ok; img.onerror = bad; img.src = url; });
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = hgt;
+    const g = canvas.getContext('2d')!;
+    const css = getComputedStyle(wrap);
+    g.fillStyle = getComputedStyle(document.body).getPropertyValue('--surface').trim() || '#111';
+    g.fillRect(0, 0, w, hgt);
+    g.fillStyle = css.color || '#fff';
+    g.font = `600 ${28}px -apple-system, system-ui, sans-serif`;
+    g.fillText(title, 24, 40);
+    g.drawImage(img, 0, top);
+    g.globalAlpha = 0.5; g.font = `22px -apple-system, system-ui, sans-serif`; g.textAlign = 'right';
+    g.fillText('Querly', w - 20, 40);
+    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/png'));
+    if (blob) await shareFile(`${title.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') || 'chart'}.png`, blob, 'image/png');
+  } catch (e) {
+    toast((e as Error).message || t('Could not make the image'), 'err');
+  }
+}
+
 function niceTicks(min: number, max: number, n = 5) {
   if (min === max) { min -= 1; max += 1; }
   const step = Math.pow(10, Math.floor(Math.log10((max - min) / n)));
@@ -196,18 +239,27 @@ function seriesSvg(rs: ResultSet, cols: number[], labelCol: number, kind: string
   });
   cols.forEach((c, si) => {
     const color = PALETTE[si % PALETTE.length];
+    const series = rows.map((r) => num(r[c]));
+    const top = series.reduce((b, v, i) => (isFinite(v) && (b < 0 || v > series[b]) ? i : b), -1);
+    const single = cols.length === 1;
     if (kind === 'Bar') {
       const bw = Math.max(1, (band * 0.8) / cols.length);
-      rows.forEach((r, i) => {
-        const v = num(r[c]);
+      rows.forEach((_, i) => {
+        const v = series[i];
         if (!isFinite(v)) return;
         const x = PAD.l + band * i + band * 0.1 + bw * si;
         const y0 = y(0), y1 = y(v);
-        svg.append(svgEl('rect', { x, y: Math.min(y0, y1), width: bw, height: Math.max(1, Math.abs(y1 - y0)), fill: color, rx: Math.min(3, bw / 3) }));
+        // One series: the biggest bar in full colour, the rest softer, so the answer stands out.
+        svg.append(svgEl('rect', { x, y: Math.min(y0, y1), width: bw, height: Math.max(1, Math.abs(y1 - y0)), fill: color, rx: Math.min(4, bw / 3), opacity: single && i !== top ? 0.55 : 1 }));
+        if (single && n <= 12) svg.append(svgEl('text', { x: x + bw / 2, y: Math.min(y0, y1) - 5, 'text-anchor': 'middle', class: `vlabel${i === top ? ' top' : ''}` }, fmtTick(v)));
       });
     } else {
-      const d = rows.map((r, i) => [PAD.l + band * (i + 0.5), y(num(r[c]))]).filter(([, yy]) => isFinite(yy)).map(([x, yy], i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${yy.toFixed(1)}`).join('');
-      svg.append(svgEl('path', { d, fill: 'none', stroke: color, 'stroke-width': 2.5, 'stroke-linejoin': 'round' }));
+      const pts = rows.map((_, i) => [PAD.l + band * (i + 0.5), y(series[i])]);
+      const d = pts.filter(([, yy]) => isFinite(yy)).map(([x, yy], i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${yy.toFixed(1)}`).join('');
+      if (single) svg.append(svgEl('path', { d: `${d}L${pts[pts.length - 1][0].toFixed(1)},${y(Math.max(lo, 0))}L${pts[0][0].toFixed(1)},${y(Math.max(lo, 0))}Z`, fill: color, opacity: 0.12 }));
+      svg.append(svgEl('path', { d, fill: 'none', stroke: color, 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+      if (single && n <= 40) pts.forEach(([x, yy], i) => { if (isFinite(yy)) svg.append(svgEl('circle', { cx: x, cy: yy, r: i === top ? 4.5 : 2.5, fill: color })); });
+      if (single && top >= 0) svg.append(svgEl('text', { x: pts[top][0], y: pts[top][1] - 9, 'text-anchor': 'middle', class: 'vlabel top' }, fmtTick(series[top])));
     }
   });
   return svg;

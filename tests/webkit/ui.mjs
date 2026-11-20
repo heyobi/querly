@@ -32,8 +32,7 @@ const imported = async (name, text) => {
     document.querySelectorAll('.viewer, .modal-back').forEach((e) => e.remove());
     await window.__importBlobs([{ name: n, blob: new Blob([t]) }], true);
   }, [name, text]);
-  await p.waitForTimeout(1500);
-  return p.evaluate((n) => {
+  const read = () => p.evaluate((n) => {
     const v = document.querySelector('.viewer')?.innerText.match(/\d+ rows? · \d+ columns?/)?.[0];
     if (v) return v;
     const md = document.querySelector('.md-body');
@@ -42,6 +41,10 @@ const imported = async (name, text) => {
     if (err) return 'error ' + err;
     return [...document.querySelectorAll('.row-title')].some((e) => e.textContent === n) ? 'kept' : 'nothing';
   }, name);
+  // Wait up to 10 s for the viewer or Markdown page (background work can slow the first open).
+  let got = 'nothing';
+  for (let i = 0; i < 20; i++) { await p.waitForTimeout(500); got = await read(); if (got !== 'kept' && got !== 'nothing') break; }
+  return got;
 };
 const checks = [
   ['frame.txt', '0 0.1 0.2 0.3 0.4\n0 0.5 0.6 0.7 0.8\n1 0.9 0.1 0.2 0.3\n', /3 rows · 5 columns/],
@@ -64,6 +67,21 @@ await p.waitForFunction(() => document.querySelectorAll('.result').length >= 3, 
 const an = await p.evaluate(() => ({ results: document.querySelectorAll('.result').length, chart: [...document.querySelectorAll('.seg button.on')].some((e) => e.textContent === 'Chart'), sql: document.body.innerText.includes('sum("quantity")') }));
 console.log('analyze:', JSON.stringify(an));
 if (an.results < 3 || !an.chart || !an.sql) fails.push('analyze notebook: ' + JSON.stringify(an));
+// Premium touches: row and column counts on recent files, the overview card, column stats, chart title.
+await p.evaluate(() => { document.querySelectorAll('.viewer, .modal-back').forEach((e) => e.remove()); window.__go({ tab: 'files' }); });
+await p.waitForFunction(() => [...document.querySelectorAll('.row-sub')].some((e) => /1,500 rows · 8 columns/.test(e.textContent)), null, { timeout: 20000 }).catch(() => {});
+await p.evaluate(() => window.__openFile('sales.csv'));
+await p.waitForSelector('.v-insight:not(.hidden)', { timeout: 20000 }).catch(() => {});
+const prem = await p.evaluate(() => ({
+  meta: [...document.querySelectorAll('.row-sub')].some((e) => /1,500 rows · 8 columns/.test(e.textContent)),
+  insight: document.querySelector('.v-insight')?.innerText.includes('no empty cells') ?? false,
+  chips: document.querySelectorAll('.vi-num').length,
+}));
+await p.tap('.vi-num');
+await p.waitForSelector('.cs-stats', { timeout: 10000 }).catch(() => {});
+prem.stats = await p.evaluate(() => document.querySelectorAll('.cs-stat').length);
+console.log('premium:', JSON.stringify(prem));
+if (!prem.meta || !prem.insight || prem.chips < 2 || prem.stats < 6) fails.push('premium: ' + JSON.stringify(prem));
 await b.close();
 if (errs.length) fails.push(...errs.map((e) => 'pageerror ' + e));
 if (fails.length) { console.error('UI check failed:\n' + fails.join('\n')); process.exit(1); }

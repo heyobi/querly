@@ -14,7 +14,7 @@ import { editableKind, isCompressed, isTextLines, kindOf } from './features';
 import { errorBox, fmtValue } from './results';
 import { requirePro } from './pro';
 import { t } from './i18n';
-import { confirmBox, fmtBytes, h, icon, promptBox, saveToFiles, sheet, shareFile, toast } from './ui';
+import { confirmBox, fmtBytes, h, icon, modal, promptBox, saveToFiles, sheet, shareFile, toast } from './ui';
 
 const lit = (s: string) => `'${s.replace(/'/g, "''")}'`;
 const qi = (s: string) => `"${s.replace(/"/g, '""')}"`;
@@ -72,6 +72,7 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
   const chipsEl = h('div', { class: 'v-chips' });
   const tabsEl = h('div', { class: 'v-tabs' });
   const bannerEl = h('div', { class: 'v-banner hidden' });
+  const insightEl = h('div', { class: 'v-insight hidden' });
   const thead = h('thead');
   const tbody = h('tbody');
   const more = h('div', { class: 'v-more muted small' });
@@ -89,7 +90,7 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
       !lines && h('button', { class: 'v-analyze', 'aria-label': t('Analyze with SQL & charts'), onclick: () => void close().then((ok) => ok && hooks.newNotebook(file)) }, icon('graph')),
       h('button', { class: 'more', 'aria-label': t('File actions'), onclick: () => moreMenu() }, icon('more'))),
     h('div', { class: 'v-tools' }, searchEl, countEl),
-    tabsEl, chipsEl, bannerEl, wrap,
+    tabsEl, insightEl, chipsEl, bannerEl, wrap,
     editable && foot);
   document.body.append(el);
   document.body.classList.add('in-viewer');
@@ -266,8 +267,92 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
     else showValue(order[ci], td.textContent ?? '');
   });
 
+  // ---------- overview and column stats ----------
+  const isNum = (ty: string) => /INT|DOUBLE|FLOAT|DECIMAL|REAL|NUMERIC/.test(ty);
+  const num = (c: string) => (isNum(typeOf(c)) ? `${qi(c)}::DOUBLE` : `TRY_CAST(${qi(c)} AS DOUBLE)`);
+  const fmtN = (v: unknown) => { const x = Number(v); return !isFinite(x) ? '–' : Math.abs(x) >= 1e6 ? `${+(x / 1e6).toFixed(2)}M` : Math.abs(x) >= 1e4 ? Math.round(x).toLocaleString() : (+x.toFixed(2)).toLocaleString(); };
+
+  /** A small card above the table: size, how complete the data is, and the range of every number column. */
+  async function insight() {
+    if (lines || !order.length) { insightEl.classList.add('hidden'); return; }
+    const use = order.slice(0, 40);
+    const parts = use.flatMap((c) => [`count(${qi(c)})`, `count(${num(c)})`, `min(${num(c)})`, `max(${num(c)})`, `avg(${num(c)})`]);
+    const r = await q(`SELECT count(*)::BIGINT, ${parts.join(', ')} FROM ${T}`, 1);
+    const row = r.rows[0] ?? [];
+    const rows = Number(row[0] ?? 0);
+    let filled = 0;
+    const nums: { c: string; lo: unknown; hi: unknown; avg: unknown }[] = [];
+    use.forEach((c, i) => {
+      const [nn, nc, lo, hi, avg] = row.slice(1 + i * 5, 6 + i * 5);
+      filled += Number(nn);
+      const idLike = /(^|_)(id|code|zip|no)$|^id_|uuid/i.test(c); // ranges of IDs say nothing
+      if (!idLike && Number(nc) > 0 && Number(nc) >= 0.9 * Number(nn)) nums.push({ c, lo, hi, avg });
+    });
+    const empty = rows && use.length ? 100 - (filled / (rows * use.length)) * 100 : 0;
+    insightEl.replaceChildren(
+      h('div', { class: 'vi-line' },
+        h('b', {}, `${rows.toLocaleString()} ${t(rows === 1 ? 'row' : 'rows')}`), ` · ${order.length} ${t(order.length === 1 ? 'column' : 'columns')} · `,
+        h('span', { class: empty < 1 ? 'vi-good' : empty > 20 ? 'vi-warn' : '' }, empty < 0.05 ? t('no empty cells') : `${empty < 1 ? empty.toFixed(1) : Math.round(empty)}% ${t('empty')}`)),
+      nums.length ? h('div', { class: 'vi-nums' }, nums.slice(0, 6).map((x) =>
+        h('button', { class: 'vi-num', onclick: () => void columnStats(x.c) },
+          h('span', { class: 'vi-c' }, x.c),
+          h('span', { class: 'vi-r' }, `${fmtN(x.lo)} – ${fmtN(x.hi)}`),
+          h('span', { class: 'vi-a' }, `${t('avg')} ${fmtN(x.avg)}`)))) : '');
+    insightEl.classList.remove('hidden');
+  }
+
+  /** Column at a glance: how full it is, distinct values, a histogram for numbers or the most common values. */
+  async function columnStats(c: string) {
+    const body = h('div', { class: 'cs' }, h('div', { class: 'muted small' }, t('Counting…')));
+    modal(h('div', {}, h('div', { class: 'cs-title' }, c), body));
+    try {
+      const n = num(c);
+      const base = await q(`SELECT count(*)::BIGINT, count(${qi(c)})::BIGINT, count(DISTINCT ${qi(c)})::BIGINT, count(${n})::BIGINT, min(${n}), max(${n}), avg(${n}), median(${n}) FROM ${T}`, 1);
+      const [all, nn, distinct, nc, lo, hi, avg, med] = base.rows[0] ?? [];
+      const numeric = Number(nc) > 0 && Number(nc) >= 0.9 * Number(nn);
+      const stat = (label: string, v: string) => h('div', { class: 'cs-stat' }, h('div', { class: 'cs-v' }, v), h('div', { class: 'cs-l' }, label));
+      const stats = h('div', { class: 'cs-stats' },
+        stat(t('filled'), `${Number(all) ? Math.round((Number(nn) / Number(all)) * 100) : 0}%`),
+        stat(t('distinct'), Number(distinct).toLocaleString()),
+        ...(numeric ? [stat(t('min'), fmtN(lo)), stat(t('max'), fmtN(hi)), stat(t('avg'), fmtN(avg)), stat(t('median'), fmtN(med))] : []));
+      const bars: { label: string; n: number }[] = [];
+      const discrete = numeric && Number(distinct) <= 15;
+      if (discrete) {
+        // Few distinct numbers (ratings, quantities): one bar per value, labelled.
+        const r = await q(`SELECT ${n} AS v, count(*)::BIGINT FROM ${T} WHERE ${n} IS NOT NULL GROUP BY 1 ORDER BY 1`, 16);
+        for (const [v, k] of r.rows) bars.push({ label: fmtN(v), n: Number(k) });
+      } else if (numeric && Number(hi) > Number(lo)) {
+        const bins = 12, l = Number(lo), w = (Number(hi) - l) / bins;
+        const r = await q(`SELECT least(${bins - 1}, floor((${n} - ${l}) / ${w}))::INT AS b, count(*)::BIGINT FROM ${T} WHERE ${n} IS NOT NULL GROUP BY 1 ORDER BY 1`, bins + 1);
+        const counts = new Array(bins).fill(0);
+        for (const [b, k] of r.rows) counts[Number(b)] = Number(k);
+        counts.forEach((k, i) => bars.push({ label: fmtN(l + w * i), n: k }));
+      } else if (!numeric) {
+        const r = await q(`SELECT CAST(${qi(c)} AS VARCHAR) AS v, count(*)::BIGINT AS n FROM ${T} WHERE ${qi(c)} IS NOT NULL GROUP BY 1 ORDER BY 2 DESC, 1 LIMIT 6`, 6);
+        for (const [v, k] of r.rows) bars.push({ label: String(v), n: Number(k) });
+      }
+      const max = Math.max(1, ...bars.map((b) => b.n));
+      const chart = numeric
+        ? h('div', { class: `cs-hist${discrete ? ' discrete' : ''}` }, bars.map((b) => h('div', { class: 'cs-col', title: `${b.label}: ${b.n}` },
+          discrete && h('span', { class: 'cs-cn' }, b.n.toLocaleString()),
+          h('i', { style: { height: `${Math.max(2, (b.n / max) * 100)}%` } }),
+          discrete && h('span', { class: 'cs-xl' }, b.label))))
+        : h('div', { class: 'cs-top' }, bars.map((b) => h('div', { class: 'cs-row' },
+          h('div', { class: 'cs-name' }, b.label || '""'),
+          h('div', { class: 'cs-bar' }, h('i', { style: { width: `${(b.n / max) * 100}%` } })),
+          h('div', { class: 'cs-n' }, b.n.toLocaleString()))));
+      body.replaceChildren(stats,
+        bars.length ? h('div', { class: 'cs-sub' }, numeric ? t('Distribution') : t('Most common values')) : '',
+        bars.length ? chart : '',
+        numeric && !discrete && bars.length ? h('div', { class: 'cs-axis' }, h('span', {}, fmtN(lo)), h('span', {}, fmtN(hi))) : '');
+    } catch (e) {
+      body.replaceChildren(h('div', { class: 'muted' }, (e as PgError).message));
+    }
+  }
+
   function columnMenu(c: string) {
     sheet(c, [
+      { label: t('Column stats'), run: () => void columnStats(c) },
       { label: t('Sort ascending'), run: () => { sort = { col: c, dir: 'ASC' }; void refresh(); } },
       { label: t('Sort descending'), run: () => { sort = { col: c, dir: 'DESC' }; void refresh(); } },
       { label: filters.has(c) ? t('Change filter') : t('Filter…'), run: async () => {
@@ -457,7 +542,7 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
   async function switchTable(tb: string) {
     if (tb === table) return;
     table = tb;
-    await run(async () => { await load(); await refresh(); });
+    await run(async () => { await load(); await refresh(); void insight().catch(() => {}); });
   }
 
   // ---------- saving and sharing ----------
@@ -533,7 +618,7 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
     if (!fmt) return;
     if (dirty && !(await confirmBox(t('Discard changes?'), t('Changing the header row reloads the file.'), t('Discard'), true))) return;
     fmt.header = !fmt.header;
-    await run(async () => { await load(); await refresh(); });
+    await run(async () => { await load(); await refresh(); void insight().catch(() => {}); });
   }
 
   async function close(force = false): Promise<boolean> {
@@ -556,6 +641,7 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
         bannerEl.replaceChildren(h('span', {}, t('Read-only.')), ' ', h('button', { class: 'link', onclick: () => void editCopy() }, t('Edit a CSV copy')));
       }
       await refresh();
+      void insight().catch(() => {});
     } catch (e) {
       more.replaceChildren(errorBox(e as PgError, h('div', { class: 'muted' }, `${file} · ${fmtBytes((await engine.fileBytes(file))?.length ?? 0)}`)));
     }

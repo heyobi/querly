@@ -2,6 +2,7 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { blobToBase64 } from './storage';
 import { t } from './i18n';
 
@@ -27,9 +28,18 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   return el;
 }
 
+/** Light taps from the Taptic Engine: tab and view switches, long-press, done and failed. No-ops on the web. */
+export const haptic = {
+  tap: () => { if (native) void Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); },
+  press: () => { if (native) void Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {}); },
+  done: () => { if (native) void Haptics.notification({ type: NotificationType.Success }).catch(() => {}); },
+  fail: () => { if (native) void Haptics.notification({ type: NotificationType.Error }).catch(() => {}); },
+};
+
 export const icon = (name: string) => h('span', { class: `i i-${name}`, 'aria-hidden': 'true' });
 
 export function toast(msg: string, kind: 'ok' | 'err' = 'ok') {
+  if (kind === 'err') haptic.fail(); else haptic.done();
   const t = h('div', { class: `toast ${kind}` }, msg);
   document.body.append(t);
   setTimeout(() => t.classList.add('out'), 2400);

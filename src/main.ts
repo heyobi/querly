@@ -16,7 +16,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { marked } from 'marked';
 import * as engine from './engine';
 import type { DataFile, PgError } from './engine';
-import { FREE_FILE_MB, importNeedsPro, isBinaryExt, isMarkdown, looksLikeText, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
+import { FREE_FILE_MB, importNeedsPro, isBinaryExt, isMarkdown, isTextLines, looksLikeText, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
 import { openViewer } from './viewer';
 import { deleteNotebook, fromIpynb, fromSql, loadNotebooks, saveNotebook, toIpynb, toSql, uid, type Cell, type Notebook } from './notebook';
 import { initPro, isPro, onPro, requirePro, setPro } from './pro';
@@ -26,7 +26,7 @@ import { LESSONS } from './lessons';
 import { EXTENSIONS, EXT_CATEGORIES, type ExtInfo } from './extensions';
 import { applyTheme, getLangPref, getThemePref, lang, setLangPref, setThemePref, t, type LangPref, type Theme } from './i18n';
 import { querySucceeded } from './review';
-import { confirmBox, dark, safeHtml, fmtBytes, fmtDate, fmtMs, h, icon, modal, native, pickFiles, promptBox, safeName, sheet, shareFile, toast } from './ui';
+import { haptic, confirmBox, dark, safeHtml, fmtBytes, fmtDate, fmtMs, h, icon, modal, native, pickFiles, promptBox, safeName, sheet, shareFile, toast } from './ui';
 
 const app = document.getElementById('app')!;
 
@@ -81,7 +81,7 @@ function tabBar() {
   const tabs: [Tab, string, string][] = [['files', 'Files', 'folder'], ['notebooks', 'Analyze', 'graph'], ['settings', 'Settings', 'gear']];
   const cur = route.tab === 'extensions' || route.tab === 'database' ? 'settings' : route.tab;
   return h('nav', { class: 'tabbar' }, tabs.map(([tb, label, ic]) =>
-    h('button', { class: cur === tb && !route.notebook ? 'on' : '', onclick: () => go({ tab: tb }) }, icon(ic), h('span', {}, t(label)))));
+    h('button', { class: cur === tb && !route.notebook ? 'on' : '', onclick: () => { if (cur !== tb || route.notebook) haptic.tap(); go({ tab: tb }); } }, icon(ic), h('span', {}, t(label)))));
 }
 
 function go(r: Route) {
@@ -331,21 +331,58 @@ function fileRow(f: DataFile) {
   // Touch and hold (or right-click) shows the file's actions: Analyze with SQL, share, rename, delete.
   let timer = 0, held = false;
   const hold = (e: TouchEvent) => { held = false; const p = e.touches[0]; const x = p.clientX, y = p.clientY;
-    timer = window.setTimeout(() => { held = true; navigator.vibrate?.(10); fileActions(f); }, 450);
+    timer = window.setTimeout(() => { held = true; haptic.press(); fileActions(f); }, 450);
     const cancel = (m: TouchEvent) => { const q = m.touches[0]; if (!q || Math.hypot(q.clientX - x, q.clientY - y) > 10) clearTimeout(timer); };
     row.addEventListener('touchmove', cancel, { passive: true, once: true });
   };
   const row = h('button', { class: 'row', onclick: () => { if (held) { held = false; return; } openFile(f.name); },
-    oncontextmenu: (e: Event) => { e.preventDefault(); clearTimeout(timer); if (!held) { held = true; fileActions(f); } } },
+    oncontextmenu: (e: Event) => { e.preventDefault(); clearTimeout(timer); if (!held) { held = true; haptic.press(); fileActions(f); } } },
     h('span', { class: `kind ${kind}` }, kind === 'other' || kind === 'csv' ? (f.name.split('.').pop() ?? '?').toLowerCase() : kind),
     h('div', { class: 'row-main' },
       h('div', { class: 'row-title' }, f.name),
-      h('div', { class: 'row-sub' }, `${fmtBytes(f.size)} · ${fmtDate(f.mtime)}`)),
+      fileSub(f)),
     importNeedsPro(kind) && !isPro() ? h('span', { class: 'pro-tag' }, 'PRO') : icon('chevron'));
   row.addEventListener('touchstart', hold, { passive: true });
   row.addEventListener('touchend', () => clearTimeout(timer));
   row.addEventListener('touchcancel', () => clearTimeout(timer));
   return row;
+}
+
+/**
+ * "74 KB · 1,500 rows · 8 columns" under each recent file. Counted once per file version in the background and
+ * remembered, so the list never waits for it.
+ */
+const META_KEY = 'qly-file-meta';
+let metaCache: Record<string, [number, number]> = {};
+try { metaCache = JSON.parse(localStorage.getItem(META_KEY) || '{}'); } catch { /* ignore */ }
+let metaQueue: Promise<void> = Promise.resolve();
+function fileSub(f: DataFile) {
+  const el = h('div', { class: 'row-sub' });
+  const key = `${f.name}|${f.size}|${f.mtime}`;
+  const paint = (m?: [number, number]) => {
+    el.textContent = m
+      ? `${fmtBytes(f.size)} · ${m[0].toLocaleString()} ${t(m[0] === 1 ? 'row' : 'rows')} · ${m[1]} ${t(m[1] === 1 ? 'column' : 'columns')}`
+      : `${fmtBytes(f.size)} · ${fmtDate(f.mtime)}`;
+  };
+  paint(metaCache[key]);
+  const kind = kindOf(f.name);
+  const countable = (kind === 'csv' && !isTextLines(f.name)) || kind === 'json' || kind === 'parquet' || kind === 'excel';
+  if (!metaCache[key] && countable && f.size < 30 * 1048576) {
+    metaQueue = metaQueue.then(async () => {
+      if (!el.isConnected) return;
+      try {
+        const reader = readerFor(f.name);
+        const c = await engine.exec(`SELECT count(*)::BIGINT FROM ${reader}`);
+        const d = await engine.exec(`DESCRIBE SELECT * FROM ${reader}`);
+        const rows = Number(c.results[0]?.rows[0]?.[0] ?? 0), cols = d.results[0]?.rows.length ?? 0;
+        if (!cols) return;
+        metaCache[key] = [rows, cols];
+        try { localStorage.setItem(META_KEY, JSON.stringify(metaCache)); } catch { /* ignore */ }
+        paint(metaCache[key]);
+      } catch { /* leave the date */ }
+    });
+  }
+  return el;
 }
 
 function fileActions(f: DataFile, withOpen = true) {

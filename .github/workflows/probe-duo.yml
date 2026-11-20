@@ -11,7 +11,7 @@ jobs:
       - run: |
           DEV=$(xcrun simctl create probe-duo com.apple.CoreSimulator.SimDeviceType.iPhone-Duo com.apple.CoreSimulator.SimRuntime.iOS-27-1)
           xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV" -b
-          open -a Simulator --args -CurrentDeviceUDID "$DEV"; sleep 25
+          open -a "$(xcode-select -p)/Applications/Simulator.app" --args -CurrentDeviceUDID "$DEV"; sleep 25
           osascript -e 'tell application "System Events" to tell process "Simulator" to get name of every menu bar item of menu bar 1' || echo "no accessibility"
           for m in Device Features I/O Window; do echo "== $m"; osascript -e "tell application \"System Events\" to tell process \"Simulator\" to get name of every menu item of menu 1 of menu bar item \"$m\" of menu bar 1" || true; done
           osascript -e 'tell application "System Events" to tell process "Simulator" to get name of every menu item of menu 1 of menu item "Posture" of menu 1 of menu bar item "Device" of menu bar 1' 2>&1 || true

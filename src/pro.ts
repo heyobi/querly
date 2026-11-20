@@ -16,10 +16,13 @@ try { pro = localStorage.getItem(KEY) === '1'; } catch { /* private mode */ }
 export const isPro = () => pro;
 export const onPro = (fn: (v: boolean) => void) => (listeners.add(fn), () => listeners.delete(fn));
 
-function setPro(v: boolean) {
+export function setPro(v: boolean) {
+  if (v === pro) return;
   pro = v;
   try { localStorage.setItem(KEY, v ? '1' : '0'); } catch { /* ignore */ }
-  listeners.forEach((l) => l(v));
+  // Listeners re-render pages, and each new page subscribes again. Iterate over a copy: a Set visits items added
+  // during forEach, which turned one Pro change into an endless render loop that froze the app.
+  for (const l of [...listeners]) l(v);
 }
 
 export async function initPro() {

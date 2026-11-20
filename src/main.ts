@@ -19,7 +19,7 @@ import type { DataFile, PgError } from './engine';
 import { FREE_FILE_MB, importNeedsPro, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
 import { openViewer } from './viewer';
 import { deleteNotebook, fromIpynb, fromSql, loadNotebooks, saveNotebook, toIpynb, toSql, uid, type Cell, type Notebook } from './notebook';
-import { initPro, isPro, onPro, requirePro } from './pro';
+import { initPro, isPro, onPro, requirePro, setPro } from './pro';
 import { errorBox, renderResult } from './results';
 import { CORE_SAMPLES, SAMPLE_FILES, sampleNotebook, type Sample } from './samples';
 import { LESSONS } from './lessons';
@@ -890,7 +890,7 @@ async function boot() {
 }
 
 // Automated checks (WebKit via Playwright) reach the engine through this hook; only with ?selftest in the URL.
-if (new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __openFile: openFile, __go: go, __openSample: openSample });
+if (new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __openFile: openFile, __go: go, __openSample: openSample, __setPro: setPro });
 
 engine.onState((s) => { if (s.status !== 'starting' && route.tab === 'database' && !route.notebook) render(); });
 engine.onMeta(() => { if (route.tab === 'database' && !route.notebook && !document.querySelector('.modal-back, .sheet-back')) render(); });

@@ -57,6 +57,7 @@ jobs:
           npx wait-on -t 30000 http://localhost:4183 || sleep 5
           APP_URL='http://localhost:4183/?pro&selftest' node tests/webkit/app.mjs
           APP_URL='http://localhost:4183/?selftest' node tests/webkit/viewer.mjs
+          APP_URL='http://localhost:4183/?selftest' node tests/webkit/ui.mjs
 
   prepare:
     name: Check App Store Connect

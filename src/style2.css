@@ -255,7 +255,7 @@ body.in-viewer { overflow: hidden; }
 .i-undo { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 14 4 9l5-5'/%3E%3Cpath d='M4 9h10.5a5.5 5.5 0 0 1 0 11H11'/%3E%3C/svg%3E"); }
 
 /* Files home: one obvious way in, nothing technical */
-.brand { padding: 6px 0 14px; }
+.brand { padding: calc(env(safe-area-inset-top) + 6px) 0 14px; }
 .brand-name { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; }
 .brand-sub { color: var(--muted); font-size: 15px; margin-top: 2px; }
 .open-card { width: 100%; display: flex; align-items: center; gap: 14px; text-align: left; padding: 18px 16px; border-radius: 20px;

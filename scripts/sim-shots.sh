@@ -44,10 +44,12 @@ echo "simulator $NAME_DEV $DEV"
 xcrun simctl boot "$DEV" || true
 xcrun simctl bootstatus "$DEV" -b
 if [ "$MODE" = "unfold" ]; then
-  # Open the foldable: inner display on, outer display off, so the app lays out on the 7.6" screen.
-  xcrun simctl io "$DEV" screenConfig --display=3 power on || true
-  xcrun simctl io "$DEV" screenConfig --display=1 power off || true
-  sleep 5
+  # Open the foldable flat, as Device Hub's "Open" button does (tools/duo-hinge.m, vendored and reviewed).
+  # Toggling display power with simctl does not unfold it and crashes SpringBoard.
+  mkdir -p build
+  clang -fobjc-arc -framework Foundation -o build/duo-hinge tools/duo-hinge.m
+  build/duo-hinge -d "$DEV" flat
+  sleep 8
 fi
 xcrun simctl status_bar "$DEV" override --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 || true
 APP=$(find build/sim/Build/Products -name "App.app" -path "*iphonesimulator*" | head -1)
@@ -63,6 +65,7 @@ for i in $(seq 1 900); do
     if [ ! -f "$OUT/$NAME.png" ]; then
       sleep 1
       xcrun simctl io "$DEV" screenshot ${DARG[@]+"${DARG[@]}"} "$OUT/$NAME.png" || echo "screenshot failed for $NAME"
+      python3 -c "import sys,zlib;d=open(sys.argv[1],'rb').read();print('size',len(d))" "$OUT/$NAME.png" || true
       echo "saved $NAME"
     fi
     printf '%s' "$NAME" > "$DATA/Documents/shots/next"

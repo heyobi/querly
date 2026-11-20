@@ -66,6 +66,24 @@ async function refreshFiles() {
   pushFiles();
 }
 
+// ---------------- notebook layout: Automatic (fold on iPhone Duo, side by side when wide), Side by side, Stacked
+type LayoutPref = 'auto' | 'side' | 'stack';
+const LAYOUTS: Record<LayoutPref, string> = { auto: 'Automatic', side: 'Side by side', stack: 'Stacked' };
+const layoutPref = (): LayoutPref => { try { const v = localStorage.getItem('qly-layout'); return v === 'side' || v === 'stack' ? v : 'auto'; } catch { return 'auto'; } };
+function applyLayout() {
+  const v = layoutPref();
+  document.body.classList.toggle('layout-side', v === 'side');
+  document.body.classList.toggle('layout-stack', v === 'stack');
+}
+function chooseLayout() {
+  const cur = layoutPref();
+  sheet(t('Layout'), (Object.keys(LAYOUTS) as LayoutPref[]).map((k) => ({
+    label: `${k === cur ? '✓ ' : ''}${t(LAYOUTS[k])}`,
+    run: () => { try { localStorage.setItem('qly-layout', k); } catch { /* ignore */ } applyLayout(); haptic.tap(); },
+  })));
+}
+applyLayout();
+
 // ---------------- native shell (system tab bar + SwiftUI Files screen, NativeShell.swift) ----------------
 type ShellMode = 'files' | 'tab' | 'full';
 const NativeShell = registerPlugin<{
@@ -145,7 +163,8 @@ async function initShell() {
   // iPhone Duo half open with a vertical fold: notebooks split exactly at the fold (code | fold | result).
   void NativeShell.addListener('fold', (d) => {
     (window as unknown as { __lastFold?: unknown }).__lastFold = d;
-    const split = d.status === 'partiallyOpen' && d.w > 0 && d.h > d.w && d.x > 200 && d.x < d.width - 200;
+    // Open (half or flat) with a vertical fold: split at the fold in both postures, so unfolding never jumps.
+    const split = (d.status === 'partiallyOpen' || d.status === 'fullyOpen') && d.w > 0 && d.h > d.w && d.x > 200 && d.x < d.width - 200;
     document.body.classList.toggle('fold-split', split);
     document.documentElement.style.setProperty('--fold-x', `${d.x}px`);
     document.documentElement.style.setProperty('--fold-w', `${Math.max(d.w, 24)}px`);
@@ -993,6 +1012,7 @@ function notebookView(nb: Notebook) {
       h('div', { class: 'grow' }),
       h('button', { class: 'more', 'aria-label': 'Notebook actions', onclick: () => sheet(nb.title, [
         { label: t('Run all cells'), run: runAll },
+        { label: `${t('Layout')}: ${t(LAYOUTS[layoutPref()])}`, run: chooseLayout },
         { label: t('Share as Jupyter notebook (.ipynb)'), run: () => shareFile(`${safeName(nb.title)}.ipynb`, toIpynb(nb), 'application/x-ipynb+json') },
         { label: t('Share as SQL script (.sql)'), run: () => shareFile(`${safeName(nb.title)}.sql`, toSql(nb), 'application/sql') },
         { label: t('Duplicate notebook'), run: async () => { const copy = structuredClone(nb); await newNotebook(copy.cells.map((c) => ({ ...c, id: uid() })), `${nb.title} copy`); } },

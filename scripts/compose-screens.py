@@ -64,7 +64,7 @@ def compose(raw: Path, title: str, sub: str, out: Path, dark: bool, fold: float 
     """Same size as the raw screenshot (iPhone, iPad or iPhone Duo); type and margins scale with the width."""
     shot = Image.open(raw).convert('RGB')
     if fold:
-        shot = mark_fold(shot, fold, 'Fold')
+        shot = mark_fold(shot, fold, 'iPhone Duo')
     w, h = shot.size
     k = min(w, h) / 1206 * (1 if h >= w else 0.8)  # landscape (iPhone Duo inner display): scale by height
     bg = gradient((30, 38, 92), (88, 64, 200), w, h) if dark else gradient((92, 132, 255), (120, 96, 245), w, h)
@@ -115,7 +115,7 @@ def main():
             continue
         dark = name in ('files', 'viewer', 'stats', 'chart', 'log')
         if use_fold and name == 'chart':
-            sub = 'Code and chart meet at the fold'
+            title, sub = 'Made for iPhone Duo', 'Code and chart on either side of the hinge'
         compose(src, title, sub, out / f'{i}-{name}.png', dark, fold if use_fold else None)
         print('saved', i, name, '(fold)' if use_fold else '')
 

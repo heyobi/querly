@@ -372,3 +372,15 @@ body.fold-split .cell.sql { display: grid; grid-template-columns: calc(var(--fol
 body.fold-split .cell.sql > .out { grid-column: 3; border-left: 0; }
 body.fold-split .cell.sql > .cell-head, body.fold-split .cell.sql > .editor { grid-column: 1; }
 body.fold-split .cell.md-cell { margin-right: calc(100% - var(--fold-x) + 13px); }
+
+/* Unfolding and folding glide instead of jumping. */
+.cell.sql { transition: grid-template-columns .35s ease; }
+/* Notebook layout chosen in the notebook menu. */
+body.layout-side .cell.sql { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr); grid-template-rows: auto 1fr; align-items: start; }
+body.layout-side .cell.sql > .cell-head, body.layout-side .cell.sql > .editor { grid-column: 1; }
+body.layout-side .cell.sql > .out { grid-column: 2; grid-row: 1 / span 2; border-top: 0; border-left: 1px solid var(--line); }
+body.layout-side .page.nb { max-width: 1500px; }
+body.layout-stack .cell.sql, body.layout-stack.fold-split .cell.sql { display: block; }
+body.layout-stack .cell.sql > .out { border-left: 0; border-top: 1px solid var(--line); border-radius: 0 0 var(--radius) var(--radius); }
+body.layout-side.fold-split .cell.sql { grid-template-columns: calc(var(--fold-x) - 13px) var(--fold-w) minmax(0, 1fr); }
+body.layout-side.fold-split .cell.sql > .out { grid-column: 3; border-left: 0; }

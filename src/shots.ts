@@ -90,7 +90,7 @@ export async function startTour() {
     await sleep(1800);
     await write('shots/ready', name);
     const t0 = Date.now();
-    while ((await read('shots/next')) !== name && Date.now() - t0 < 60000) await sleep(300);
+    while ((await read('shots/next')) !== name && Date.now() - t0 < 300000) await sleep(300);
   }
   await write('shots/ready', 'done');
 }

@@ -3,7 +3,7 @@ name: iOS → TestFlight
 on:
   push:
     branches: [main, duo-ipad]
-    paths-ignore: ['**.md', 'docs/**', '.gitignore']
+    paths-ignore: ['**.md', 'docs/**', '.gitignore', 'store/**', 'tools/**', 'scripts/sim-shots.sh', 'scripts/compose-screens.py', '.github/workflows/screenshots.yml']
   pull_request:
   workflow_dispatch:
 

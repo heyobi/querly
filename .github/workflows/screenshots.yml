@@ -5,7 +5,7 @@ on:
 
 jobs:
   shots:
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
@@ -28,9 +28,19 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build/sim \
             CODE_SIGNING_ALLOWED=NO | tail -n 60
-      - name: Take the screenshots
-        run: bash scripts/sim-shots.sh shots
+      - name: iPhone 6.3" screenshots
+        run: bash scripts/sim-shots.sh "iPhone 17 Pro" shots/iphone
+      - name: iPad 13" screenshots
+        continue-on-error: true
+        run: bash scripts/sim-shots.sh "iPad Pro 13-inch (M5)" shots/ipad
+      - name: iPhone Duo outer display screenshots
+        continue-on-error: true
+        run: bash scripts/sim-shots.sh "iPhone Duo" shots/duo-outer 1
+      - name: iPhone Duo inner display screenshots
+        continue-on-error: true
+        run: bash scripts/sim-shots.sh "iPhone Duo" shots/duo-inner 3 unfold
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: screenshots
           path: shots/

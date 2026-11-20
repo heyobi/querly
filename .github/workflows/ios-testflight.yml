@@ -2,7 +2,7 @@ name: iOS → TestFlight
 
 on:
   push:
-    branches: [main]
+    branches: [main, duo-ipad]
     paths-ignore: ['**.md', 'docs/**', '.gitignore']
   pull_request:
   workflow_dispatch:
@@ -94,7 +94,7 @@ jobs:
   build:
     name: Build & upload to TestFlight
     needs: prepare
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 45
     env:
       ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}

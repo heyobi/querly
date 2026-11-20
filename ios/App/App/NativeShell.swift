@@ -103,6 +103,9 @@ final class ShellViewController: UIViewController, UITabBarControllerDelegate, U
         tabs.viewControllers = [filesNav, analyzeVC, settingsVC]
         tabs.delegate = self
         tabs.view.backgroundColor = .clear
+        // iPad and the open iPhone Duo would put the tab bar at the top or in a sidebar, over the web view.
+        // A compact width keeps the system tab bar at the bottom, where the web pages leave room for it.
+        if #available(iOS 17.0, *) { tabs.traitOverrides.horizontalSizeClass = .compact }
         if #unavailable(iOS 26.0) {
             // Over a web view there is no scroll view to track: keep the bar's blur at all times.
             let a = UITabBarAppearance()
@@ -316,6 +319,9 @@ struct FilesView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .frame(maxWidth: 760)
+        .frame(maxWidth: .infinity)
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Querly")
         .searchable(text: $query, prompt: model.t("Search"))
         .refreshable {

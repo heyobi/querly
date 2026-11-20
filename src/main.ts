@@ -144,6 +144,7 @@ async function initShell() {
   void NativeShell.addListener('action', (d) => void shellAction(d.action, d.name, d.arg));
   // iPhone Duo half open with a vertical fold: notebooks split exactly at the fold (code | fold | result).
   void NativeShell.addListener('fold', (d) => {
+    (window as unknown as { __lastFold?: unknown }).__lastFold = d;
     const split = d.status === 'partiallyOpen' && d.w > 0 && d.h > d.w && d.x > 200 && d.x < d.width - 200;
     document.body.classList.toggle('fold-split', split);
     document.documentElement.style.setProperty('--fold-x', `${d.x}px`);

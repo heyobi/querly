@@ -73,5 +73,8 @@ for i in $(seq 1 900); do
   fi
   sleep 1
 done
+cp "$DATA/Documents/shots/"fold-*.json "$OUT"/ 2>/dev/null || true
+cat "$OUT"/fold-*.json 2>/dev/null | head -c 2000 || true
+echo
 sips -g pixelWidth -g pixelHeight "$OUT"/*.png | grep pixel | sort | uniq -c || true
 xcrun simctl shutdown "$DEV" || true

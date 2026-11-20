@@ -88,6 +88,7 @@ export async function startTour() {
   for (const [name, setup] of steps) {
     try { await setup(); } catch (e) { console.error('shot', name, e); }
     await sleep(1800);
+    await write(`shots/fold-${name}.json`, JSON.stringify((window as unknown as { __lastFold?: unknown }).__lastFold ?? null));
     await write('shots/ready', name);
     const t0 = Date.now();
     while ((await read('shots/next')) !== name && Date.now() - t0 < 300000) await sleep(300);

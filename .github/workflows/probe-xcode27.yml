@@ -1,0 +1,16 @@
+name: Probe Xcode 27 runner
+on:
+  push:
+    branches: [duo-ipad]
+    paths: ['.github/workflows/probe-xcode27.yml']
+jobs:
+  probe:
+    runs-on: xcode-27
+    steps:
+      - run: |
+          sw_vers; ls /Applications | grep -i xcode; xcodebuild -version; xcodebuild -showsdks | grep -i ios
+          xcrun simctl list runtimes
+          xcrun simctl list devicetypes | grep -iE "duo|fold|ipad pro 13|ipad air 13|iphone 17 pro"
+          xcrun simctl list devices available | grep -iE "duo|ipad pro 13|iphone 17 pro" | head -20
+          xcrun simctl io 2>&1 | head -40 || true
+          xcrun simctl help io 2>&1 | head -60 || true

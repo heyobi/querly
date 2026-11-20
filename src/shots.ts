@@ -78,7 +78,6 @@ const steps: [string, () => Promise<void>][] = [
     await centre(0, '.result');
   }],
   ['log', async () => { theme('dark'); await w.__analyze('server.log'); await until(() => document.querySelectorAll('.result').length >= 3, 40000); await centre(1, '.chart'); }],
-  ['analyze', async () => { theme('light'); w.__go({ tab: 'notebooks' }); }],
 ];
 
 export async function startTour() {

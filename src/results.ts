@@ -136,7 +136,9 @@ function geoLabel(hex: string) {
 function chart(rs: ResultSet, numCols: number[]): HTMLElement {
   const labelCol = rs.fields.findIndex((_, i) => !numCols.includes(i));
   const kinds = ['Bar', 'Line', ...(numCols.length >= 2 ? ['Scatter'] : [])];
-  let kind = numCols.length >= 2 && labelCol < 0 ? 'Scatter' : rs.rows.length > 40 ? 'Line' : 'Bar';
+  // Over time (a date or timestamp label) reads best as a line.
+  const overTime = labelCol >= 0 && /^(DATE|TIMESTAMP)/.test(rs.fields[labelCol].type);
+  let kind = numCols.length >= 2 && labelCol < 0 ? 'Scatter' : rs.rows.length > 40 || overTime ? 'Line' : 'Bar';
   const wrap = h('div', { class: 'chart' });
   const bar = h('div', { class: 'chips' });
   // "Total quantity — Region": what the chart shows, in words.
@@ -231,7 +233,10 @@ function seriesSvg(rs: ResultSet, cols: number[], labelCol: number, kind: string
   const y = (v: number) => PAD.t + ih - ((v - lo) / (hi - lo)) * ih;
   axes(svg, ticks, y);
   const n = rows.length, band = iw / n;
-  const label = (i: number) => (labelCol >= 0 ? fmtValue(rows[i][labelCol]).text : String(i + 1));
+  // Dates as "Jan 25" instead of a cut-off ISO string.
+  const isDate = labelCol >= 0 && /^(DATE|TIMESTAMP)/.test(rs.fields[labelCol].type);
+  const dateLabel = (v: unknown) => { const d = new Date(typeof v === 'number' ? v : String(v)); return isNaN(+d) ? fmtValue(v).text : d.toLocaleDateString([], { month: 'short', year: '2-digit' }); };
+  const label = (i: number) => (labelCol >= 0 ? (isDate ? dateLabel(rows[i][labelCol]) : fmtValue(rows[i][labelCol]).text) : String(i + 1));
   const every = Math.ceil(n / 8);
   rows.forEach((_, i) => {
     if (i % every) return;

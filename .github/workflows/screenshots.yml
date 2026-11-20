@@ -2,23 +2,43 @@ name: App Store screenshots
 
 on:
   workflow_dispatch:
+    inputs:
+      only:
+        description: 'Run one device only (iphone, ipad, duo-outer, duo-inner, duo-half); empty for all'
+        default: ''
 
 jobs:
   shots:
-    runs-on: macos-26
-    timeout-minutes: 45
+    runs-on: xcode-27
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { id: iphone, device: 'iPhone 17 Pro', display: '', mode: '' }
+          - { id: ipad, device: 'iPad Pro 13-inch (M5)', display: '', mode: '' }
+          - { id: duo-outer, device: 'iPhone Duo', display: '1', mode: '' }
+          - { id: duo-inner, device: 'iPhone Duo', display: '3', mode: 'unfold' }
+          - { id: duo-half, device: 'iPhone Duo', display: '3', mode: 'half' }
+    name: ${{ matrix.id }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - if: inputs.only == '' || inputs.only == matrix.id
+        uses: actions/checkout@v7
+      - if: inputs.only == '' || inputs.only == matrix.id
+        uses: actions/setup-node@v7
         with: { node-version: 22, cache: npm }
-      - run: npm ci
-      - uses: actions/cache@v5
+      - if: inputs.only == '' || inputs.only == matrix.id
+        run: npm ci
+      - if: inputs.only == '' || inputs.only == matrix.id
+        uses: actions/cache@v5
         with:
           path: .cache/duckdb-ext
           key: duckdb-ext-${{ hashFiles('scripts/duckdb-assets.mjs') }}
-      - name: Build the web app with the screenshot tour and sync into the iOS project
+      - if: inputs.only == '' || inputs.only == matrix.id
+        name: Build the web app with the screenshot tour and sync into the iOS project
         run: VITE_SHOTS=1 npm run build && npx cap sync ios
-      - name: Build for the simulator
+      - if: inputs.only == '' || inputs.only == matrix.id
+        name: Build for the simulator
         run: |
           xcodebuild build \
             -project ios/App/App.xcodeproj \
@@ -27,10 +47,12 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build/sim \
-            CODE_SIGNING_ALLOWED=NO | tail -n 60
-      - name: Take the screenshots
-        run: bash scripts/sim-shots.sh shots
-      - uses: actions/upload-artifact@v4
+            CODE_SIGNING_ALLOWED=NO | tail -n 30
+      - if: inputs.only == '' || inputs.only == matrix.id
+        name: Take the screenshots
+        run: bash scripts/sim-shots.sh "${{ matrix.device }}" "shots/${{ matrix.id }}" "${{ matrix.display }}" "${{ matrix.mode }}"
+      - if: always() && (inputs.only == '' || inputs.only == matrix.id)
+        uses: actions/upload-artifact@v4
         with:
-          name: screenshots
+          name: screenshots-${{ matrix.id }}
           path: shots/

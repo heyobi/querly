@@ -103,6 +103,9 @@ final class ShellViewController: UIViewController, UITabBarControllerDelegate, U
         tabs.viewControllers = [filesNav, analyzeVC, settingsVC]
         tabs.delegate = self
         tabs.view.backgroundColor = .clear
+        // iPad and the open iPhone Duo would put the tab bar at the top or in a sidebar, over the web view.
+        // A compact width keeps the system tab bar at the bottom, where the web pages leave room for it.
+        if #available(iOS 17.0, *) { tabs.traitOverrides.horizontalSizeClass = .compact }
         if #unavailable(iOS 26.0) {
             // Over a web view there is no scroll view to track: keep the bar's blur at all times.
             let a = UITabBarAppearance()
@@ -125,6 +128,18 @@ final class ShellViewController: UIViewController, UITabBarControllerDelegate, U
         wrap.addSubview(tabs.view)
         tabs.didMove(toParent: self)
         wrap.isHidden = true
+
+        // iPhone Duo: an invisible SwiftUI view, behind everything, reports the hinge and the fold's position to the web app.
+        if #available(iOS 27.1, *) {
+            let probe = UIHostingController(rootView: FoldProbe())
+            probe.view.isUserInteractionEnabled = false
+            probe.view.backgroundColor = .clear
+            probe.view.frame = view.bounds
+            probe.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            addChild(probe)
+            view.insertSubview(probe.view, at: 0)
+            probe.didMove(toParent: self)
+        }
     }
 
     /// Called by the web app whenever its screen changes.
@@ -202,6 +217,12 @@ public class NativeShellPlugin: CAPPlugin, CAPBridgedPlugin {
         notifyListeners(event, data: data)
     }
 
+    /// For state the web app needs even if it starts listening later (the fold): the last value is kept until a
+    /// listener is added.
+    func emitRetained(_ event: String, _ data: [String: Any]) {
+        notifyListeners(event, data: data, retainUntilConsumed: true)
+    }
+
     @objc func setMode(_ call: CAPPluginCall) {
         let mode = call.getString("mode") ?? "web"
         let tab = call.getString("tab") ?? "files"
@@ -265,6 +286,58 @@ struct FilesView: View {
     }
 
     var body: some View {
+        GeometryReader { geo in
+            if geo.size.width >= 700 { wideGrid } else { narrowList }
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Querly")
+        .searchable(text: $query, prompt: model.t("Search"))
+        .refreshable {
+            model.send("refresh", "")
+            try? await Task.sleep(nanoseconds: 500_000_000)
+        }
+        .modifier(FileDialogs(model: model, renaming: $renaming, newName: $newName, deleting: $deleting))
+        .overlay(alignment: .bottom) { ToastView(model: model) }
+    }
+
+    /// iPad and the open iPhone Duo: the open card and tips side by side, files as a grid of cards.
+    private var wideGrid: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                HStack(alignment: .top, spacing: 18) {
+                    Button { model.shell?.pickFiles() } label: { OpenCard(model: model) }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label(model.t("Open files from other apps"), systemImage: "square.and.arrow.down.on.square").font(.headline)
+                        Text("1. " + model.t("In the Files app, touch and hold a file."))
+                        Text("2. " + model.t("Choose Open With, then Querly."))
+                        Text("3. " + model.t("In Mail, Messages or Safari, use Share › Querly."))
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                }
+                Text(model.t("Recent")).font(.title2.weight(.bold))
+                if shown.isEmpty {
+                    Text(model.t("Files you open appear here.")).foregroundStyle(.secondary)
+                }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 16)], spacing: 16) {
+                    ForEach(shown) { f in
+                        Button { model.send("open", f.name) } label: { FileCard(file: f, model: model) }
+                            .buttonStyle(.plain)
+                            .contextMenu { menu(for: f) } preview: { FilePreview(file: f, model: model) }
+                    }
+                }
+            }
+            .padding(.horizontal, 28)
+            .padding(.vertical, 12)
+        }
+    }
+
+    private var narrowList: some View {
         List {
             Section {
                 Button { model.shell?.pickFiles() } label: { OpenCard(model: model) }
@@ -316,42 +389,6 @@ struct FilesView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Querly")
-        .searchable(text: $query, prompt: model.t("Search"))
-        .refreshable {
-            model.send("refresh", "")
-            try? await Task.sleep(nanoseconds: 500_000_000)
-        }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { model.shell?.pickFiles() } label: { Image(systemName: "plus") }
-                    .accessibilityLabel(model.t("Open a file"))
-            }
-        }
-        .confirmationDialog(
-            deleting.map { "\(model.t("Delete")) “\($0.name)”?" } ?? "",
-            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
-            titleVisibility: .visible,
-            presenting: deleting
-        ) { f in
-            Button(model.t("Delete"), role: .destructive) { model.send("delete", f.name) }
-            Button(model.t("Cancel"), role: .cancel) {}
-        } message: { _ in
-            Text(model.t("The file is removed from this iPhone. Tables you created from it are kept."))
-        }
-        .alert(model.t("Rename file"), isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
-            TextField(model.t("Name"), text: $newName)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-            Button(model.t("Rename")) {
-                if let f = renaming, !newName.trimmingCharacters(in: .whitespaces).isEmpty, newName != f.name {
-                    model.send("rename", f.name, newName.trimmingCharacters(in: .whitespaces))
-                }
-                renaming = nil
-            }
-            Button(model.t("Cancel"), role: .cancel) { renaming = nil }
-        }
-        .overlay(alignment: .bottom) { ToastView(model: model) }
     }
 
     @ViewBuilder
@@ -364,6 +401,69 @@ struct FilesView: View {
         Button { newName = f.name; renaming = f } label: { Label(model.t("Rename"), systemImage: "pencil") }
         Divider()
         Button(role: .destructive) { deleting = f } label: { Label(model.t("Delete"), systemImage: "trash") }
+    }
+}
+
+/// Delete confirmation and rename prompt, shared by the list and the grid.
+struct FileDialogs: ViewModifier {
+    @ObservedObject var model: FilesModel
+    @Binding var renaming: FileItem?
+    @Binding var newName: String
+    @Binding var deleting: FileItem?
+
+    func body(content: Content) -> some View {
+            content
+.confirmationDialog(
+            deleting.map { "\(model.t("Delete")) “\($0.name)”?" } ?? "",
+            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
+            titleVisibility: .visible,
+            presenting: deleting
+        ) { f in
+            Button(model.t("Delete"), role: .destructive) { model.send("delete", f.name) }
+            Button(model.t("Cancel"), role: .cancel) {}
+        } message: { _ in
+            Text(model.t("The file is removed from this iPhone. Tables you created from it are kept."))
+        }
+            .alert(model.t("Rename file"), isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            TextField(model.t("Name"), text: $newName)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button(model.t("Rename")) {
+                if let f = renaming, !newName.trimmingCharacters(in: .whitespaces).isEmpty, newName != f.name {
+                    model.send("rename", f.name, newName.trimmingCharacters(in: .whitespaces))
+                }
+                renaming = nil
+            }
+            Button(model.t("Cancel"), role: .cancel) { renaming = nil }
+        }
+    }
+}
+
+/// A file as a card on wide screens: thumbnail or type badge, name, size and table shape, first columns.
+struct FileCard: View {
+    let file: FileItem
+    @ObservedObject var model: FilesModel
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                Thumb(file: file, size: 54)
+                Spacer()
+                if file.pro {
+                    Text("PRO").font(.caption2.weight(.bold)).padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.orange.opacity(0.18), in: Capsule()).foregroundStyle(.orange)
+                }
+            }
+            Text(file.name).font(.headline).lineLimit(2).truncationMode(.middle)
+            Text(subtitle(file, model)).font(.footnote).foregroundStyle(.secondary).lineLimit(2)
+            if !file.columns.isEmpty {
+                Text(file.columns.prefix(5).joined(separator: " · "))
+                    .font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 168, alignment: .topLeading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 
@@ -400,6 +500,7 @@ struct OpenCard: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(model.t("Open a file")).font(.title3.weight(.bold))
                 Text("CSV · Excel · JSON · TXT · Parquet · SQLite").font(.footnote).opacity(0.85)
+                    .lineLimit(1).minimumScaleFactor(0.7)
             }
             Spacer(minLength: 0)
         }
@@ -510,5 +611,57 @@ struct ToastView: View {
                     withAnimation { if model.toast == toast { model.toast = nil } }
                 }
         }
+    }
+}
+
+// MARK: - iPhone Duo fold
+
+/// Reads the hinge (closed, partially open, fully open) and the fold's division region in window coordinates,
+/// and sends both to the web app as a "fold" event. Half-open, notebooks put the code on one side of the fold and
+/// the result on the other.
+@available(iOS 27.1, *)
+struct FoldProbe: View {
+    @State private var hinge: DeviceHinge?
+    @State private var fold: CGRect = .zero
+    @State private var foldActive = false
+    @State private var size: CGSize = .zero
+
+    var body: some View {
+        GeometryReader { proxy in
+            let division = proxy.reservedRegions(kind: .division, options: [.includeInactive]).first
+            let frame = division?.frame ?? .zero
+            let active = division?.isActive ?? false
+            Color.clear
+                .task(id: "\(frame)|\(active)|\(proxy.size)") {
+                    fold = frame
+                    foldActive = active
+                    size = proxy.size
+                    send()
+                }
+        }
+        .ignoresSafeArea()
+        .onHingeChange { _, newContext in
+            hinge = newContext.hinge
+            send()
+        }
+    }
+
+    private func send() {
+        var status = "none"
+        if let st = hinge?.status {
+            switch st {
+            case .closed: status = "closed"
+            case .partiallyOpen: status = "partiallyOpen"
+            case .fullyOpen: status = "fullyOpen"
+            default: status = "unknown"
+            }
+        }
+        NativeShellPlugin.shared?.emitRetained("fold", [
+            "status": status,
+            "angle": hinge?.angle.degrees ?? 0,
+            "x": Double(fold.minX), "y": Double(fold.minY), "w": Double(fold.width), "h": Double(fold.height),
+            "active": foldActive,
+            "width": Double(size.width), "height": Double(size.height)
+        ])
     }
 }

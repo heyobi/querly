@@ -33,6 +33,17 @@ document.documentElement.lang = lang();
 
 const TR: Record<string, string> = {
   // tabs & headers
+  "Open any data file": "Her veri dosyasını aç",
+  "Open a file": "Dosya aç",
+  "From the Files app: touch and hold a file, then Open With › Querly. Or use Share › Querly in Mail and other apps.": "Dosyalar uygulamasında bir dosyaya basılı tutun, sonra Birlikte Aç › Querly. Mail ve diğer uygulamalarda Paylaş › Querly de olur.",
+  "Recent files": "Son dosyalar",
+  "Files you open appear here.": "Açtığınız dosyalar burada görünür.",
+  "Tap a file to see it as a table: sort, search and filter. CSV, TSV and TXT files can be edited and saved back to Files. Files stay on this iPhone.": "Bir dosyaya dokunun, tablo olarak açılsın: sıralayın, arayın, filtreleyin. CSV, TSV ve TXT dosyaları düzenlenip Dosyalar'a geri kaydedilebilir. Dosyalar bu iPhone'da kalır.",
+  "Try a sample file": "Örnek dosyayı dene",
+  "Ask questions with SQL": "SQL ile sorular sorun",
+  "Notebooks, charts and free lessons": "Not defterleri, grafikler ve ücretsiz dersler",
+  "Notebooks for asking questions of your files with SQL: filter, join, group and chart. New to SQL? The free lessons below start from zero.": "Dosyalarınıza SQL ile soru sormak için not defterleri: filtreleyin, birleştirin, gruplayın, grafik çizin. SQL'e yeni misiniz? Aşağıdaki ücretsiz dersler sıfırdan başlar.",
+  "built in, work offline": "yerleşik, çevrimdışı çalışır",
   'Notebooks': 'Not defterleri', 'Terminal': 'Terminal', 'Extensions': 'Eklentiler', 'Databases': 'Veritabanları',
   'New notebook': 'Yeni not defteri', 'Import': 'İçe aktar', 'Untitled notebook': 'Adsız not defteri',
   'No notebooks yet. Start with an example below.': 'Henüz not defteri yok. Aşağıdaki bir örnekle başlayın.',

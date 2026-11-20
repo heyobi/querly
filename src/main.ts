@@ -1,6 +1,7 @@
 import './style.css';
 import './style2.css';
 import { App as CapApp } from '@capacitor/app';
+import { registerPlugin, type PluginListenerHandle } from '@capacitor/core';
 import { Filesystem } from '@capacitor/filesystem';
 import { Keyboard } from '@capacitor/keyboard';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -37,7 +38,7 @@ const editors = new Set<EditorView>();
 
 type Tab = 'notebooks' | 'files' | 'extensions' | 'database';
 type Route = { tab: Tab; notebook?: string };
-let route: Route = { tab: 'notebooks' };
+let route: Route = { tab: 'files' };
 
 const dialect = StandardSQL;
 function sqlLang() {
@@ -76,9 +77,11 @@ function statusPill() {
 }
 
 function tabBar() {
-  const tabs: [Tab, string, string][] = [['notebooks', 'Notebooks', 'doc'], ['files', 'Files', 'folder'], ['extensions', 'Extensions', 'puzzle'], ['database', 'Database', 'db']];
+  // Files first: most people come to open a file. SQL and the database are there for those who want more.
+  const tabs: [Tab, string, string][] = [['files', 'Files', 'folder'], ['notebooks', 'SQL', 'term'], ['database', 'Database', 'db']];
+  const cur = route.tab === 'extensions' ? 'database' : route.tab;
   return h('nav', { class: 'tabbar' }, tabs.map(([tb, label, ic]) =>
-    h('button', { class: route.tab === tb && !route.notebook ? 'on' : '', onclick: () => go({ tab: tb }) }, icon(ic), h('span', {}, t(label)))));
+    h('button', { class: cur === tb && !route.notebook ? 'on' : '', onclick: () => go({ tab: tb }) }, icon(ic), h('span', {}, t(label)))));
 }
 
 function go(r: Route) {
@@ -142,7 +145,8 @@ async function importNotebookFile(f: File) {
 
 function homePage() {
   return h('div', { class: 'page' },
-    header(t('Notebooks'), statusPill()),
+    header(t('SQL'), statusPill()),
+    h('p', { class: 'muted small drop-hint' }, t('Notebooks for asking questions of your files with SQL: filter, join, group and chart. New to SQL? The free lessons below start from zero.')),
     h('div', { class: 'actions' },
       h('button', { class: 'btn primary', onclick: () => newNotebook() }, icon('plus'), t('New notebook')),
       h('button', { class: 'btn', onclick: () => void importFlow() }, icon('import'), t('Import'))),
@@ -302,14 +306,27 @@ async function previewModal(title: string, query: string) {
 }
 
 function filesPage() {
+  const sample = files.find((f) => f.name === 'sales.csv') ?? files.find((f) => viewableKind(kindOf(f.name)));
   const page = h('div', { class: 'page' },
-    header(t('Files'), statusPill()),
-    h('div', { class: 'actions' },
-      h('button', { class: 'btn primary', onclick: () => void importFlow() }, icon('import'), t('Import files'))),
-    h('p', { class: 'muted small drop-hint' }, t('Tap a file to view it as a table. CSV, TSV and TXT files can be edited and saved. Viewing Excel, Parquet and SQLite files is free; SQL on them needs Pro. You can also use Share › Querly in other apps, or copy files into Files › On My iPhone › Querly › Data.')),
+    header(t('Files')),
+    h('div', { class: 'hero' },
+      h('div', { class: 'hero-ico' }, icon('table')),
+      h('div', { class: 'hero-title' }, t('Open any data file')),
+      h('div', { class: 'hero-kinds' }, ['CSV', 'TSV', 'TXT', 'Excel', 'JSON', 'Parquet', 'SQLite'].map((k) => h('span', {}, k))),
+      h('button', { class: 'btn primary big', onclick: () => void importFlow() }, icon('folder'), t('Open a file')),
+      h('div', { class: 'hero-tip' }, t('From the Files app: touch and hold a file, then Open With › Querly. Or use Share › Querly in Mail and other apps.'))),
+    h('h2', { class: 'section' }, t('Recent files'), files.length > 0 && h('span', { class: 'section-note' }, String(files.length))),
     files.length
       ? h('div', { class: 'list' }, files.map(fileRow))
-      : h('div', { class: 'empty' }, t('No files yet. Import a CSV, Parquet, JSON or Excel file.')));
+      : h('div', { class: 'empty' }, t('Files you open appear here.')),
+    h('p', { class: 'muted small drop-hint' }, t('Tap a file to see it as a table: sort, search and filter. CSV, TSV and TXT files can be edited and saved back to Files. Files stay on this iPhone.')),
+    h('div', { class: 'cards' },
+      sample && h('button', { class: 'card', onclick: () => openFile(sample.name) },
+        h('div', { class: 'card-title' }, icon('play'), ' ', t('Try a sample file')),
+        h('div', { class: 'card-sub' }, sample.name)),
+      h('button', { class: 'card', onclick: () => go({ tab: 'notebooks' }) },
+        h('div', { class: 'card-title' }, icon('term'), ' ', t('Ask questions with SQL')),
+        h('div', { class: 'card-sub' }, t('Notebooks, charts and free lessons')))));
   const offPro = onPro(() => render());
   new MutationObserver(() => { if (!page.isConnected) offPro(); }).observe(document.body, { childList: true, subtree: true });
   return page;
@@ -359,7 +376,8 @@ function extensionsPage() {
   const offPro = onPro(() => render());
   new MutationObserver(() => { if (!listEl.isConnected) offPro(); }).observe(document.body, { childList: true, subtree: true });
   return h('div', { class: 'page' },
-    header(t('Extensions'), statusPill()),
+    h('button', { class: 'back', onclick: () => go({ tab: 'database' }) }, icon('back'), t('Database')),
+    header(t('Extensions')),
     h('p', { class: 'muted small drop-hint' }, `${EXTENSIONS.length} ${t('DuckDB extensions are built into the app and load offline, without downloading anything. Most load automatically the first time a query needs them.')}`),
     !isPro() && h('button', { class: 'pro-banner', onclick: () => requirePro().then(() => render()) },
       h('div', {}, h('b', {}, t('Unlock Parquet, Excel, SQLite and Spatial')), h('div', { class: 'small' }, t('Charts, maps and big files too · one-time purchase'))),
@@ -461,6 +479,10 @@ function databasePage() {
           h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, x.name), h('div', { class: 'row-sub' }, x.kind === 'view' ? t('view') : `${t('table')}${x.rows !== null ? ` · ~${Number(x.rows).toLocaleString()} ${t('rows')}` : ''}`)),
           icon('chevron'))))
       : h('div', { class: 'empty' }, t('No tables yet. Run an example, or load a file into a table from the Files tab.')),
+    h('div', { class: 'list' }, h('button', { class: 'row', onclick: () => go({ tab: 'extensions' }) },
+      h('div', { class: 'row-icon' }, icon('puzzle')),
+      h('div', { class: 'row-main' }, h('div', { class: 'row-title' }, t('Extensions')), h('div', { class: 'row-sub' }, `${EXTENSIONS.length} ${t('built in, work offline')}`)),
+      icon('chevron'))),
     h('h2', { class: 'section' }, t('All databases')),
     h('div', { class: 'list' }, engine.databases().map((d) => h('button', { class: `row${d.id === cur?.id ? ' current' : ''}`, onclick: async () => {
       if (d.id === cur?.id) return;
@@ -744,7 +766,19 @@ function trackKeyboard() {
   }
 }
 
-/** A file opened with "Open in Querly" / the share sheet arrives as a file:// URL (a copy in our Inbox). */
+const IncomingFiles = registerPlugin<{
+  take(): Promise<{ urls: string[] }>;
+  addListener(e: 'available', f: () => void): Promise<PluginListenerHandle>;
+}>('IncomingFiles');
+
+async function takeIncoming() {
+  try {
+    const { urls } = await IncomingFiles.take();
+    for (const u of urls) await openSharedUrl(u);
+  } catch { /* plugin missing (web) */ }
+}
+
+/** A file opened from another app arrives as a file:// URL to a private copy in Caches/Incoming. */
 async function openSharedUrl(url: string) {
   if (!/^file:/i.test(url)) return;
   try {
@@ -789,8 +823,9 @@ async function boot() {
   render();
   if (native) {
     SplashScreen.hide().catch(() => {});
-    CapApp.addListener('appUrlOpen', (e) => void openSharedUrl(e.url)).catch(() => {});
-    CapApp.getLaunchUrl().then((u) => { if (u?.url) void openSharedUrl(u.url); }).catch(() => {});
+    // Files opened with Open With › Querly or Share › Querly; SceneDelegate.swift copies them in first.
+    IncomingFiles.addListener('available', () => void takeIncoming()).catch(() => {});
+    void takeIncoming();
     // Files dropped into Files › Querly › Data from outside show up when the app comes back.
     CapApp.addListener('appStateChange', (s) => { if (s.isActive) void refreshFiles().then(() => { if (route.tab === 'files' && !route.notebook) render(); }); }).catch(() => {});
   }

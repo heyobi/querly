@@ -11,11 +11,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = QuerlyViewController()
         window?.makeKeyAndVisible()
 
+        // A file tapped in Files (Open With › Querly) or shared to Querly while the app was closed.
+        IncomingFiles.accept(connectionOptions.urlContexts.map { $0.url }.filter { $0.isFileURL })
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        SceneDelegateProxy.shared.scene(scene, openURLContexts: URLContexts)
+        IncomingFiles.accept(URLContexts.map { $0.url }.filter { $0.isFileURL })
+        let others = URLContexts.filter { !$0.url.isFileURL }
+        if !others.isEmpty { SceneDelegateProxy.shared.scene(scene, openURLContexts: others) }
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
@@ -27,6 +31,79 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 class QuerlyViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(SaveToFilesPlugin())
+        bridge?.registerPluginInstance(IncomingFilesPlugin())
+    }
+}
+
+/// Files opened from other apps. Querly declares LSSupportsOpeningDocumentsInPlace, so iOS lists it under
+/// Files › Open With and hands over the original file (often outside our sandbox, maybe still in iCloud).
+/// We copy it into Caches/Incoming right away; the web app imports the copy and deletes it.
+enum IncomingFiles {
+    private static var pending: [String] = []
+    static weak var plugin: IncomingFilesPlugin?
+
+    static func accept(_ urls: [URL]) {
+        guard !urls.isEmpty else { return }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let copies = urls.compactMap(copyIn)
+            DispatchQueue.main.async {
+                pending.append(contentsOf: copies.map { $0.absoluteString })
+                plugin?.announce()
+            }
+        }
+    }
+
+    static func take() -> [String] {
+        let out = pending
+        pending = []
+        return out
+    }
+
+    private static func copyIn(_ url: URL) -> URL? {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        let fm = FileManager.default
+        guard let caches = fm.urls(for: .cachesDirectory, in: .userDomainMask).first else { return nil }
+        let folder = caches.appendingPathComponent("Incoming/\(UUID().uuidString)", isDirectory: true)
+        let dest = folder.appendingPathComponent(url.lastPathComponent)
+        var copied = false
+        var coordError: NSError?
+        // The coordinator downloads iCloud files first and waits for other apps that are writing to it.
+        NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &coordError) { src in
+            do {
+                try fm.createDirectory(at: folder, withIntermediateDirectories: true)
+                try fm.copyItem(at: src, to: dest)
+                copied = true
+            } catch {
+                NSLog("Querly: could not copy incoming file: \(error)")
+            }
+        }
+        // Files iOS already copied into our Inbox are ours to clean up.
+        if copied, url.path.contains("/Inbox/") { try? fm.removeItem(at: url) }
+        return copied ? dest : nil
+    }
+}
+
+@objc(IncomingFilesPlugin)
+public class IncomingFilesPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "IncomingFilesPlugin"
+    public let jsName = "IncomingFiles"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "take", returnType: CAPPluginReturnPromise)
+    ]
+
+    override public func load() {
+        IncomingFiles.plugin = self
+    }
+
+    func announce() {
+        notifyListeners("available", data: [:], retainUntilConsumed: true)
+    }
+
+    @objc func take(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            call.resolve(["urls": IncomingFiles.take()])
+        }
     }
 }
 

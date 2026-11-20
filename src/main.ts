@@ -310,11 +310,11 @@ async function openMarkdown(name: string) {
   const bytes = await engine.fileBytes(name);
   const text = bytes ? new TextDecoder().decode(bytes) : '';
   const f = files.find((x) => x.name === name);
-  // The file menu closes the Markdown page first, so Analyze, Load into a table and Rename show on top.
+  // The page stays under the file menu; Analyze, Rename and Delete close it first.
   const close = modal(h('div', { class: 'md-view' },
     h('div', { class: 'md-head' },
       h('div', { class: 'md-title' }, name),
-      f && h('button', { class: 'md-more', 'aria-label': t('More'), onclick: () => { close(); fileActions(f, false); } }, '•••')),
+      f && h('button', { class: 'md-more', 'aria-label': t('More'), onclick: () => fileActions(f, false, close) }, '•••')),
     h('div', { class: 'md-body', html: safeHtml(marked.parse(text, { async: false }) as string) })));
 }
 
@@ -536,13 +536,14 @@ function fileSub(f: DataFile) {
   return el;
 }
 
-function fileActions(f: DataFile, withOpen = true) {
+/** leave: closes the screen the menu was opened from (Markdown page) before an action that moves away or changes the file. */
+function fileActions(f: DataFile, withOpen = true, leave?: () => void) {
   const kind = kindOf(f.name);
   const reader = readerFor(f.name);
   const gate = async () => !isProKind(kind) || requirePro(`${f.name}: ${t('SQL on this file type is part of Pro.')}`);
   sheet(f.name, [
     ...(withOpen && (viewableKind(kind) || kind === 'other') ? [{ label: t('Open'), run: () => openFile(f.name) }] : []),
-    ...(kind === 'other' ? [] : [{ label: t('Analyze with SQL & charts'), run: () => void notebookFromFile(f.name) }]),
+    ...(kind === 'other' ? [] : [{ label: t('Analyze with SQL & charts'), run: () => { leave?.(); void notebookFromFile(f.name); } }]),
     ...(!viewableKind(kind) && kind !== 'other' ? [{ label: t('Preview'), run: async () => { if (await gate()) await previewModal(f.name, `SELECT * FROM ${reader} LIMIT 200`); } }] : []),
     ...(kind === 'sqlite' || kind === 'other' ? [] : [{ label: `${t('Load into a table')} (${tableNameFor(f.name)})`, run: async () => {
       if (!(await gate())) return;
@@ -555,11 +556,13 @@ function fileActions(f: DataFile, withOpen = true) {
     } }]),
     { label: t('Share'), run: async () => { const b = await engine.fileBytes(f.name); if (b) await shareFile(f.name, new Blob([b as BlobPart]), 'application/octet-stream'); } },
     { label: t('Rename'), run: async () => {
+      leave?.();
       const n = await promptBox(t('Rename file'), t('Name'), f.name, t('Rename'));
       if (!n || n === f.name) return;
       try { await engine.renameFile(f.name, n); await refreshFiles(); render(); } catch (e) { toast((e as Error).message, 'err'); }
     } },
     { label: t('Delete'), danger: true, run: async () => {
+      leave?.();
       if (!(await confirmBox(`${t('Delete')} “${f.name}”?`, t('The file is removed from this iPhone. Tables you created from it are kept.'), t('Delete'), true))) return;
       await engine.deleteFile(f.name); await refreshFiles(); render();
     } },

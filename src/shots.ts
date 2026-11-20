@@ -27,32 +27,36 @@ function closeAll() {
   document.body.classList.remove('in-viewer');
 }
 function theme(t: Theme) { setThemePref(t); w.__go({ tab: 'files' }); }
-async function scrollToCell(i: number) {
-  const cell = document.querySelectorAll('.cell.sql')[i] as HTMLElement | undefined;
-  if (!cell) return;
-  cell.scrollIntoView({ block: 'start' });
-  window.scrollBy(0, -110);
-}
 async function runCell(i: number) {
   (document.querySelectorAll('.cell.sql .run')[i] as HTMLButtonElement | undefined)?.click();
   await until(() => !!document.querySelectorAll('.cell.sql')[i]?.querySelector('.out')?.children.length);
 }
 
-/** A believable library: the samples plus Excel, Parquet, JSON and a log made from them. */
+/** A believable library: the samples plus Excel, Parquet, JSON and a log made from them (one import, nothing opens). */
 async function seed() {
   const E = w.__engine;
+  const items: { name: string; blob: Blob }[] = [];
   const make = async (name: string, sql: string, fmt: 'xlsx' | 'parquet' | 'json') => {
-    try { await w.__importBlobs([{ name, blob: await E.exportQuery(sql, fmt) }]); } catch { /* skip */ }
+    try { items.push({ name, blob: await E.exportQuery(sql, fmt) }); } catch { /* skip */ }
   };
   await make('Orders 2025.xlsx', `SELECT * FROM 'sales.csv'`, 'xlsx');
   await make('sales_by_region.parquet', `SELECT region, product, sum(quantity) AS units, round(sum(quantity * unit_price), 2) AS revenue FROM 'sales.csv' GROUP BY ALL`, 'parquet');
   await make('cities.json', `SELECT * FROM 'cities.csv'`, 'json');
   const log = Array.from({ length: 60 }, (_, i) => `2025-06-${String(1 + (i % 28)).padStart(2, '0')} ${['INFO', 'INFO', 'WARN', 'INFO', 'ERROR'][i % 5]} worker-${i % 4} request ${1000 + i}`).join('\n');
-  await w.__importBlobs([{ name: 'server.log', blob: new Blob([log]) }]);
+  items.push({ name: 'server.log', blob: new Blob([log]) });
+  await w.__importBlobs(items);
+  closeAll();
+}
+
+/** Bring a result (chart, map) into the middle of the screen. */
+async function centre(cell: number, sel: string) {
+  await until(() => !!document.querySelectorAll('.cell.sql')[cell]?.querySelector(sel), 20000);
+  const el = document.querySelectorAll('.cell.sql')[cell]?.querySelector(sel) as HTMLElement | undefined;
+  el?.scrollIntoView({ block: 'center' });
 }
 
 const steps: [string, () => Promise<void>][] = [
-  ['files', async () => { theme('dark'); await sleep(2500); }],
+  ['files', async () => { closeAll(); theme('dark'); await sleep(2500); }],
   ['viewer', async () => { w.__openFile('sales.csv'); await until(() => !!document.querySelector('.v-insight:not(.hidden)')); }],
   ['stats', async () => {
     (document.querySelector('.vi-num') as HTMLElement | null)?.click();
@@ -62,18 +66,18 @@ const steps: [string, () => Promise<void>][] = [
     closeAll();
     await w.__analyze('sales.csv');
     await until(() => document.querySelectorAll('.result').length >= 4, 40000);
-    await scrollToCell(1);
+    await centre(1, '.chart');
   }],
-  ['trend', async () => { theme('light'); await w.__analyze('sales.csv'); await until(() => document.querySelectorAll('.result').length >= 4, 40000); await scrollToCell(2); }],
+  ['trend', async () => { theme('light'); await w.__analyze('sales.csv'); await until(() => document.querySelectorAll('.result').length >= 4, 40000); await centre(2, '.chart'); }],
   ['map', async () => {
     w.__go({ tab: 'notebooks' });
     await w.__openSample(w.__samples.find((s) => s.key === 'spatial'));
     await until(() => !!document.querySelector('.cell.sql'));
     await runCell(0);
     await until(() => !!document.querySelector('.out canvas, .out svg'), 40000);
-    await scrollToCell(0);
+    await centre(0, '.result');
   }],
-  ['log', async () => { theme('dark'); await w.__analyze('server.log'); await until(() => document.querySelectorAll('.result').length >= 3, 40000); await scrollToCell(1); }],
+  ['log', async () => { theme('dark'); await w.__analyze('server.log'); await until(() => document.querySelectorAll('.result').length >= 3, 40000); await centre(1, '.chart'); }],
   ['analyze', async () => { theme('light'); w.__go({ tab: 'notebooks' }); }],
 ];
 

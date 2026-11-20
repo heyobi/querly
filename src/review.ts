@@ -7,7 +7,7 @@ const KEY = 'qly-review';
 const STEPS = [10, 60, 250];
 
 export function querySucceeded() {
-  if (!native) return;
+  if (!native || import.meta.env.VITE_SHOTS) return; // never during the screenshot tour
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || '{"n":0,"asked":0}') as { n: number; asked: number };
     s.n++;

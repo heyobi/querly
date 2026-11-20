@@ -15,6 +15,7 @@ jobs:
           - { id: ipad, device: 'iPad Pro 13-inch (M5)', display: '', mode: '' }
           - { id: duo-outer, device: 'iPhone Duo', display: '1', mode: '' }
           - { id: duo-inner, device: 'iPhone Duo', display: '3', mode: 'unfold' }
+          - { id: duo-half, device: 'iPhone Duo', display: '3', mode: 'half' }
     name: ${{ matrix.id }}
     steps:
       - uses: actions/checkout@v7

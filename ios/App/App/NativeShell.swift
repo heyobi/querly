@@ -128,6 +128,18 @@ final class ShellViewController: UIViewController, UITabBarControllerDelegate, U
         wrap.addSubview(tabs.view)
         tabs.didMove(toParent: self)
         wrap.isHidden = true
+
+        // iPhone Duo: an invisible SwiftUI view, behind everything, reports the hinge and the fold's position to the web app.
+        if #available(iOS 27.1, *) {
+            let probe = UIHostingController(rootView: FoldProbe())
+            probe.view.isUserInteractionEnabled = false
+            probe.view.backgroundColor = .clear
+            probe.view.frame = view.bounds
+            probe.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            addChild(probe)
+            view.insertSubview(probe.view, at: 0)
+            probe.didMove(toParent: self)
+        }
     }
 
     /// Called by the web app whenever its screen changes.
@@ -598,5 +610,57 @@ struct ToastView: View {
                     withAnimation { if model.toast == toast { model.toast = nil } }
                 }
         }
+    }
+}
+
+// MARK: - iPhone Duo fold
+
+/// Reads the hinge (closed, partially open, fully open) and the fold's division region in window coordinates,
+/// and sends both to the web app as a "fold" event. Half-open, notebooks put the code on one side of the fold and
+/// the result on the other.
+@available(iOS 27.1, *)
+struct FoldProbe: View {
+    @State private var hinge: DeviceHinge?
+    @State private var fold: CGRect = .zero
+    @State private var foldActive = false
+    @State private var size: CGSize = .zero
+
+    var body: some View {
+        GeometryReader { proxy in
+            let division = proxy.reservedRegions(kind: .division, options: [.includeInactive]).first
+            let frame = division?.frame ?? .zero
+            let active = division?.isActive ?? false
+            Color.clear
+                .task(id: "\(frame)|\(active)|\(proxy.size)") {
+                    fold = frame
+                    foldActive = active
+                    size = proxy.size
+                    send()
+                }
+        }
+        .ignoresSafeArea()
+        .onHingeChange { _, newContext in
+            hinge = newContext.hinge
+            send()
+        }
+    }
+
+    private func send() {
+        var status = "none"
+        if let st = hinge?.status {
+            switch st {
+            case .closed: status = "closed"
+            case .partiallyOpen: status = "partiallyOpen"
+            case .fullyOpen: status = "fullyOpen"
+            default: status = "unknown"
+            }
+        }
+        NativeShellPlugin.shared?.emit("fold", [
+            "status": status,
+            "angle": hinge?.angle.degrees ?? 0,
+            "x": Double(fold.minX), "y": Double(fold.minY), "w": Double(fold.width), "h": Double(fold.height),
+            "active": foldActive,
+            "width": Double(size.width), "height": Double(size.height)
+        ])
     }
 }

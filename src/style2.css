@@ -365,3 +365,10 @@ body.in-viewer { overflow: hidden; }
   .cell.sql:has(> .out:empty) { grid-template-columns: minmax(0, 1fr); }
   .cell.sql > .out:empty { display: none; }
 }
+
+/* iPhone Duo half open (like a book): the code sits left of the fold, the result right of it, the fold itself empty. */
+body.fold-split .page.nb { max-width: none; padding-left: 12px; padding-right: 12px; }
+body.fold-split .cell.sql { display: grid; grid-template-columns: calc(var(--fold-x) - 13px) var(--fold-w) minmax(0, 1fr); }
+body.fold-split .cell.sql > .out { grid-column: 3; border-left: 0; }
+body.fold-split .cell.sql > .cell-head, body.fold-split .cell.sql > .editor { grid-column: 1; }
+body.fold-split .cell.md-cell { margin-right: calc(100% - var(--fold-x) + 13px); }

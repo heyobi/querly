@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # App Store screenshots from an iOS simulator. Run after building the app with VITE_SHOTS=1.
-# Usage: sim-shots.sh "<device name>" <out dir> [display id] [unfold]
+# Usage: sim-shots.sh "<device name>" <out dir> [display id] [unfold|half]
 #   iPhone 17 Pro → 1206x2622, iPad Pro 13-inch (M5) → 2064x2752,
 #   iPhone Duo: display 1 = outer 1398x2034, display 3 + unfold = inner 2007x2853.
 # The app's tour (src/shots.ts) writes each screen's name to Documents/shots/ready; this script takes the
@@ -43,12 +43,13 @@ fi
 echo "simulator $NAME_DEV $DEV"
 xcrun simctl boot "$DEV" || true
 xcrun simctl bootstatus "$DEV" -b
-if [ "$MODE" = "unfold" ]; then
+if [ "$MODE" = "unfold" ] || [ "$MODE" = "half" ]; then
   # Open the foldable flat, as Device Hub's "Open" button does (tools/duo-hinge.m, vendored and reviewed).
   # Toggling display power with simctl does not unfold it and crashes SpringBoard.
   mkdir -p build
   clang -fobjc-arc -framework Foundation -o build/duo-hinge tools/duo-hinge.m
-  build/duo-hinge -d "$DEV" flat
+  [ "$MODE" = "half" ] && ANGLE=half || ANGLE=flat
+  build/duo-hinge -d "$DEV" "$ANGLE"
   sleep 8
 fi
 xcrun simctl status_bar "$DEV" override --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 || true

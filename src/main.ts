@@ -74,6 +74,7 @@ const NativeShell = registerPlugin<{
   toast(o: { message: string; error: boolean }): Promise<void>;
   addListener(e: 'tab', f: (d: { tab: Tab }) => void): Promise<PluginListenerHandle>;
   addListener(e: 'action', f: (d: { action: string; name: string; arg: string }) => void): Promise<PluginListenerHandle>;
+  addListener(e: 'fold', f: (d: { status: string; angle: number; x: number; y: number; w: number; h: number; active: boolean; width: number; height: number }) => void): Promise<PluginListenerHandle>;
 }>('NativeShell');
 let shell = false;
 let shellState = '';
@@ -141,6 +142,13 @@ async function initShell() {
   };
   void NativeShell.addListener('tab', (d) => { if (route.tab !== d.tab || route.notebook) go({ tab: d.tab }); });
   void NativeShell.addListener('action', (d) => void shellAction(d.action, d.name, d.arg));
+  // iPhone Duo half open with a vertical fold: notebooks split exactly at the fold (code | fold | result).
+  void NativeShell.addListener('fold', (d) => {
+    const split = d.status === 'partiallyOpen' && d.w > 0 && d.h > d.w && d.x > 200 && d.x < d.width - 200;
+    document.body.classList.toggle('fold-split', split);
+    document.documentElement.style.setProperty('--fold-x', `${d.x}px`);
+    document.documentElement.style.setProperty('--fold-w', `${Math.max(d.w, 24)}px`);
+  });
   new MutationObserver(() => syncShell()).observe(document.body, { childList: true });
   onPro(() => pushFiles());
   pushFiles();

@@ -835,7 +835,33 @@ function showError(msg: string) {
 window.addEventListener('error', (e) => showError(e.message || String(e.error)));
 window.addEventListener('unhandledrejection', (e) => showError((e.reason as Error)?.message ?? String(e.reason)));
 
+/**
+ * TestFlight diagnostics: a thin strip at the top shows whether JavaScript is alive (tick), the last touch and
+ * click with the element under the finger, and the last error. One screenshot tells where taps get lost.
+ * Remove before the App Store release.
+ */
+function diagStrip() {
+  const strip = h('div', { class: 'diag' });
+  document.body.append(strip);
+  let tick = 0, touch = '-', click = '-', err = '-';
+  const desc = (el: EventTarget | null) => {
+    const e = el as HTMLElement | null;
+    if (!e || !e.tagName) return '?';
+    const c = (e.className && typeof e.className === 'string') ? '.' + e.className.split(' ')[0] : '';
+    const host = e.closest('button, a, summary, .row, .tabbar');
+    return e.tagName.toLowerCase() + c + (host && host !== e ? '<' + host.tagName.toLowerCase() + (typeof host.className === 'string' && host.className ? '.' + host.className.split(' ')[0] : '') : '');
+  };
+  const paint = () => { strip.textContent = `${appVersion || '?'} · t${tick} · touch ${touch} · click ${click} · ${route.tab} · err ${err}`; };
+  setInterval(() => { tick++; paint(); }, 1000);
+  document.addEventListener('touchstart', (e) => { const p = e.touches[0]; touch = `${Math.round(p.clientX)},${Math.round(p.clientY)} ${desc(e.target)}`; paint(); }, { capture: true, passive: true });
+  document.addEventListener('click', (e) => { click = desc(e.target); paint(); }, true);
+  window.addEventListener('error', (e) => { err = (e.message || '').slice(0, 60); paint(); });
+  window.addEventListener('unhandledrejection', (e) => { err = String((e.reason as Error)?.message ?? e.reason).slice(0, 60); paint(); });
+  paint();
+}
+
 async function boot() {
+  if (native) diagStrip();
   trackKeyboard();
   dismissKeyboardOnTapOutside();
   if (native) {

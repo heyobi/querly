@@ -290,21 +290,62 @@ async function notebookFromFile(name: string) {
   const cells: Cell[] = kind === 'sqlite'
     ? [{ id: uid(), type: 'markdown', source: `# ${name}\nAttach the SQLite file, list its tables, then query them as \`db.table_name\`.` },
        { id: uid(), type: 'sql', source: `ATTACH '${name}' AS ${tbl} (TYPE sqlite, READ_ONLY);\nSELECT name FROM ${tbl}.sqlite_master WHERE type = 'table';` }]
-    : [{ id: uid(), type: 'markdown', source: `# ${name}` },
-       { id: uid(), type: 'sql', source: `DESCRIBE SELECT * FROM ${reader};` },
-       { id: uid(), type: 'sql', source: `SELECT * FROM ${reader} LIMIT 100;` },
-       { id: uid(), type: 'sql', source: `SUMMARIZE SELECT * FROM ${reader};` }];
+    : await analysisCells(name, reader);
+  autoRun = true;
   await newNotebook(cells, name.replace(/\.[^.]+$/, ''));
+}
+
+/** Set before opening a notebook made from a file: its cells run right away, so results and charts are there. */
+let autoRun = false;
+
+/**
+ * A starter analysis for a file: the rows, then ready-made totals by a text column and over time when the file has
+ * them (these open as charts), then a summary of every column. People change the queries from there.
+ */
+async function analysisCells(name: string, reader: string): Promise<Cell[]> {
+  const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
+  let cols: [string, string][] = [];
+  try {
+    const r = await engine.exec(`DESCRIBE SELECT * FROM ${reader}`);
+    cols = (r.results[0]?.rows ?? []).map((x) => [String(x[0]), String(x[1])]);
+  } catch { /* the cells below show the error */ }
+  // A measure worth adding up: amounts, prices, quantities; never IDs, codes or years.
+  const nums = cols.filter(([n, ty]) => /INT|DOUBLE|FLOAT|DECIMAL|REAL|NUMERIC/.test(ty) && !/(^|_)(id|code|zip|year|no|number)$|^id_|uuid/i.test(n));
+  const num = nums.find(([n]) => /amount|revenue|total|price|sales|value|cost|qty|quantity|profit|units|count|tutar|fiyat|adet/i.test(n)) ?? nums[0];
+  const cat = cols.find(([n, ty]) => ty === 'VARCHAR' && !/id$|_id|uuid|email|name$/i.test(n)) ?? cols.find(([, ty]) => ty === 'VARCHAR');
+  const date = cols.find(([, ty]) => /^(DATE|TIMESTAMP)/.test(ty));
+  const measure = num ? `sum(${q(num[0])})` : 'count(*)';
+  const label = num ? `total_${num[0].replace(/\W+/g, '_').toLowerCase()}` : 'rows';
+  const cells: Cell[] = [
+    { id: uid(), type: 'markdown', source: `# ${name}\n${t('Every block is a question about your file. Change the text and tap ▶ to run it again. Switch between Table and Chart above a result.')}` },
+    { id: uid(), type: 'sql', source: `SELECT * FROM ${reader} LIMIT 100;` },
+  ];
+  if (cat) cells.push({ id: uid(), type: 'sql', source: `-- ${t('Totals by')} ${cat[0]}\nSELECT ${q(cat[0])}, ${measure} AS ${label}\nFROM ${reader}\nGROUP BY 1\nORDER BY 2 DESC\nLIMIT 15;` });
+  if (date) cells.push({ id: uid(), type: 'sql', source: `-- ${t('By month')}\nSELECT date_trunc('month', ${q(date[0])}) AS month, ${measure} AS ${label}\nFROM ${reader}\nGROUP BY 1\nORDER BY 1;` });
+  cells.push({ id: uid(), type: 'sql', source: `-- ${t('Every column at a glance')}\nSUMMARIZE SELECT * FROM ${reader};` });
+  return cells;
 }
 
 function fileRow(f: DataFile) {
   const kind = kindOf(f.name);
-  return h('button', { class: 'row', onclick: () => openFile(f.name) },
+  // Touch and hold (or right-click) shows the file's actions: Analyze with SQL, share, rename, delete.
+  let timer = 0, held = false;
+  const hold = (e: TouchEvent) => { held = false; const p = e.touches[0]; const x = p.clientX, y = p.clientY;
+    timer = window.setTimeout(() => { held = true; navigator.vibrate?.(10); fileActions(f); }, 450);
+    const cancel = (m: TouchEvent) => { const q = m.touches[0]; if (!q || Math.hypot(q.clientX - x, q.clientY - y) > 10) clearTimeout(timer); };
+    row.addEventListener('touchmove', cancel, { passive: true, once: true });
+  };
+  const row = h('button', { class: 'row', onclick: () => { if (held) { held = false; return; } openFile(f.name); },
+    oncontextmenu: (e: Event) => { e.preventDefault(); clearTimeout(timer); if (!held) { held = true; fileActions(f); } } },
     h('span', { class: `kind ${kind}` }, kind === 'other' || kind === 'csv' ? (f.name.split('.').pop() ?? '?').toLowerCase() : kind),
     h('div', { class: 'row-main' },
       h('div', { class: 'row-title' }, f.name),
       h('div', { class: 'row-sub' }, `${fmtBytes(f.size)} · ${fmtDate(f.mtime)}`)),
     importNeedsPro(kind) && !isPro() ? h('span', { class: 'pro-tag' }, 'PRO') : icon('chevron'));
+  row.addEventListener('touchstart', hold, { passive: true });
+  row.addEventListener('touchend', () => clearTimeout(timer));
+  row.addEventListener('touchcancel', () => clearTimeout(timer));
+  return row;
 }
 
 function fileActions(f: DataFile, withOpen = true) {
@@ -313,8 +354,8 @@ function fileActions(f: DataFile, withOpen = true) {
   const gate = async () => !isProKind(kind) || requirePro(`${f.name}: ${t('SQL on this file type is part of Pro.')}`);
   sheet(f.name, [
     ...(withOpen && (viewableKind(kind) || kind === 'other') ? [{ label: t('Open'), run: () => openFile(f.name) }] : []),
+    ...(kind === 'other' ? [] : [{ label: t('Analyze with SQL & charts'), run: () => void notebookFromFile(f.name) }]),
     ...(!viewableKind(kind) && kind !== 'other' ? [{ label: t('Preview'), run: async () => { if (await gate()) await previewModal(f.name, `SELECT * FROM ${reader} LIMIT 200`); } }] : []),
-    ...(kind === 'other' ? [] : [{ label: t('New notebook from this file'), run: () => void notebookFromFile(f.name) }]),
     ...(kind === 'sqlite' || kind === 'other' ? [] : [{ label: `${t('Load into a table')} (${tableNameFor(f.name)})`, run: async () => {
       if (!(await gate())) return;
       const name = await promptBox(t('Load into a table'), t('Table name'), tableNameFor(f.name), t('Load'));
@@ -744,6 +785,7 @@ function notebookView(nb: Notebook) {
   }
 
   rebuild();
+  if (autoRun) { autoRun = false; setTimeout(() => void runAll(), 100); }
 
   return h('div', { class: 'page nb' },
     h('header', { class: 'bar' },

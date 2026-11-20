@@ -300,3 +300,8 @@ body.in-viewer { overflow: hidden; }
 .md-body th, .md-body td { border: 1px solid var(--line); padding: 4px 8px; }
 .md-body img { max-width: 100%; }
 .md-body a { color: var(--accent); }
+
+/* Sub-pages (Database, Extensions): the back link sits below the status bar and the title below it scrolls normally. */
+.page > .back { padding-top: env(safe-area-inset-top); }
+.page > .back + .bar { position: static; padding-top: 0; }
+.v-analyze { background: none; border: 0; color: var(--accent); font-size: 20px; padding: 6px; display: flex; align-items: center; }

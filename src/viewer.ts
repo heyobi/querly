@@ -86,6 +86,7 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
       h('button', { class: 'back', onclick: () => void close() }, icon('back'), t('Files')),
       titleEl,
       editable && saveBtn,
+      !lines && h('button', { class: 'v-analyze', 'aria-label': t('Analyze with SQL & charts'), onclick: () => void close().then((ok) => ok && hooks.newNotebook(file)) }, icon('graph')),
       h('button', { class: 'more', 'aria-label': t('File actions'), onclick: () => moreMenu() }, icon('more'))),
     h('div', { class: 'v-tools' }, searchEl, countEl),
     tabsEl, chipsEl, bannerEl, wrap,
@@ -523,7 +524,7 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
       { label: `${t('Share as Parquet')} · Pro`, run: () => void shareAs('parquet') },
       ...(!editable ? [{ label: t('Edit a CSV copy'), run: () => void editCopy() }] : []),
       ...(editable && fmt ? [{ label: `${fmt.header ? '✓ ' : ''}${t('First row is the header')}`, run: () => void toggleHeader() }] : []),
-      { label: t('New notebook from this file'), run: () => void close().then((ok) => ok && hooks.newNotebook(file)) },
+      ...(!lines ? [{ label: t('Analyze with SQL & charts'), run: () => void close().then((ok) => ok && hooks.newNotebook(file)) }] : []),
       { label: t('Rename, delete…'), run: () => void close().then((ok) => ok && hooks.fileMenu(file)) },
     ]);
   }

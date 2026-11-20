@@ -55,6 +55,15 @@ for (const [n, body, want] of checks) {
   console.log(`${n}: ${got}`);
   if (!want.test(got)) fails.push(`${n}: got "${got}"`);
 }
+// Touch and hold a file → "Analyze with SQL & charts": the notebook runs by itself and totals open as a chart.
+await p.evaluate(() => { document.querySelectorAll('.viewer, .modal-back').forEach((e) => e.remove()); window.__go({ tab: 'files' }); window.__setPro(true); });
+await p.waitForFunction(() => window.__engine?.getState().status === 'ready', null, { timeout: 120000 });
+await p.evaluate(() => [...document.querySelectorAll('.row')].find((e) => e.textContent.includes('sales.csv')).dispatchEvent(new Event('contextmenu', { bubbles: true, cancelable: true })));
+await p.tap('.sheet-btn:has-text("Analyze with SQL")');
+await p.waitForFunction(() => document.querySelectorAll('.result').length >= 3, null, { timeout: 30000 }).catch(() => {});
+const an = await p.evaluate(() => ({ results: document.querySelectorAll('.result').length, chart: [...document.querySelectorAll('.seg button.on')].some((e) => e.textContent === 'Chart'), sql: document.body.innerText.includes('sum("quantity")') }));
+console.log('analyze:', JSON.stringify(an));
+if (an.results < 3 || !an.chart || !an.sql) fails.push('analyze notebook: ' + JSON.stringify(an));
 await b.close();
 if (errs.length) fails.push(...errs.map((e) => 'pageerror ' + e));
 if (fails.length) { console.error('UI check failed:\n' + fails.join('\n')); process.exit(1); }

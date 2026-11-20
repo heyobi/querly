@@ -9,7 +9,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = QuerlyViewController()
+        window?.rootViewController = ShellViewController()
         window?.makeKeyAndVisible()
 
         // A file tapped in Files (Open With › Querly) or shared to Querly while the app was closed.
@@ -34,6 +34,7 @@ class QuerlyViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(SaveToFilesPlugin())
         bridge?.registerPluginInstance(IncomingFilesPlugin())
         bridge?.registerPluginInstance(QuickLookPlugin())
+        bridge?.registerPluginInstance(NativeShellPlugin())
     }
 }
 

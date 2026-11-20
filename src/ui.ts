@@ -39,8 +39,12 @@ export const haptic = {
 
 export const icon = (name: string) => h('span', { class: `i i-${name}`, 'aria-hidden': 'true' });
 
+/** Set by the native shell: while its Files screen covers the web view, toasts are shown natively. */
+export const toastHooks: { native?: (msg: string, error: boolean) => boolean } = {};
+
 export function toast(msg: string, kind: 'ok' | 'err' = 'ok') {
   if (kind === 'err') haptic.fail(); else haptic.done();
+  if (toastHooks.native?.(msg, kind === 'err')) return;
   const t = h('div', { class: `toast ${kind}` }, msg);
   document.body.append(t);
   setTimeout(() => t.classList.add('out'), 2400);

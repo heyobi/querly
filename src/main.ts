@@ -26,7 +26,7 @@ import { LESSONS } from './lessons';
 import { EXTENSIONS, EXT_CATEGORIES, type ExtInfo } from './extensions';
 import { applyTheme, getLangPref, getThemePref, lang, setLangPref, setThemePref, t, type LangPref, type Theme } from './i18n';
 import { querySucceeded } from './review';
-import { haptic, confirmBox, dark, safeHtml, fmtBytes, fmtDate, fmtMs, h, icon, modal, native, pickFiles, promptBox, safeName, sheet, shareFile, toast } from './ui';
+import { haptic, toastHooks, confirmBox, dark, safeHtml, fmtBytes, fmtDate, fmtMs, h, icon, modal, native, pickFiles, promptBox, safeName, sheet, shareFile, toast } from './ui';
 
 const app = document.getElementById('app')!;
 
@@ -63,6 +63,88 @@ engine.onMeta(reconfigureEditors);
 async function refreshFiles() {
   files = await engine.listFiles();
   reconfigureEditors();
+  pushFiles();
+}
+
+// ---------------- native shell (system tab bar + SwiftUI Files screen, NativeShell.swift) ----------------
+type ShellMode = 'files' | 'tab' | 'full';
+const NativeShell = registerPlugin<{
+  setMode(o: { mode: ShellMode; tab: string; theme: string }): Promise<{ native: boolean }>;
+  setFiles(o: { files: unknown[]; labels: Record<string, string> }): Promise<void>;
+  toast(o: { message: string; error: boolean }): Promise<void>;
+  addListener(e: 'tab', f: (d: { tab: Tab }) => void): Promise<PluginListenerHandle>;
+  addListener(e: 'action', f: (d: { action: string; name: string; arg: string }) => void): Promise<PluginListenerHandle>;
+}>('NativeShell');
+let shell = false;
+let shellState = '';
+
+const shellTab = () => (route.tab === 'files' ? 'files' : route.tab === 'notebooks' ? 'notebooks' : 'settings');
+/** Web screens that need the whole display: the table viewer, a notebook, Markdown, the paywall, web dialogs. */
+const shellMode = (): ShellMode => (route.notebook || document.querySelector('.viewer, .modal-back, .sheet-back') ? 'full' : route.tab === 'files' ? 'files' : 'tab');
+let shellFrame = 0;
+function syncShell() {
+  if (!shell || shellFrame) return;
+  shellFrame = requestAnimationFrame(() => {
+    shellFrame = 0;
+    const s = { mode: shellMode(), tab: shellTab(), theme: getThemePref() };
+    const key = JSON.stringify(s);
+    if (key === shellState) return;
+    shellState = key;
+    void NativeShell.setMode(s).catch(() => {});
+  });
+}
+
+const SHELL_LABELS = ['Files', 'Analyze', 'Settings', 'Open a file', 'Open files from other apps', 'In the Files app, touch and hold a file.',
+  'Choose Open With, then Querly.', 'In Mail, Messages or Safari, use Share › Querly.', 'Recent', 'Files you open appear here.', 'Try a sample file',
+  'Open', 'Analyze with SQL & charts', 'Share', 'Rename', 'Rename file', 'Name', 'Delete', 'Cancel', 'Search', 'Columns',
+  'The file is removed from this iPhone. Tables you created from it are kept.', 'row', 'rows', 'column', 'columns'];
+let pushTimer = 0;
+/** The native Files screen shows the same list as the web one, with rows, columns and column names when known. */
+function pushFiles() {
+  if (!shell) return;
+  clearTimeout(pushTimer);
+  pushTimer = window.setTimeout(() => {
+    const list = files.map((f) => {
+      const kind = kindOf(f.name);
+      const m = metaCache[`${f.name}|${f.size}|${f.mtime}`];
+      return { name: f.name, size: f.size, mtime: f.mtime, badge: (f.name.split('.').pop() ?? '').toLowerCase(),
+        rows: m?.[0] ?? -1, cols: m?.[1] ?? -1, columns: m?.[2] ?? [], pro: importNeedsPro(kind) && !isPro(), analyze: kind !== 'other' };
+    });
+    void NativeShell.setFiles({ files: list, labels: Object.fromEntries(SHELL_LABELS.map((k) => [k, t(k)])) }).catch(() => {});
+  }, 60);
+}
+
+async function shellAction(action: string, name: string, arg: string) {
+  try {
+    if (action === 'open') openFile(name);
+    else if (action === 'analyze') await notebookFromFile(name);
+    else if (action === 'rename') { await engine.renameFile(name, arg); await refreshFiles(); render(); }
+    else if (action === 'delete') { await engine.deleteFile(name); await refreshFiles(); render(); }
+    else if (action === 'refresh') { await refreshFiles(); render(); }
+  } catch (e) {
+    toast((e as Error).message, 'err');
+  }
+}
+
+/** Switch to the native shell when the app runs inside it; the web tab bar stays for the browser. */
+async function initShell() {
+  if (!native) return;
+  try {
+    await NativeShell.setMode({ mode: shellMode(), tab: shellTab(), theme: getThemePref() });
+  } catch { return; }
+  shell = true;
+  document.body.classList.add('native-shell');
+  toastHooks.native = (msg, error) => {
+    if (shellMode() !== 'files') return false;
+    void NativeShell.toast({ message: msg, error }).catch(() => {});
+    return true;
+  };
+  void NativeShell.addListener('tab', (d) => { if (route.tab !== d.tab || route.notebook) go({ tab: d.tab }); });
+  void NativeShell.addListener('action', (d) => void shellAction(d.action, d.name, d.arg));
+  new MutationObserver(() => syncShell()).observe(document.body, { childList: true });
+  onPro(() => pushFiles());
+  pushFiles();
+  syncShell();
 }
 
 // ---------------- shell ----------------
@@ -88,12 +170,13 @@ function render() {
   document.body.classList.toggle('in-notebook', !!route.notebook);
   if (route.notebook) {
     const nb = notebooks.find((n) => n.id === route.notebook);
-    if (nb) { app.append(notebookView(nb)); return; }
+    if (nb) { app.append(notebookView(nb)); syncShell(); return; }
     route = { tab: 'notebooks' };
   }
   const page = route.tab === 'files' ? filesPage() : route.tab === 'extensions' ? extensionsPage() : route.tab === 'database' ? databasePage()
     : route.tab === 'settings' ? settingsPage() : homePage();
   app.append(page, tabBar());
+  syncShell();
 }
 
 const header = (title: string, ...right: (HTMLElement | false)[]) =>
@@ -419,13 +502,13 @@ function fileRow(f: DataFile) {
  * remembered, so the list never waits for it.
  */
 const META_KEY = 'qly-file-meta';
-let metaCache: Record<string, [number, number]> = {};
+let metaCache: Record<string, [number, number, string[]?]> = {};
 try { metaCache = JSON.parse(localStorage.getItem(META_KEY) || '{}'); } catch { /* ignore */ }
 let metaQueue: Promise<void> = Promise.resolve();
 function fileSub(f: DataFile) {
   const el = h('div', { class: 'row-sub' });
   const key = `${f.name}|${f.size}|${f.mtime}`;
-  const paint = (m?: [number, number]) => {
+  const paint = (m?: [number, number, string[]?]) => {
     el.textContent = m
       ? `${fmtBytes(f.size)} · ${m[0].toLocaleString()} ${t(m[0] === 1 ? 'row' : 'rows')} · ${m[1]} ${t(m[1] === 1 ? 'column' : 'columns')}`
       : `${fmtBytes(f.size)} · ${fmtDate(f.mtime)}`;
@@ -433,7 +516,7 @@ function fileSub(f: DataFile) {
   paint(metaCache[key]);
   const kind = kindOf(f.name);
   const countable = (kind === 'csv' && !isTextLines(f.name)) || kind === 'json' || kind === 'parquet' || kind === 'excel';
-  if (!metaCache[key] && countable && f.size < 30 * 1048576) {
+  if ((!metaCache[key] || (shell && !metaCache[key][2])) && countable && f.size < 30 * 1048576) {
     metaQueue = metaQueue.then(async () => {
       if (!el.isConnected) return;
       try {
@@ -442,9 +525,10 @@ function fileSub(f: DataFile) {
         const d = await engine.exec(`DESCRIBE SELECT * FROM ${reader}`);
         const rows = Number(c.results[0]?.rows[0]?.[0] ?? 0), cols = d.results[0]?.rows.length ?? 0;
         if (!cols) return;
-        metaCache[key] = [rows, cols];
+        metaCache[key] = [rows, cols, (d.results[0]?.rows ?? []).slice(0, 40).map((x) => String(x[0]))];
         try { localStorage.setItem(META_KEY, JSON.stringify(metaCache)); } catch { /* ignore */ }
         paint(metaCache[key]);
+        pushFiles();
       } catch { /* leave the date */ }
     });
   }
@@ -1046,6 +1130,7 @@ async function boot() {
     // Files dropped into Files › Querly › Data from outside show up when the app comes back.
     CapApp.addListener('appStateChange', (s) => { if (s.isActive) void refreshFiles().then(() => { if (route.tab === 'files' && !route.notebook) render(); }); }).catch(() => {});
   }
+  void initShell();
   void initPro().then(() => !route.notebook && render());
   engine.start().catch((e) => { console.error(e); toast(t('DuckDB did not start — see Database'), 'err'); });
 }

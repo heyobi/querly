@@ -91,10 +91,10 @@ export function requirePro(reason?: string): Promise<boolean> {
     if (native) void refreshPrice().then(() => { if (!buyBtn.hasAttribute('disabled')) buyBtn.textContent = price ? `${t('Unlock Pro')} · ${price}` : t('Unlock Pro'); });
     const features: [string, string][] = [
       ['Parquet', t('Query and export Parquet files')],
-      ['Excel', t('Read and write .xlsx sheets')],
+      ['Excel', t('Query and export .xlsx sheets')],
       [t('Charts'), t('Bar, line and scatter charts')],
       [t('Maps'), t('Spatial SQL with a map view')],
-      ['SQLite', t('Open .sqlite and .db files')],
+      ['SQLite', t('SQL on .sqlite and .db files')],
       [t('Big files'), `${t('Files over')} ${FREE_FILE_MB} MB`],
     ];
     const content = h('div', { class: 'paywall' },
@@ -108,7 +108,7 @@ export function requirePro(reason?: string): Promise<boolean> {
         h('li', {}, icon('check'), t('One-time purchase. No subscription, no account.'))),
     buyBtn,
       h('button', { class: 'link', onclick: async () => { if (await restore()) { close(); finish(true); } } }, t('Restore purchase')),
-      h('p', { class: 'muted small center' }, t('SQL, notebooks, CSV and JSON files and the lessons stay free forever.')));
+      h('p', { class: 'muted small center' }, t('Viewing any file, editing CSV files, SQL notebooks and the lessons stay free forever.')));
     const close = modal(content, () => finish(pro));
   });
 }

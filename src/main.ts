@@ -15,7 +15,8 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { marked } from 'marked';
 import * as engine from './engine';
 import type { DataFile, PgError } from './engine';
-import { FREE_FILE_MB, isProKind, kindOf, proFeature, readerFor, tableNameFor } from './features';
+import { FREE_FILE_MB, importNeedsPro, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
+import { openViewer } from './viewer';
 import { deleteNotebook, fromIpynb, fromSql, loadNotebooks, saveNotebook, toIpynb, toSql, uid, type Cell, type Notebook } from './notebook';
 import { initPro, isPro, onPro, requirePro } from './pro';
 import { errorBox, renderResult } from './results';
@@ -184,15 +185,30 @@ async function ensureSampleFiles() {
   await refreshFiles();
 }
 
-/** Import from the file picker, a share sheet or "Open in Querly". Routes notebooks and snapshots to their own place. */
-async function importBlobs(items: { name: string; blob: Blob }[]) {
+/** Open a data file in the table viewer (or the actions sheet for kinds without one). */
+function openFile(name: string) {
+  if (!viewableKind(kindOf(name))) { const f = files.find((x) => x.name === name); if (f) fileActions(f); return; }
+  openViewer(name, {
+    filesChanged: async () => { await refreshFiles(); if (route.tab === 'files' && !route.notebook) render(); },
+    newNotebook: (file) => void notebookFromFile(file),
+    fileMenu: (file) => { const f = files.find((x) => x.name === file); if (f) fileActions(f, false); },
+    open: (file) => openFile(file),
+  });
+}
+
+/**
+ * Import from the file picker, a share sheet or "Open in Querly". Routes notebooks and snapshots to their own place.
+ * open: show a single imported data file in the viewer right away (Open in / Share › Querly).
+ */
+async function importBlobs(items: { name: string; blob: Blob }[], open = false) {
   let imported = 0;
+  const savedNames: string[] = [];
   for (const { name, blob } of items) {
     const kind = kindOf(name);
     try {
       if (kind === 'notebook') { await importNotebookFile(new File([blob], name)); continue; }
       if (kind === 'snapshot') { await restoreSnapshot(blob, name); continue; }
-      if (isProKind(kind) && !(await requirePro(`${name}: ${t('this file type is part of Pro.')}`))) continue;
+      if (importNeedsPro(kind) && !(await requirePro(`${name}: ${t('this file type is part of Pro.')}`))) continue;
       if (blob.size > FREE_FILE_MB * 1048576 && !(await requirePro(`${name} (${fmtBytes(blob.size)}): ${t('files over')} ${FREE_FILE_MB} MB ${t('are part of Pro.')}`))) continue;
       const bar = h('div', { class: 'progress' }, h('i'));
       const note = h('div', { class: 'muted small drop-hint' }, `${t('Importing')} ${name}…`);
@@ -200,13 +216,17 @@ async function importBlobs(items: { name: string; blob: Blob }[]) {
       const saved = await engine.importFile(name, blob, (done) => { (bar.firstChild as HTMLElement).style.width = `${Math.round((done / Math.max(1, blob.size)) * 100)}%`; });
       note.remove(); bar.remove();
       imported++;
+      savedNames.push(saved);
       if (saved !== name) toast(`${t('Saved as')} ${saved}`);
     } catch (e) {
       toast(`${t('Could not import')} ${name}: ${(e as Error).message}`, 'err');
     }
   }
   await refreshFiles();
-  if (imported) { toast(`${imported} ${t(imported === 1 ? 'file imported' : 'files imported')}`); if (route.tab !== 'files' || route.notebook) go({ tab: 'files' }); else render(); }
+  if (!imported) return;
+  if (route.tab !== 'files' || route.notebook) go({ tab: 'files' }); else render();
+  if (savedNames.length === 1 && (open || items.length === 1) && viewableKind(kindOf(savedNames[0]))) openFile(savedNames[0]);
+  else toast(`${imported} ${t(imported === 1 ? 'file imported' : 'files imported')}`);
 }
 
 async function importFlow() {
@@ -214,34 +234,39 @@ async function importFlow() {
   if (picked.length) await importBlobs(picked.map((f) => ({ name: f.name, blob: f })));
 }
 
+async function notebookFromFile(name: string) {
+  const kind = kindOf(name);
+  if (isProKind(kind) && !(await requirePro(`${name}: ${t('SQL on this file type is part of Pro.')}`))) return;
+  const reader = readerFor(name);
+  const tbl = tableNameFor(name);
+  const cells: Cell[] = kind === 'sqlite'
+    ? [{ id: uid(), type: 'markdown', source: `# ${name}\nAttach the SQLite file, list its tables, then query them as \`db.table_name\`.` },
+       { id: uid(), type: 'sql', source: `ATTACH '${name}' AS ${tbl} (TYPE sqlite, READ_ONLY);\nSELECT name FROM ${tbl}.sqlite_master WHERE type = 'table';` }]
+    : [{ id: uid(), type: 'markdown', source: `# ${name}` },
+       { id: uid(), type: 'sql', source: `DESCRIBE SELECT * FROM ${reader};` },
+       { id: uid(), type: 'sql', source: `SELECT * FROM ${reader} LIMIT 100;` },
+       { id: uid(), type: 'sql', source: `SUMMARIZE SELECT * FROM ${reader};` }];
+  await newNotebook(cells, name.replace(/\.[^.]+$/, ''));
+}
+
 function fileRow(f: DataFile) {
   const kind = kindOf(f.name);
-  return h('button', { class: 'row', onclick: () => fileActions(f) },
+  return h('button', { class: 'row', onclick: () => openFile(f.name) },
     h('span', { class: `kind ${kind}` }, kind === 'other' ? f.name.split('.').pop() ?? '?' : kind),
     h('div', { class: 'row-main' },
       h('div', { class: 'row-title' }, f.name),
       h('div', { class: 'row-sub' }, `${fmtBytes(f.size)} · ${fmtDate(f.mtime)}`)),
-    isProKind(kind) && !isPro() ? h('span', { class: 'pro-tag' }, 'PRO') : icon('chevron'));
+    importNeedsPro(kind) && !isPro() ? h('span', { class: 'pro-tag' }, 'PRO') : icon('chevron'));
 }
 
-function fileActions(f: DataFile) {
+function fileActions(f: DataFile, withOpen = true) {
   const kind = kindOf(f.name);
   const reader = readerFor(f.name);
-  const gate = async () => !isProKind(kind) || requirePro(`${f.name}: ${t('this file type is part of Pro.')}`);
+  const gate = async () => !isProKind(kind) || requirePro(`${f.name}: ${t('SQL on this file type is part of Pro.')}`);
   sheet(f.name, [
-    { label: t('Preview'), run: async () => { if (await gate()) await previewModal(f.name, kind === 'sqlite' ? `SELECT * FROM sqlite_master` : `SELECT * FROM ${reader} LIMIT 200`); } },
-    { label: t('New notebook from this file'), run: async () => {
-      if (!(await gate())) return;
-      const tbl = tableNameFor(f.name);
-      const cells: Cell[] = kind === 'sqlite'
-        ? [{ id: uid(), type: 'markdown', source: `# ${f.name}\nAttach the SQLite file, list its tables, then query them as \`db.table_name\`.` },
-           { id: uid(), type: 'sql', source: `ATTACH '${f.name}' AS ${tbl} (TYPE sqlite, READ_ONLY);\nSELECT name FROM ${tbl}.sqlite_master WHERE type = 'table';` }]
-        : [{ id: uid(), type: 'markdown', source: `# ${f.name}` },
-           { id: uid(), type: 'sql', source: `DESCRIBE SELECT * FROM ${reader};` },
-           { id: uid(), type: 'sql', source: `SELECT * FROM ${reader} LIMIT 100;` },
-           { id: uid(), type: 'sql', source: `SUMMARIZE SELECT * FROM ${reader};` }];
-      await newNotebook(cells, f.name.replace(/\.[^.]+$/, ''));
-    } },
+    ...(withOpen && viewableKind(kind) ? [{ label: t('Open'), run: () => openFile(f.name) }] : []),
+    ...(!viewableKind(kind) ? [{ label: t('Preview'), run: async () => { if (await gate()) await previewModal(f.name, `SELECT * FROM ${reader} LIMIT 200`); } }] : []),
+    { label: t('New notebook from this file'), run: () => void notebookFromFile(f.name) },
     ...(kind === 'sqlite' || kind === 'other' ? [] : [{ label: `${t('Load into a table')} (${tableNameFor(f.name)})`, run: async () => {
       if (!(await gate())) return;
       const name = await promptBox(t('Load into a table'), t('Table name'), tableNameFor(f.name), t('Load'));
@@ -281,7 +306,7 @@ function filesPage() {
     header(t('Files'), statusPill()),
     h('div', { class: 'actions' },
       h('button', { class: 'btn primary', onclick: () => void importFlow() }, icon('import'), t('Import files'))),
-    h('p', { class: 'muted small drop-hint' }, t('CSV, TSV and JSON are free. Parquet, Excel (.xlsx), SQLite and spatial files need Pro. You can also use Share › Querly in other apps, or copy files into Files › On My iPhone › Querly › Data.')),
+    h('p', { class: 'muted small drop-hint' }, t('Tap a file to view it as a table. CSV, TSV and TXT files can be edited and saved. Viewing Excel, Parquet and SQLite files is free; SQL on them needs Pro. You can also use Share › Querly in other apps, or copy files into Files › On My iPhone › Querly › Data.')),
     files.length
       ? h('div', { class: 'list' }, files.map(fileRow))
       : h('div', { class: 'empty' }, t('No files yet. Import a CSV, Parquet, JSON or Excel file.')));
@@ -734,7 +759,7 @@ async function openSharedUrl(url: string) {
       const bin = atob(typeof f.data === 'string' ? f.data : '');
       blob = new Blob([Uint8Array.from(bin, (c) => c.charCodeAt(0))]);
     }
-    await importBlobs([{ name, blob }]);
+    await importBlobs([{ name, blob }], true);
     Filesystem.deleteFile({ path: url }).catch(() => {});
   } catch (e) {
     toast(`${t('Could not open this file')}: ${(e as Error).message}`, 'err');
@@ -774,7 +799,7 @@ async function boot() {
 }
 
 // Automated checks (WebKit via Playwright) reach the engine through this hook; only with ?selftest in the URL.
-if (new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __go: go, __openSample: openSample });
+if (new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __openFile: openFile, __go: go, __openSample: openSample });
 
 engine.onState((s) => { if (s.status !== 'starting' && route.tab === 'database' && !route.notebook) render(); });
 engine.onMeta(() => { if (route.tab === 'database' && !route.notebook && !document.querySelector('.modal-back, .sheet-back')) render(); });

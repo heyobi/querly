@@ -1,8 +1,9 @@
 // Pure helpers (no DuckDB, no Capacitor): file kinds, readers, names, and which SQL needs Pro.
 //
-// Free: DuckDB SQL on in-memory tables, CSV/TSV and JSON files up to FREE_FILE_MB, notebooks, lessons, examples,
-//       table results, CSV export, one database.
-// Pro (one-time purchase): Parquet, Excel and SQLite files, spatial SQL with the map view, charts, export to
+// Free: viewing every data file as a table (CSV/TSV/TXT, JSON, Excel, Parquet, SQLite), editing and saving delimited
+//       text, sharing as CSV, DuckDB SQL on in-memory tables, CSV/TSV and JSON files up to FREE_FILE_MB, notebooks,
+//       lessons, examples, table results, CSV export, one database.
+// Pro (one-time purchase): SQL on Parquet, Excel and SQLite files, spatial SQL with the map view, charts, export to
 //       Parquet / Excel / JSON, larger files, more than one database and database snapshots (backup / restore).
 
 export const FREE_FILE_MB = 25;
@@ -24,6 +25,13 @@ export function kindOf(name: string): FileKind {
 }
 
 export const isProKind = (k: FileKind) => k === 'parquet' || k === 'excel' || k === 'sqlite' || k === 'spatial' || k === 'geojson';
+
+/** Files the table viewer opens. Viewing is free for all of them; SQL on Pro kinds stays Pro. */
+export const viewableKind = (k: FileKind) => k === 'csv' || k === 'json' || k === 'excel' || k === 'parquet' || k === 'sqlite';
+/** Files the viewer can edit and save in place (delimited text). Other kinds offer "Edit a CSV copy". */
+export const editableKind = (k: FileKind) => k === 'csv';
+/** Pro is needed to import these at all (spatial files have no table viewer). */
+export const importNeedsPro = (k: FileKind) => isProKind(k) && !viewableKind(k);
 
 const lit = (name: string) => `'${name.replace(/'/g, "''")}'`;
 

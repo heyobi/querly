@@ -1,5 +1,5 @@
 // Small DOM helpers shared by every view.
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { blobToBase64 } from './storage';
@@ -106,6 +106,25 @@ export async function shareFile(name: string, data: Blob | string, mime: string)
     const a = h('a', { href: URL.createObjectURL(blob), download: name });
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+}
+
+/** Native "Save to Files" (UIDocumentPickerViewController in export mode), registered in SceneDelegate.swift. */
+const SaveToFiles = registerPlugin<{ save(o: { path: string }): Promise<{ saved: boolean }> }>('SaveToFiles');
+
+/**
+ * Let the user pick a folder in the Files app and save the file there. Saving into the folder the file came from
+ * replaces it after iOS asks. Falls back to the share sheet (which also offers "Save to Files").
+ * Resolves true when the file was saved, false when the picker was cancelled.
+ */
+export async function saveToFiles(name: string, data: Blob): Promise<boolean> {
+  if (!native) { await shareFile(name, data, data.type || 'application/octet-stream'); return true; }
+  const w = await Filesystem.writeFile({ directory: Directory.Cache, path: name, data: await blobToBase64(data) });
+  try {
+    return (await SaveToFiles.save({ path: w.uri })).saved;
+  } catch {
+    await Share.share({ title: name, files: [w.uri] }).catch(() => {});
+    return true;
   }
 }
 

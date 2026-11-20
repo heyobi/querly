@@ -355,14 +355,43 @@ export async function exec(sql: string): Promise<ExecOk> {
   });
 }
 
+/**
+ * Queries for the file viewer: temporary tables only, so the database is not marked as changed and the table list is
+ * not refreshed. Loads an extension named in a "exists in the … extension" error and retries, like exec().
+ */
+export async function viewerQuery(sql: string, maxRows = MAX_ROWS): Promise<ResultSet> {
+  await ready();
+  return serial(async () => {
+    try {
+      await ensureFiles(sql);
+      try {
+        return await runQuery(sql, maxRows);
+      } catch (e) {
+        const m = /exists in the (\w+) extension/.exec((e as Error)?.message ?? '');
+        if (!m) throw e;
+        await conn!.query(`LOAD ${m[1]}`);
+        return await runQuery(sql, maxRows);
+      }
+    } catch (e) {
+      throw errMsg(e);
+    }
+  });
+}
+
+/** Replace a file in the Data folder (the viewer's Save). The next query reads the new bytes. */
+export async function writeDataFile(name: string, data: Blob): Promise<void> {
+  await writeLarge('docs', `${DATA}/${name}`, data);
+  if (registered.has(name)) { registered.delete(name); await serial(() => db!.dropFile(name)).catch(() => {}); }
+}
+
 /** Run a query and return its full result as a file in the given format (for export / share). */
-export async function exportQuery(sql: string, format: 'csv' | 'parquet' | 'json' | 'xlsx'): Promise<Blob> {
+export async function exportQuery(sql: string, format: 'csv' | 'parquet' | 'json' | 'xlsx', copyOptions?: string): Promise<Blob> {
   await ready();
   return serial(async () => {
     await ensureFiles(sql);
     const name = `export_${uid()}.${format}`;
     await db!.registerEmptyFileBuffer(name);
-    const opts = format === 'csv' ? '(HEADER, DELIMITER \',\')' : format === 'parquet' ? '(FORMAT parquet, COMPRESSION zstd)' : format === 'json' ? '(FORMAT json, ARRAY true)' : '(FORMAT xlsx, HEADER true)';
+    const opts = copyOptions ?? (format === 'csv' ? '(HEADER, DELIMITER \',\')' : format === 'parquet' ? '(FORMAT parquet, COMPRESSION zstd)' : format === 'json' ? '(FORMAT json, ARRAY true)' : '(FORMAT xlsx, HEADER true)');
     const body = sql.trim().replace(/;\s*$/, '');
     try {
       await conn!.query(`COPY (${body}) TO '${name}' ${opts}`);

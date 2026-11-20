@@ -66,16 +66,6 @@ async function refreshFiles() {
 }
 
 // ---------------- shell ----------------
-function statusPill() {
-  const el = h('button', { class: 'pill', onclick: () => go({ tab: 'database' }) });
-  const off = engine.onState((s) => {
-    el.className = `pill ${s.status}`;
-    el.textContent = s.status === 'ready' ? `${s.db?.name ?? ''} · DuckDB` : s.status === 'starting' ? t('Starting…') : t('Error');
-  });
-  new MutationObserver(() => { if (!el.isConnected) off(); }).observe(document.body, { childList: true, subtree: true });
-  return el;
-}
-
 function tabBar() {
   // Files first: most people come to open a file. SQL and the database are there for those who want more.
   const tabs: [Tab, string, string][] = [['files', 'Files', 'folder'], ['notebooks', 'Analyze', 'graph'], ['settings', 'Settings', 'gear']];
@@ -144,7 +134,7 @@ async function importNotebookFile(f: File) {
 
 function homePage() {
   return h('div', { class: 'page' },
-    header(t('Analyze'), statusPill()),
+    header(t('Analyze')),
     h('div', { class: 'intro' },
       h('div', { class: 'intro-title' }, t('Go further with your data')),
       h('div', { class: 'intro-sub' }, t('Totals, groups, joins and charts with SQL notebooks. Optional: viewing and editing files never needs it. New to SQL? The free lessons start from zero.'))),
@@ -657,7 +647,7 @@ function databasePage() {
 
   const page = h('div', { class: 'page' },
     h('button', { class: 'back', onclick: () => go({ tab: 'settings' }) }, icon('back'), t('Settings')),
-    header(t('Database'), statusPill()),
+    header(t('Database')),
     st.status === 'error' && errorBox({ message: `DuckDB did not start: ${st.error}` }, h('div', { class: 'muted' }, t('Restore a backup or reset this database.'))),
     cur && h('div', { class: 'db-hero' },
       h('div', { class: 'db-hero-top' },
@@ -904,7 +894,6 @@ function notebookView(nb: Notebook) {
     h('header', { class: 'bar' },
       h('button', { class: 'back', onclick: async () => { clearTimeout(saveTimer); await saveNotebook(nb); notebooks.sort((a, b) => b.updated - a.updated); go({ tab: 'notebooks' }); } }, icon('back'), t('Notebooks')),
       h('div', { class: 'grow' }),
-      statusPill(),
       h('button', { class: 'more', 'aria-label': 'Notebook actions', onclick: () => sheet(nb.title, [
         { label: t('Run all cells'), run: runAll },
         { label: t('Share as Jupyter notebook (.ipynb)'), run: () => shareFile(`${safeName(nb.title)}.ipynb`, toIpynb(nb), 'application/x-ipynb+json') },

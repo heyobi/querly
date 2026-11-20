@@ -16,7 +16,6 @@ ORDER = [
     ('stats', 'Understand every column', 'Ranges, averages, top values'),
     ('trend', 'See trends over time', 'Monthly totals, ready made'),
     ('log', 'Logs and text files too', 'Levels and top words, charted'),
-    ('analyze', 'SQL when you want it', 'Notebooks and free lessons'),
 ]
 BOLD = 'C:/Windows/Fonts/segoeuib.ttf'
 SEMI = 'C:/Windows/Fonts/seguisb.ttf'
@@ -45,6 +44,8 @@ def compose(raw: Path, title: str, sub: str, out: Path, dark: bool):
     f1 = ImageFont.truetype(BOLD, 96)
     f2 = ImageFont.truetype(SEMI, 52)
     y = 170
+    while d.textlength(title, font=f1) > W - 140 and f1.size > 60:
+        f1 = ImageFont.truetype(BOLD, f1.size - 4)
     for text, font, fill, gap in ((title, f1, (255, 255, 255), 26), (sub, f2, (230, 232, 255), 0)):
         w = d.textlength(text, font=font)
         d.text(((W - w) / 2, y), text, font=font, fill=fill)

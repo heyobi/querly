@@ -82,6 +82,28 @@ await p.waitForSelector('.cs-stats', { timeout: 10000 }).catch(() => {});
 prem.stats = await p.evaluate(() => document.querySelectorAll('.cs-stat').length);
 console.log('premium:', JSON.stringify(prem));
 if (!prem.meta || !prem.insight || prem.chips < 2 || prem.stats < 6) fails.push('premium: ' + JSON.stringify(prem));
+// Automatic analysis fits the data: free text, space-separated numbers, logs and other delimiters all get
+// working queries and at least one chart, never a reader error.
+const texts = {
+  'rules.txt': '# allow ssh\niptables -A INPUT -p tcp --dport 22 -j ACCEPT\niptables -P INPUT DROP\n',
+  'yolo.txt': '0 0.1 0.2 0.3 0.4\n0 0.5 0.6 0.7 0.8\n1 0.9 0.1 0.2 0.3\n2 0.3 0.3 0.3 0.3\n',
+  'app.log': '2025-01-01 INFO start\n2025-01-01 WARN slow disk\n2025-01-02 ERROR crash\n2025-01-02 INFO restart\n',
+  'data.dat': 'a;b;c\n1;2;x\n3;4;y\n',
+};
+for (const [n, body] of Object.entries(texts)) {
+  await p.evaluate(async ([n, body]) => {
+    document.querySelectorAll('.viewer, .modal-back').forEach((e) => e.remove());
+    await window.__importBlobs([{ name: n, blob: new Blob([body]) }]);
+    document.querySelectorAll('.viewer').forEach((e) => e.remove());
+    await window.__analyze(n);
+  }, [n, body]);
+  await p.waitForFunction(() => document.querySelectorAll('.result').length >= 3, null, { timeout: 20000 }).catch(() => {});
+  await p.waitForTimeout(800);
+  const r = await p.evaluate(() => ({ results: document.querySelectorAll('.result').length, chart: [...document.querySelectorAll('.seg button.on')].some((e) => e.textContent === 'Chart'), errors: document.querySelectorAll('.out .error, .out .err-box, .errbox').length + (document.body.innerText.includes('Binder Error') ? 1 : 0) }));
+  console.log(`analyze ${n}:`, JSON.stringify(r));
+  if (r.results < 3 || !r.chart || r.errors) fails.push(`analyze ${n}: ` + JSON.stringify(r));
+  await p.evaluate(() => window.__go({ tab: 'files' }));
+}
 await b.close();
 if (errs.length) fails.push(...errs.map((e) => 'pageerror ' + e));
 if (fails.length) { console.error('UI check failed:\n' + fails.join('\n')); process.exit(1); }

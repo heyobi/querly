@@ -3,6 +3,7 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 import { blobToBase64 } from './storage';
 import { t } from './i18n';
 
@@ -46,7 +47,23 @@ export function toast(msg: string, kind: 'ok' | 'err' = 'ok') {
   setTimeout(() => t.remove(), 2800);
 }
 
+/** Menus: the system action sheet on iPhone (UIAlertController), the same look in the browser. */
 export function sheet(title: string, actions: { label: string; danger?: boolean; run: () => void }[]) {
+  if (native) {
+    void ActionSheet.showActions({
+      title,
+      options: [
+        ...actions.map((a) => ({ title: a.label, style: a.danger ? ActionSheetButtonStyle.Destructive : ActionSheetButtonStyle.Default })),
+        { title: t('Cancel'), style: ActionSheetButtonStyle.Cancel },
+      ],
+    }).then((r) => { if (!r.canceled && r.index >= 0 && r.index < actions.length) actions[r.index].run(); })
+      .catch(() => webSheet(title, actions));
+    return;
+  }
+  webSheet(title, actions);
+}
+
+function webSheet(title: string, actions: { label: string; danger?: boolean; run: () => void }[]) {
   const close = () => back.remove();
   const back = h('div', { class: 'sheet-back', onclick: (e: Event) => e.target === back && close() },
     h('div', { class: 'sheet' },

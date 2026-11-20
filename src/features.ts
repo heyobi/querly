@@ -65,9 +65,15 @@ export function readerFor(name: string): string {
     case 'json': return `read_json_auto(${lit(name)})`;
     case 'geojson': case 'spatial': return `ST_Read(${lit(name)})`;
     case 'sqlite': return `sqlite_scan(${lit(name)}, 'table_name')`;
+    case 'csv':
+      if (isTextLines(name)) return linesReader(name);
+      return ['csv', 'tsv'].includes(ext(name)) ? lit(name) : `read_csv(${lit(name)})`;
     default: return lit(name);
   }
 }
+
+/** Free text as a table with one "line" column: notes, logs, configuration, anything without columns. */
+export const linesReader = (name: string) => `(SELECT unnest(string_split(replace(content, chr(13), ''), chr(10))) AS line FROM read_text(${lit(name)}))`;
 
 /** Table name derived from a file name: "Sales 2024.csv" → sales_2024. */
 export function tableNameFor(file: string): string {

@@ -16,7 +16,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { marked } from 'marked';
 import * as engine from './engine';
 import type { DataFile, PgError } from './engine';
-import { FREE_FILE_MB, importNeedsPro, isBinaryExt, isMarkdown, isTextLines, looksLikeText, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
+import { FREE_FILE_MB, importNeedsPro, isBinaryExt, isMarkdown, isTextLines, linesReader, looksLikeText, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
 import { openViewer } from './viewer';
 import { deleteNotebook, fromIpynb, fromSql, loadNotebooks, saveNotebook, toIpynb, toSql, uid, type Cell, type Notebook } from './notebook';
 import { initPro, isPro, onPro, requirePro, setPro } from './pro';
@@ -285,7 +285,7 @@ async function importFlow() {
 async function notebookFromFile(name: string) {
   const kind = kindOf(name);
   if (isProKind(kind) && !(await requirePro(`${name}: ${t('SQL on this file type is part of Pro.')}`))) return;
-  const reader = readerFor(name);
+  const reader = await smartReader(name);
   const tbl = tableNameFor(name);
   const cells: Cell[] = kind === 'sqlite'
     ? [{ id: uid(), type: 'markdown', source: `# ${name}\nAttach the SQLite file, list its tables, then query them as \`db.table_name\`.` },
@@ -299,52 +299,128 @@ async function notebookFromFile(name: string) {
 let autoRun = false;
 
 /**
- * A starter analysis for a file: the rows, then ready-made totals by a text column and over time when the file has
- * them (these open as charts), then a summary of every column. People change the queries from there.
+ * How to read a file for SQL. Known formats use DuckDB's readers. Text with another extension (.txt, .dat, .log…)
+ * is looked at first: space-separated numbers get columns, delimited text gets read_csv, and free text becomes one
+ * "line" per row, so every text file can be queried and charted.
+ */
+async function smartReader(name: string): Promise<string> {
+  const reader = readerFor(name);
+  if (kindOf(name) !== 'csv' || isTextLines(name) || /\.(csv|tsv)(\.gz)?$/i.test(name)) return reader;
+  const lit = `'${name.replace(/'/g, "''")}'`;
+  try {
+    const s = await engine.exec(`SELECT content[1:8192] FROM read_text(${lit})`);
+    const rows = String(s.results[0]?.rows[0]?.[0] ?? '').split(/\r?\n/).filter((l) => l.trim());
+    if (rows.length > 1) rows.pop(); // the sample may cut the last line
+    const n = rows.slice(0, 50).map((l) => (l.includes(',') || l.includes('\t') ? -1 : l.trim().split(/ +/).length));
+    if (n.length && n[0] > 1 && n.every((x) => x === n[0])) return `read_csv(${lit}, delim = ' ', header = false)`;
+    const d = await engine.exec(`DESCRIBE SELECT * FROM ${reader}`);
+    if ((d.results[0]?.rows.length ?? 0) > 1) return reader;
+  } catch { /* not delimited */ }
+  return linesReader(name);
+}
+
+/**
+ * A starter analysis that fits the data. Tables: the rows, totals by the most telling text column, the trend by
+ * month, the top rows, and two numbers against each other. Free text: the lines, log levels, the most frequent
+ * words and line statistics. Grouped results open as charts; people change the queries from there.
  */
 async function analysisCells(name: string, reader: string): Promise<Cell[]> {
   const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
+  const intro: Cell = { id: uid(), type: 'markdown', source: `# ${name}\n${t('Every block is a question about your file. Change the text and tap ▶ to run it again. Switch between Table and Chart above a result.')}` };
+  const sql = (title: string, body: string): Cell => ({ id: uid(), type: 'sql', source: `-- ${title}\n${body}` });
   let cols: [string, string][] = [];
   try {
     const r = await engine.exec(`DESCRIBE SELECT * FROM ${reader}`);
     cols = (r.results[0]?.rows ?? []).map((x) => [String(x[0]), String(x[1])]);
   } catch { /* the cells below show the error */ }
-  // A measure worth adding up: amounts, prices, quantities; never IDs, codes or years.
-  const nums = cols.filter(([n, ty]) => /INT|DOUBLE|FLOAT|DECIMAL|REAL|NUMERIC/.test(ty) && !/(^|_)(id|code|zip|year|no|number)$|^id_|uuid/i.test(n));
-  const num = nums.find(([n]) => /amount|revenue|total|price|sales|value|cost|qty|quantity|profit|units|count|tutar|fiyat|adet/i.test(n)) ?? nums[0];
-  const cat = cols.find(([n, ty]) => ty === 'VARCHAR' && !/id$|_id|uuid|email|name$/i.test(n)) ?? cols.find(([, ty]) => ty === 'VARCHAR');
+
+  // ---- free text ----
+  if (cols.length === 1 && cols[0][0] === 'line') {
+    const cells: Cell[] = [intro, sql(t('The lines'), `SELECT * FROM ${reader} LIMIT 200;`)];
+    let levels = 0;
+    try {
+      const r = await engine.exec(`SELECT count(*) FILTER (WHERE regexp_matches(line, '\\b(ERROR|WARN|WARNING|INFO|DEBUG|TRACE|FATAL)\\b'))::BIGINT FROM ${reader}`);
+      levels = Number(r.results[0]?.rows[0]?.[0] ?? 0);
+    } catch { /* ignore */ }
+    if (levels > 0) cells.push(sql(t('Log levels'), `SELECT level, count(*) AS lines\nFROM (SELECT regexp_extract(line, '\\b(ERROR|WARN|WARNING|INFO|DEBUG|TRACE|FATAL)\\b', 1) AS level FROM ${reader})\nWHERE level <> ''\nGROUP BY 1\nORDER BY 2 DESC;`));
+    cells.push(sql(t('Most frequent words'), `SELECT word, count(*) AS times\nFROM (SELECT unnest(regexp_extract_all(lower(line), '[\\p{L}\\p{N}_]{3,}')) AS word FROM ${reader})\nGROUP BY 1\nORDER BY 2 DESC\nLIMIT 15;`));
+    cells.push(sql(t('Line statistics'), `SELECT count(*) AS lines,\n  count(*) FILTER (WHERE trim(line) = '') AS empty_lines,\n  round(avg(length(line)), 1) AS average_length,\n  max(length(line)) AS longest\nFROM ${reader};`));
+    return cells;
+  }
+
+  // ---- tables ----
+  const isNum = (ty: string) => /INT|DOUBLE|FLOAT|DECIMAL|REAL|NUMERIC/.test(ty);
+  const idLike = (n: string) => /(^|_)(id|code|zip|year|no|number)$|^id_|uuid/i.test(n);
+  const nums = cols.filter(([n, ty]) => isNum(ty) && !idLike(n));
+  const preferred = /amount|revenue|total|price|sales|value|cost|qty|quantity|profit|units|count|score|tutar|fiyat|adet|miktar/i;
   const date = cols.find(([, ty]) => /^(DATE|TIMESTAMP)/.test(ty));
-  const measure = num ? `sum(${q(num[0])})` : 'count(*)';
-  const label = num ? `total_${num[0].replace(/\W+/g, '_').toLowerCase()}` : 'rows';
-  const cells: Cell[] = [
-    { id: uid(), type: 'markdown', source: `# ${name}\n${t('Every block is a question about your file. Change the text and tap ▶ to run it again. Switch between Table and Chart above a result.')}` },
-    { id: uid(), type: 'sql', source: `SELECT * FROM ${reader} LIMIT 100;` },
-  ];
-  if (cat) cells.push({ id: uid(), type: 'sql', source: `-- ${t('Totals by')} ${cat[0]}\nSELECT ${q(cat[0])}, ${measure} AS ${label}\nFROM ${reader}\nGROUP BY 1\nORDER BY 2 DESC\nLIMIT 15;` });
-  if (date) cells.push({ id: uid(), type: 'sql', source: `-- ${t('By month')}\nSELECT date_trunc('month', ${q(date[0])}) AS month, ${measure} AS ${label}\nFROM ${reader}\nGROUP BY 1\nORDER BY 1;` });
-  cells.push({ id: uid(), type: 'sql', source: `-- ${t('Every column at a glance')}\nSUMMARIZE SELECT * FROM ${reader};` });
+  // The most telling text column: a handful of distinct values (regions, categories), not names or IDs.
+  const texts = cols.filter(([n, ty]) => ty === 'VARCHAR' && !/id$|_id|uuid|email|phone|address/i.test(n)).slice(0, 12);
+  let cat: string | undefined;
+  if (texts.length) {
+    try {
+      const r = await engine.exec(`SELECT ${texts.map(([n]) => `approx_count_distinct(${q(n)})`).join(', ')} FROM ${reader}`);
+      const d = (r.results[0]?.rows[0] ?? []).map(Number);
+      const scored = texts.map(([n], i) => ({ n, d: d[i] })).filter((x) => x.d >= 2 && x.d <= 40);
+      scored.sort((a, b) => Math.abs(a.d - 8) - Math.abs(b.d - 8));
+      cat = scored[0]?.n;
+    } catch { /* ignore */ }
+  }
+  // No text column (headerless numbers, sensor exports): a number column with few values acts as the category.
+  let catExpr = cat ? q(cat) : '';
+  if (!cat && nums.length > 1) {
+    try {
+      const cand = nums.slice(0, 8);
+      const r = await engine.exec(`SELECT ${cand.map(([n]) => `approx_count_distinct(${q(n)})`).join(', ')} FROM ${reader}`);
+      const d = (r.results[0]?.rows[0] ?? []).map(Number);
+      const i = d.findIndex((x) => x >= 2 && x <= 20);
+      if (i >= 0) { cat = cand[i][0]; catExpr = `CAST(${q(cat)} AS VARCHAR) AS ${q(cat)}`; }
+    } catch { /* ignore */ }
+  }
+  const valueCols = nums.filter(([n]) => n !== cat);
+  const numM = valueCols.find(([n]) => preferred.test(n)) ?? valueCols[0];
+  const measure = numM ? `sum(${q(numM[0])})` : 'count(*)';
+  const label = numM ? `total_${numM[0].replace(/\W+/g, '_').toLowerCase()}` : 'rows';
+  const cells: Cell[] = [intro, sql(t('The rows'), `SELECT * FROM ${reader} LIMIT 100;`)];
+  if (cat) cells.push(sql(`${t('Totals by')} ${cat}`, `SELECT ${catExpr}, ${measure} AS ${label}\nFROM ${reader}\nGROUP BY 1\nORDER BY 2 DESC\nLIMIT 15;`));
+  if (date) cells.push(sql(t('By month'), `SELECT date_trunc('month', ${q(date[0])}) AS month, ${measure} AS ${label}\nFROM ${reader}\nGROUP BY 1\nORDER BY 1;`));
+  if (numM) cells.push(sql(`${t('Top 10 by')} ${numM[0]}`, `SELECT *\nFROM ${reader}\nORDER BY ${q(numM[0])} DESC\nLIMIT 10;`));
+  const second = valueCols.find((c) => c !== numM);
+  if (numM && second) cells.push(sql(`${second[0]} × ${numM[0]}`, `SELECT ${q(second[0])}, ${q(numM[0])}\nFROM ${reader}\nLIMIT 2000;`));
+  cells.push(sql(t('Every column at a glance'), `SUMMARIZE SELECT * FROM ${reader};`));
   return cells;
 }
 
+/**
+ * Touch and hold a file for its actions. It only counts when the finger stays put: any movement over a few points
+ * or any scrolling cancels it, so slow scrolling through the list never opens a menu.
+ */
+let holdTimer = 0;
+const cancelHold = () => { clearTimeout(holdTimer); holdTimer = 0; };
+window.addEventListener('scroll', cancelHold, { passive: true, capture: true });
+
 function fileRow(f: DataFile) {
   const kind = kindOf(f.name);
-  // Touch and hold (or right-click) shows the file's actions: Analyze with SQL, share, rename, delete.
-  let timer = 0, held = false;
-  const hold = (e: TouchEvent) => { held = false; const p = e.touches[0]; const x = p.clientX, y = p.clientY;
-    timer = window.setTimeout(() => { held = true; haptic.press(); fileActions(f); }, 450);
-    const cancel = (m: TouchEvent) => { const q = m.touches[0]; if (!q || Math.hypot(q.clientX - x, q.clientY - y) > 10) clearTimeout(timer); };
-    row.addEventListener('touchmove', cancel, { passive: true, once: true });
-  };
+  let held = false, x0 = 0, y0 = 0;
   const row = h('button', { class: 'row', onclick: () => { if (held) { held = false; return; } openFile(f.name); },
-    oncontextmenu: (e: Event) => { e.preventDefault(); clearTimeout(timer); if (!held) { held = true; haptic.press(); fileActions(f); } } },
+    oncontextmenu: (e: Event) => { e.preventDefault(); cancelHold(); if (!held) { held = true; haptic.press(); fileActions(f); } } },
     h('span', { class: `kind ${kind}` }, kind === 'other' || kind === 'csv' ? (f.name.split('.').pop() ?? '?').toLowerCase() : kind),
     h('div', { class: 'row-main' },
       h('div', { class: 'row-title' }, f.name),
       fileSub(f)),
     importNeedsPro(kind) && !isPro() ? h('span', { class: 'pro-tag' }, 'PRO') : icon('chevron'));
-  row.addEventListener('touchstart', hold, { passive: true });
-  row.addEventListener('touchend', () => clearTimeout(timer));
-  row.addEventListener('touchcancel', () => clearTimeout(timer));
+  row.addEventListener('touchstart', (e) => {
+    held = false; cancelHold();
+    if (e.touches.length !== 1) return;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    holdTimer = window.setTimeout(() => { holdTimer = 0; held = true; haptic.press(); fileActions(f); }, 550);
+  }, { passive: true });
+  row.addEventListener('touchmove', (e) => {
+    const p = e.touches[0];
+    if (!p || Math.abs(p.clientX - x0) > 6 || Math.abs(p.clientY - y0) > 6) cancelHold();
+  }, { passive: true });
+  row.addEventListener('touchend', cancelHold);
+  row.addEventListener('touchcancel', cancelHold);
   return row;
 }
 
@@ -371,7 +447,7 @@ function fileSub(f: DataFile) {
     metaQueue = metaQueue.then(async () => {
       if (!el.isConnected) return;
       try {
-        const reader = readerFor(f.name);
+        const reader = await smartReader(f.name);
         const c = await engine.exec(`SELECT count(*)::BIGINT FROM ${reader}`);
         const d = await engine.exec(`DESCRIBE SELECT * FROM ${reader}`);
         const rows = Number(c.results[0]?.rows[0]?.[0] ?? 0), cols = d.results[0]?.rows.length ?? 0;
@@ -986,7 +1062,7 @@ async function boot() {
 }
 
 // Automated checks (WebKit via Playwright) reach the engine through this hook; only with ?selftest in the URL.
-if (new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __openFile: openFile, __go: go, __openSample: openSample, __setPro: setPro });
+if (new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __openFile: openFile, __go: go, __openSample: openSample, __setPro: setPro, __analyze: notebookFromFile });
 
 engine.onState((s) => { if (s.status !== 'starting' && route.tab === 'database' && !route.notebook) render(); });
 engine.onMeta(() => { if (route.tab === 'database' && !route.notebook && !document.querySelector('.modal-back, .sheet-back')) render(); });

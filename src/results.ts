@@ -65,7 +65,8 @@ function resultBlock(rs: ResultSet, sql?: string): HTMLElement {
   };
   views.forEach(([name], i) => tabs.append(h('button', { onclick: () => show(i) }, t(name))));
   // Open on the most useful view: map for geometry results, a chart for "label, number" totals, table otherwise.
-  const totals = rs.fields.length === 2 && numCols.length === 1 && numCols[0] === 1 && rs.rows.length > 1 && rs.rows.length <= 60 && isPro();
+  const totals = isPro() && rs.rows.length > 1 && rs.fields.length === 2
+    && ((numCols.length === 1 && numCols[0] === 1 && rs.rows.length <= 60) || numCols.length === 2);
   show(geoCols.length ? views.findIndex((v) => v[0] === 'Map') : totals ? views.findIndex((v) => v[0] === 'Chart') : 0);
 
   return h('div', { class: 'result' },

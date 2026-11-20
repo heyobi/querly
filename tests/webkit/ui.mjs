@@ -25,6 +25,22 @@ for (const [i, want] of [[3, 'Settings'], [2, 'Analyze'], [1, 'Querly']]) {
   console.log(`tab ${i}: ${got}`);
   if (got !== want) fails.push(`tab ${i} shows ${got}, expected ${want}`);
 }
+// File types: space-separated text gets columns, notes open as lines, pictures are refused with a message.
+const imported = async (name, text) => {
+  await p.evaluate(async ([n, t]) => { document.querySelector('.viewer .back, .viewer button')?.click(); await window.__importBlobs([{ name: n, blob: new Blob([t]) }], true); }, [name, text]);
+  await p.waitForTimeout(1500);
+  return p.evaluate(() => document.querySelector('.viewer')?.innerText.match(/\d+ rows? · \d+ columns?/)?.[0] ?? (document.querySelector('.toast')?.textContent || 'nothing'));
+};
+const checks = [
+  ['frame.txt', '0 0.1 0.2 0.3 0.4\n0 0.5 0.6 0.7 0.8\n1 0.9 0.1 0.2 0.3\n', /3 rows · 5 columns/],
+  ['notes.md', '# Title\n\nSome text, with a comma | and a pipe\n- item\n', /rows? · 1 column/],
+  ['photo.jpg', '\xff\xd8\xff\xe0 binary', /opens data and text files/],
+];
+for (const [n, body, want] of checks) {
+  const got = await imported(n, body);
+  console.log(`${n}: ${got}`);
+  if (!want.test(got)) fails.push(`${n}: got "${got}"`);
+}
 await b.close();
 if (errs.length) fails.push(...errs.map((e) => 'pageerror ' + e));
 if (fails.length) { console.error('UI check failed:\n' + fails.join('\n')); process.exit(1); }

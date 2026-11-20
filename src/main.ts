@@ -16,7 +16,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { marked } from 'marked';
 import * as engine from './engine';
 import type { DataFile, PgError } from './engine';
-import { FREE_FILE_MB, importNeedsPro, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
+import { FREE_FILE_MB, PICKER_ACCEPT, importNeedsPro, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
 import { openViewer } from './viewer';
 import { deleteNotebook, fromIpynb, fromSql, loadNotebooks, saveNotebook, toIpynb, toSql, uid, type Cell, type Notebook } from './notebook';
 import { initPro, isPro, onPro, requirePro, setPro } from './pro';
@@ -213,6 +213,7 @@ async function importBlobs(items: { name: string; blob: Blob }[], open = false) 
     try {
       if (kind === 'notebook') { await importNotebookFile(new File([blob], name)); continue; }
       if (kind === 'snapshot') { await restoreSnapshot(blob, name); continue; }
+      if (kind === 'other') { toast(`${name}: ${t('Querly opens data and text files: CSV, Excel, JSON, TXT, Parquet, SQLite.')}`, 'err'); continue; }
       if (importNeedsPro(kind) && !(await requirePro(`${name}: ${t('this file type is part of Pro.')}`))) continue;
       if (blob.size > FREE_FILE_MB * 1048576 && !(await requirePro(`${name} (${fmtBytes(blob.size)}): ${t('files over')} ${FREE_FILE_MB} MB ${t('are part of Pro.')}`))) continue;
       const bar = h('div', { class: 'progress' }, h('i'));
@@ -235,7 +236,7 @@ async function importBlobs(items: { name: string; blob: Blob }[], open = false) 
 }
 
 async function importFlow() {
-  const picked = await pickFiles(true);
+  const picked = await pickFiles(true, PICKER_ACCEPT);
   if (picked.length) await importBlobs(picked.map((f) => ({ name: f.name, blob: f })));
 }
 
@@ -257,7 +258,7 @@ async function notebookFromFile(name: string) {
 function fileRow(f: DataFile) {
   const kind = kindOf(f.name);
   return h('button', { class: 'row', onclick: () => openFile(f.name) },
-    h('span', { class: `kind ${kind}` }, kind === 'other' ? f.name.split('.').pop() ?? '?' : kind),
+    h('span', { class: `kind ${kind}` }, kind === 'other' || kind === 'csv' ? (f.name.split('.').pop() ?? '?').toLowerCase() : kind),
     h('div', { class: 'row-main' },
       h('div', { class: 'row-title' }, f.name),
       h('div', { class: 'row-sub' }, `${fmtBytes(f.size)} · ${fmtDate(f.mtime)}`)),
@@ -268,11 +269,21 @@ function fileActions(f: DataFile, withOpen = true) {
   const kind = kindOf(f.name);
   const reader = readerFor(f.name);
   const gate = async () => !isProKind(kind) || requirePro(`${f.name}: ${t('SQL on this file type is part of Pro.')}`);
+  if (kind === 'other') {
+    // Imported before Querly filtered file types: it cannot be opened, so offer only what still makes sense.
+    sheet(`${f.name} · ${t('not a data file')}`, [
+      { label: t('Share'), run: async () => { const b = await engine.fileBytes(f.name); if (b) await shareFile(f.name, new Blob([b as BlobPart]), 'application/octet-stream'); } },
+      { label: t('Delete'), danger: true, run: async () => {
+        if (!(await confirmBox(`${t('Delete')} “${f.name}”?`, t('The file is removed from this iPhone. Tables you created from it are kept.'), t('Delete'), true))) return;
+        await engine.deleteFile(f.name); await refreshFiles(); render();
+      } }]);
+    return;
+  }
   sheet(f.name, [
     ...(withOpen && viewableKind(kind) ? [{ label: t('Open'), run: () => openFile(f.name) }] : []),
     ...(!viewableKind(kind) ? [{ label: t('Preview'), run: async () => { if (await gate()) await previewModal(f.name, `SELECT * FROM ${reader} LIMIT 200`); } }] : []),
     { label: t('New notebook from this file'), run: () => void notebookFromFile(f.name) },
-    ...(kind === 'sqlite' || kind === 'other' ? [] : [{ label: `${t('Load into a table')} (${tableNameFor(f.name)})`, run: async () => {
+    ...(kind === 'sqlite' ? [] : [{ label: `${t('Load into a table')} (${tableNameFor(f.name)})`, run: async () => {
       if (!(await gate())) return;
       const name = await promptBox(t('Load into a table'), t('Table name'), tableNameFor(f.name), t('Load'));
       if (!name) return;

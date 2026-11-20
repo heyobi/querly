@@ -10,9 +10,17 @@ export const FREE_FILE_MB = 25;
 
 export type FileKind = 'csv' | 'parquet' | 'json' | 'geojson' | 'excel' | 'sqlite' | 'spatial' | 'snapshot' | 'notebook' | 'other';
 
+/** Plain text that is not a table (notes, logs, code): shown read-only, one line per row. */
+const TEXT_EXT = ['md', 'markdown', 'log', 'text', 'conf', 'cfg', 'ini', 'yaml', 'yml', 'toml', 'xml', 'html', 'htm', 'py', 'pyi', 'js', 'ts', 'sh', 'env', 'properties', 'rst', 'out', 'err'];
+const ext = (name: string) => (name.includes('.') ? name.toLowerCase().split('.').pop() ?? '' : '');
+export const isTextLines = (name: string) => TEXT_EXT.includes(ext(name));
+/** Extensions the file picker offers (everything Querly can import). */
+export const PICKER_ACCEPT = ['csv', 'tsv', 'txt', 'psv', 'tab', 'dat', 'prn', ...TEXT_EXT, 'parquet', 'pq', 'json', 'jsonl', 'ndjson', 'geojson', 'xlsx',
+  'sqlite', 'sqlite3', 'db', 'shp', 'gpkg', 'fgb', 'kml', 'gpx', 'qsnap', 'ipynb', 'sql'].map((e) => '.' + e).join(',');
+
 export function kindOf(name: string): FileKind {
-  const e = name.toLowerCase().split('.').pop() ?? '';
-  if (['csv', 'tsv', 'txt', 'psv', 'tab'].includes(e)) return 'csv';
+  const e = ext(name);
+  if (['csv', 'tsv', 'txt', 'psv', 'tab', 'dat', 'prn'].includes(e) || TEXT_EXT.includes(e)) return 'csv';
   if (['parquet', 'pq'].includes(e)) return 'parquet';
   if (['json', 'jsonl', 'ndjson'].includes(e)) return 'json';
   if (e === 'geojson') return 'geojson';

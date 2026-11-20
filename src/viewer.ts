@@ -10,7 +10,7 @@
 // character and header row.
 import * as engine from './engine';
 import type { PgError, ResultSet } from './engine';
-import { editableKind, kindOf } from './features';
+import { editableKind, isTextLines, kindOf } from './features';
 import { errorBox, fmtValue } from './results';
 import { requirePro } from './pro';
 import { t } from './i18n';
@@ -41,7 +41,8 @@ const ch = (v: unknown, dflt: string) => {
 
 export function openViewer(file: string, hooks: ViewerHooks) {
   const kind = kindOf(file);
-  const editable = editableKind(kind);
+  const lines = isTextLines(file);
+  const editable = editableKind(kind) && !lines; // notes, logs and code are shown read-only
   const id = `qv_${Math.random().toString(36).slice(2, 9)}`;
   const tn = (n: string) => `qv.${qi(n)}`;
   const T = tn(id);
@@ -111,11 +112,22 @@ export function openViewer(file: string, hooks: ViewerHooks) {
   async function load() {
     const src = lit(file);
     if (kind === 'csv') {
-      if (!fmt) {
+      if (!fmt && lines) {
+        // One line per row: separators that cannot appear in text, so nothing is split or unquoted.
+        fmt = { delim: '\x1f', quote: '\x1e', escape: '\x1e', header: false, encoding: 'utf-8' };
+      } else if (!fmt) {
         const s = await q(`SELECT Delimiter, Quote, Escape, HasHeader FROM sniff_csv(${src}, sample_size = 20480)`);
         const [d, qu, es, hh] = (s.rows[0] ?? []) as unknown[];
         const quote = ch(qu, '"');
         fmt = { delim: ch(d, ','), quote, escape: ch(es, quote), header: hh !== false, encoding: 'utf-8' };
+        // Space-separated numbers (".txt" exports, YOLO labels…): the sniffer reports "," and one column.
+        if (fmt.delim === ',') {
+          const sample = await q(`SELECT content[1:8192] FROM read_text(${src})`).catch(() => null);
+          const rows = String(sample?.rows[0]?.[0] ?? '').split(/\r?\n/).slice(0, 50).filter((l) => l.trim());
+          if (rows.length > 1) rows.pop(); // the sample may cut the last line
+          const n = rows.map((l) => (l.includes(',') ? -1 : l.split(' ').length));
+          if (n.length && n[0] > 1 && n.every((x) => x === n[0])) fmt = { delim: ' ', quote: '"', escape: '"', header: false, encoding: 'utf-8' };
+        }
       }
       const opts = () => `all_varchar = true, header = ${fmt!.header}, delim = ${lit(fmt!.delim)}, quote = ${lit(fmt!.quote)}, escape = ${lit(fmt!.escape)}, null_padding = true, strict_mode = false, encoding = ${lit(fmt!.encoding)}`;
       try {

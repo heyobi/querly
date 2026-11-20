@@ -290,12 +290,6 @@ struct FilesView: View {
             model.send("refresh", "")
             try? await Task.sleep(nanoseconds: 500_000_000)
         }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { model.shell?.pickFiles() } label: { Image(systemName: "plus") }
-                    .accessibilityLabel(model.t("Open a file"))
-            }
-        }
         .modifier(FileDialogs(model: model, renaming: $renaming, newName: $newName, deleting: $deleting))
         .overlay(alignment: .bottom) { ToastView(model: model) }
     }
@@ -500,6 +494,7 @@ struct OpenCard: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(model.t("Open a file")).font(.title3.weight(.bold))
                 Text("CSV · Excel · JSON · TXT · Parquet · SQLite").font(.footnote).opacity(0.85)
+                    .lineLimit(1).minimumScaleFactor(0.7)
             }
             Spacer(minLength: 0)
         }

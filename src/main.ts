@@ -2,7 +2,7 @@ import './style.css';
 import './style2.css';
 import { App as CapApp } from '@capacitor/app';
 import { registerPlugin, type PluginListenerHandle } from '@capacitor/core';
-import { Filesystem } from '@capacitor/filesystem';
+import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Keyboard } from '@capacitor/keyboard';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -16,7 +16,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { marked } from 'marked';
 import * as engine from './engine';
 import type { DataFile, PgError } from './engine';
-import { FREE_FILE_MB, PICKER_ACCEPT, importNeedsPro, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
+import { FREE_FILE_MB, importNeedsPro, isBinaryExt, isMarkdown, looksLikeText, isProKind, kindOf, proFeature, readerFor, tableNameFor, viewableKind } from './features';
 import { openViewer } from './viewer';
 import { deleteNotebook, fromIpynb, fromSql, loadNotebooks, saveNotebook, toIpynb, toSql, uid, type Cell, type Notebook } from './notebook';
 import { initPro, isPro, onPro, requirePro, setPro } from './pro';
@@ -26,7 +26,7 @@ import { LESSONS } from './lessons';
 import { EXTENSIONS, EXT_CATEGORIES, type ExtInfo } from './extensions';
 import { applyTheme, getLangPref, getThemePref, lang, setLangPref, setThemePref, t, type LangPref, type Theme } from './i18n';
 import { querySucceeded } from './review';
-import { confirmBox, dark, fmtBytes, fmtDate, fmtMs, h, icon, modal, native, pickFiles, promptBox, safeName, sheet, shareFile, toast } from './ui';
+import { confirmBox, dark, safeHtml, fmtBytes, fmtDate, fmtMs, h, icon, modal, native, pickFiles, promptBox, safeName, sheet, shareFile, toast } from './ui';
 
 const app = document.getElementById('app')!;
 
@@ -191,14 +191,57 @@ async function ensureSampleFiles() {
 }
 
 /** Open a data file in the table viewer (or the actions sheet for kinds without one). */
+const viewerHooks = {
+  filesChanged: async () => { await refreshFiles(); if (route.tab === 'files' && !route.notebook) render(); },
+  newNotebook: (file: string) => void notebookFromFile(file),
+  fileMenu: (file: string) => { const f = files.find((x) => x.name === file); if (f) fileActions(f, false); },
+  open: (file: string) => openFile(file),
+};
+
+/** Native Quick Look (QLPreviewController), registered in SceneDelegate.swift: pictures, PDF, Office, iWork, media… */
+const QuickLook = registerPlugin<{ preview(o: { path: string }): Promise<void> }>('QuickLook');
+
+/**
+ * Every file opens somehow: data files as tables, Markdown rendered, other text one line per row,
+ * and everything else in Quick Look, the same preview the Files app uses.
+ */
 function openFile(name: string) {
-  if (!viewableKind(kindOf(name))) { const f = files.find((x) => x.name === name); if (f) fileActions(f); return; }
-  openViewer(name, {
-    filesChanged: async () => { await refreshFiles(); if (route.tab === 'files' && !route.notebook) render(); },
-    newNotebook: (file) => void notebookFromFile(file),
-    fileMenu: (file) => { const f = files.find((x) => x.name === file); if (f) fileActions(f, false); },
-    open: (file) => openFile(file),
-  });
+  const kind = kindOf(name);
+  if (isMarkdown(name)) return void openMarkdown(name);
+  if (kind === 'other') return void openOther(name);
+  if (!viewableKind(kind)) { const f = files.find((x) => x.name === name); if (f) fileActions(f); return; }
+  openViewer(name, viewerHooks);
+}
+
+async function openOther(name: string) {
+  const size = files.find((f) => f.name === name)?.size ?? 0;
+  if (!isBinaryExt(name) && size < 20 * 1048576) {
+    const bytes = await engine.fileBytes(name);
+    if (bytes && looksLikeText(bytes)) return openViewer(name, viewerHooks, true);
+  }
+  await quickLook(name);
+}
+
+async function quickLook(name: string) {
+  try {
+    if (!native) throw new Error('web');
+    const { uri } = await Filesystem.getUri({ directory: Directory.Documents, path: `Data/${name}` });
+    await QuickLook.preview({ path: uri });
+  } catch {
+    const b = await engine.fileBytes(name);
+    if (b) await shareFile(name, new Blob([b as BlobPart]), 'application/octet-stream');
+  }
+}
+
+async function openMarkdown(name: string) {
+  const bytes = await engine.fileBytes(name);
+  const text = bytes ? new TextDecoder().decode(bytes) : '';
+  const f = files.find((x) => x.name === name);
+  modal(h('div', { class: 'md-view' },
+    h('div', { class: 'md-head' },
+      h('div', { class: 'md-title' }, name),
+      f && h('button', { class: 'md-more', 'aria-label': t('More'), onclick: () => fileActions(f, false) }, '•••')),
+    h('div', { class: 'md-body', html: safeHtml(marked.parse(text, { async: false }) as string) })));
 }
 
 /**
@@ -213,7 +256,6 @@ async function importBlobs(items: { name: string; blob: Blob }[], open = false) 
     try {
       if (kind === 'notebook') { await importNotebookFile(new File([blob], name)); continue; }
       if (kind === 'snapshot') { await restoreSnapshot(blob, name); continue; }
-      if (kind === 'other') { toast(`${name}: ${t('Querly opens data and text files: CSV, Excel, JSON, TXT, Parquet, SQLite.')}`, 'err'); continue; }
       if (importNeedsPro(kind) && !(await requirePro(`${name}: ${t('this file type is part of Pro.')}`))) continue;
       if (blob.size > FREE_FILE_MB * 1048576 && !(await requirePro(`${name} (${fmtBytes(blob.size)}): ${t('files over')} ${FREE_FILE_MB} MB ${t('are part of Pro.')}`))) continue;
       const bar = h('div', { class: 'progress' }, h('i'));
@@ -231,12 +273,12 @@ async function importBlobs(items: { name: string; blob: Blob }[], open = false) 
   await refreshFiles();
   if (!imported) return;
   if (route.tab !== 'files' || route.notebook) go({ tab: 'files' }); else render();
-  if (savedNames.length === 1 && (open || items.length === 1) && viewableKind(kindOf(savedNames[0]))) openFile(savedNames[0]);
+  if (savedNames.length === 1 && (open || items.length === 1) && (viewableKind(kindOf(savedNames[0])) || kindOf(savedNames[0]) === 'other')) openFile(savedNames[0]);
   else toast(`${imported} ${t(imported === 1 ? 'file imported' : 'files imported')}`);
 }
 
 async function importFlow() {
-  const picked = await pickFiles(true, PICKER_ACCEPT);
+  const picked = await pickFiles(true);
   if (picked.length) await importBlobs(picked.map((f) => ({ name: f.name, blob: f })));
 }
 
@@ -269,21 +311,11 @@ function fileActions(f: DataFile, withOpen = true) {
   const kind = kindOf(f.name);
   const reader = readerFor(f.name);
   const gate = async () => !isProKind(kind) || requirePro(`${f.name}: ${t('SQL on this file type is part of Pro.')}`);
-  if (kind === 'other') {
-    // Imported before Querly filtered file types: it cannot be opened, so offer only what still makes sense.
-    sheet(`${f.name} · ${t('not a data file')}`, [
-      { label: t('Share'), run: async () => { const b = await engine.fileBytes(f.name); if (b) await shareFile(f.name, new Blob([b as BlobPart]), 'application/octet-stream'); } },
-      { label: t('Delete'), danger: true, run: async () => {
-        if (!(await confirmBox(`${t('Delete')} “${f.name}”?`, t('The file is removed from this iPhone. Tables you created from it are kept.'), t('Delete'), true))) return;
-        await engine.deleteFile(f.name); await refreshFiles(); render();
-      } }]);
-    return;
-  }
   sheet(f.name, [
-    ...(withOpen && viewableKind(kind) ? [{ label: t('Open'), run: () => openFile(f.name) }] : []),
-    ...(!viewableKind(kind) ? [{ label: t('Preview'), run: async () => { if (await gate()) await previewModal(f.name, `SELECT * FROM ${reader} LIMIT 200`); } }] : []),
-    { label: t('New notebook from this file'), run: () => void notebookFromFile(f.name) },
-    ...(kind === 'sqlite' ? [] : [{ label: `${t('Load into a table')} (${tableNameFor(f.name)})`, run: async () => {
+    ...(withOpen && (viewableKind(kind) || kind === 'other') ? [{ label: t('Open'), run: () => openFile(f.name) }] : []),
+    ...(!viewableKind(kind) && kind !== 'other' ? [{ label: t('Preview'), run: async () => { if (await gate()) await previewModal(f.name, `SELECT * FROM ${reader} LIMIT 200`); } }] : []),
+    ...(kind === 'other' ? [] : [{ label: t('New notebook from this file'), run: () => void notebookFromFile(f.name) }]),
+    ...(kind === 'sqlite' || kind === 'other' ? [] : [{ label: `${t('Load into a table')} (${tableNameFor(f.name)})`, run: async () => {
       if (!(await gate())) return;
       const name = await promptBox(t('Load into a table'), t('Table name'), tableNameFor(f.name), t('Load'));
       if (!name) return;
@@ -687,7 +719,7 @@ function notebookView(nb: Notebook) {
       };
       runBtn.onclick = () => void ui.run!();
     } else {
-      const html = () => (cell.source.trim() ? (marked.parse(cell.source) as string) : `<p class="muted">${t('Empty text cell — tap to edit')}</p>`);
+      const html = () => (cell.source.trim() ? safeHtml(marked.parse(cell.source) as string) : `<p class="muted">${t('Empty text cell — tap to edit')}</p>`);
       const view = h('div', { class: 'md', html: html() });
       const ed = h('div', { class: 'editor hidden' });
       let editor: EditorView | null = null;

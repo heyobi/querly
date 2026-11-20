@@ -25,16 +25,30 @@ for (const [i, want] of [[3, 'Settings'], [2, 'Analyze'], [1, 'Querly']]) {
   console.log(`tab ${i}: ${got}`);
   if (got !== want) fails.push(`tab ${i} shows ${got}, expected ${want}`);
 }
-// File types: space-separated text gets columns, notes open as lines, pictures are refused with a message.
+// File types: every file opens somehow. Space-separated text gets columns, logs and unknown text open as lines,
+// Markdown is rendered (without running scripts), pictures are kept for Quick Look.
 const imported = async (name, text) => {
-  await p.evaluate(async ([n, t]) => { document.querySelector('.viewer .back, .viewer button')?.click(); await window.__importBlobs([{ name: n, blob: new Blob([t]) }], true); }, [name, text]);
+  await p.evaluate(async ([n, t]) => {
+    document.querySelectorAll('.viewer, .modal-back').forEach((e) => e.remove());
+    await window.__importBlobs([{ name: n, blob: new Blob([t]) }], true);
+  }, [name, text]);
   await p.waitForTimeout(1500);
-  return p.evaluate(() => document.querySelector('.viewer')?.innerText.match(/\d+ rows? · \d+ columns?/)?.[0] ?? (document.querySelector('.toast')?.textContent || 'nothing'));
+  return p.evaluate((n) => {
+    const v = document.querySelector('.viewer')?.innerText.match(/\d+ rows? · \d+ columns?/)?.[0];
+    if (v) return v;
+    const md = document.querySelector('.md-body');
+    if (md) return `markdown h1=${md.querySelector('h1')?.textContent} xss=${String(window.__x)}`;
+    const err = document.querySelector('.toast.err')?.textContent;
+    if (err) return 'error ' + err;
+    return [...document.querySelectorAll('.row-title')].some((e) => e.textContent === n) ? 'kept' : 'nothing';
+  }, name);
 };
 const checks = [
   ['frame.txt', '0 0.1 0.2 0.3 0.4\n0 0.5 0.6 0.7 0.8\n1 0.9 0.1 0.2 0.3\n', /3 rows · 5 columns/],
-  ['notes.md', '# Title\n\nSome text, with a comma | and a pipe\n- item\n', /rows? · 1 column/],
-  ['photo.jpg', '\xff\xd8\xff\xe0 binary', /opens data and text files/],
+  ['server.log', 'INFO start, ok | 1\nWARN slow\n\nERROR done\n', /4 rows · 1 column/],
+  ['settings.foo', 'a = 1\nb = 2\n', /2 rows · 1 column/],
+  ['notes.md', '# Title\n\nSome text\n\n<img src=x onerror="window.__x=1">\n', /markdown h1=Title xss=undefined/],
+  ['photo.jpg', '\xff\xd8\xff\xe0\x00\x10 binary', /kept/],
 ];
 for (const [n, body, want] of checks) {
   const got = await imported(n, body);

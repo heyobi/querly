@@ -10,7 +10,7 @@
 // character and header row.
 import * as engine from './engine';
 import type { PgError, ResultSet } from './engine';
-import { editableKind, isTextLines, kindOf } from './features';
+import { editableKind, isCompressed, isTextLines, kindOf } from './features';
 import { errorBox, fmtValue } from './results';
 import { requirePro } from './pro';
 import { t } from './i18n';
@@ -39,10 +39,11 @@ const ch = (v: unknown, dflt: string) => {
   return !s || s === '\0' || s === '(empty)' ? dflt : s;
 };
 
-export function openViewer(file: string, hooks: ViewerHooks) {
-  const kind = kindOf(file);
-  const lines = isTextLines(file);
-  const editable = editableKind(kind) && !lines; // notes, logs and code are shown read-only
+/** asText: a file with an unknown extension whose bytes look like text; shown one line per row. */
+export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
+  const kind = asText ? 'csv' : kindOf(file);
+  const lines = asText || isTextLines(file);
+  const editable = editableKind(kind) && !lines && !isCompressed(file); // notes, logs, code and .gz are shown read-only
   const id = `qv_${Math.random().toString(36).slice(2, 9)}`;
   const tn = (n: string) => `qv.${qi(n)}`;
   const T = tn(id);

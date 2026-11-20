@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import QuickLook
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -32,6 +33,7 @@ class QuerlyViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(SaveToFilesPlugin())
         bridge?.registerPluginInstance(IncomingFilesPlugin())
+        bridge?.registerPluginInstance(QuickLookPlugin())
     }
 }
 
@@ -140,6 +142,47 @@ public class SaveToFilesPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDel
 
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
         pending?.resolve(["saved": false])
+        pending = nil
+    }
+}
+
+/// Quick Look preview for files that are not tables: pictures, PDF, Office and iWork documents, audio, video…
+/// The same preview the Files app shows, with its own share button.
+@objc(QuickLookPlugin)
+public class QuickLookPlugin: CAPPlugin, CAPBridgedPlugin, QLPreviewControllerDataSource, QLPreviewControllerDelegate {
+    public let identifier = "QuickLookPlugin"
+    public let jsName = "QuickLook"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "preview", returnType: CAPPluginReturnPromise)
+    ]
+    private var url: URL?
+    private var pending: CAPPluginCall?
+
+    @objc func preview(_ call: CAPPluginCall) {
+        guard let path = call.getString("path"), let url = URL(string: path), url.isFileURL else {
+            call.reject("A file URL is required")
+            return
+        }
+        DispatchQueue.main.async {
+            guard let vc = self.bridge?.viewController else { call.reject("No view controller"); return }
+            self.pending?.resolve()
+            self.pending = call
+            self.url = url
+            let ql = QLPreviewController()
+            ql.dataSource = self
+            ql.delegate = self
+            vc.present(ql, animated: true)
+        }
+    }
+
+    public func numberOfPreviewItems(in controller: QLPreviewController) -> Int { url == nil ? 0 : 1 }
+
+    public func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        (url ?? URL(fileURLWithPath: "/")) as NSURL
+    }
+
+    public func previewControllerDidDismiss(_ controller: QLPreviewController) {
+        pending?.resolve()
         pending = nil
     }
 }

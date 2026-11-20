@@ -288,3 +288,15 @@ body.in-viewer { overflow: hidden; }
 .diag { position: fixed; left: 0; right: 0; top: env(safe-area-inset-top); z-index: 100; pointer-events: none;
   font: 10px/1.3 ui-monospace, Menlo, monospace; color: #fff; background: rgba(200,0,80,.75); padding: 2px 6px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.md-view { padding: 4px 4px 24px; }
+.md-head { display: flex; align-items: center; gap: 8px; margin: 0 40px 12px 0; }
+.md-title { flex: 1; font-weight: 700; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.md-more { background: var(--surface-2); border: 0; color: var(--text); border-radius: 10px; padding: 6px 10px; }
+.md-body { font-size: 16px; line-height: 1.55; overflow-wrap: anywhere; }
+.md-body pre { background: var(--surface-2); padding: 10px; border-radius: 10px; overflow-x: auto; font-size: 13px; }
+.md-body code { font-family: ui-monospace, Menlo, monospace; font-size: .9em; }
+.md-body table { border-collapse: collapse; display: block; overflow-x: auto; }
+.md-body th, .md-body td { border: 1px solid var(--line); padding: 4px 8px; }
+.md-body img { max-width: 100%; }
+.md-body a { color: var(--accent); }

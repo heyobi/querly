@@ -12,11 +12,26 @@ export type FileKind = 'csv' | 'parquet' | 'json' | 'geojson' | 'excel' | 'sqlit
 
 /** Plain text that is not a table (notes, logs, code): shown read-only, one line per row. */
 const TEXT_EXT = ['md', 'markdown', 'log', 'text', 'conf', 'cfg', 'ini', 'yaml', 'yml', 'toml', 'xml', 'html', 'htm', 'py', 'pyi', 'js', 'ts', 'sh', 'env', 'properties', 'rst', 'out', 'err'];
-const ext = (name: string) => (name.includes('.') ? name.toLowerCase().split('.').pop() ?? '' : '');
+/** Lower-case extension; "sales.csv.gz" counts as "csv" (DuckDB reads gzip directly). */
+const ext = (name: string) => {
+  const parts = name.toLowerCase().split('.');
+  if (parts.length > 2 && parts[parts.length - 1] === 'gz') parts.pop();
+  return parts.length > 1 ? parts.pop() ?? '' : '';
+};
+export const isCompressed = (name: string) => /\.gz$/i.test(name);
+export const isMarkdown = (name: string) => ['md', 'markdown'].includes(ext(name));
+/** Never worth sniffing for text: pictures, documents, media and archives go straight to Quick Look. */
+const BINARY_EXT = ['jpg', 'jpeg', 'png', 'gif', 'heic', 'heif', 'webp', 'bmp', 'tif', 'tiff', 'pdf', 'doc', 'docx', 'xls', 'ppt', 'pptx',
+  'pages', 'numbers', 'key', 'rtf', 'mp3', 'm4a', 'wav', 'aac', 'mp4', 'mov', 'm4v', 'zip', 'usdz', 'epub', 'ods', 'odt'];
+export const isBinaryExt = (name: string) => BINARY_EXT.includes(ext(name));
+/** No NUL bytes and almost no control characters in the first 8 KB: treat as text. */
+export function looksLikeText(bytes: Uint8Array): boolean {
+  const n = Math.min(bytes.length, 8192);
+  let ctrl = 0;
+  for (let i = 0; i < n; i++) { const b = bytes[i]; if (b === 0) return false; if (b < 9 || (b > 13 && b < 32)) ctrl++; }
+  return ctrl <= n / 100;
+}
 export const isTextLines = (name: string) => TEXT_EXT.includes(ext(name));
-/** Extensions the file picker offers (everything Querly can import). */
-export const PICKER_ACCEPT = ['csv', 'tsv', 'txt', 'psv', 'tab', 'dat', 'prn', ...TEXT_EXT, 'parquet', 'pq', 'json', 'jsonl', 'ndjson', 'geojson', 'xlsx',
-  'sqlite', 'sqlite3', 'db', 'shp', 'gpkg', 'fgb', 'kml', 'gpx', 'qsnap', 'ipynb', 'sql'].map((e) => '.' + e).join(',');
 
 export function kindOf(name: string): FileKind {
   const e = ext(name);

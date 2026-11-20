@@ -58,8 +58,6 @@ const TR: Record<string, string> = {
   "Stays on your iPhone": "iPhone'unuzda kalır",
   "Tables, backups, more databases": "Tablolar, yedekler, diğer veritabanları",
   "Something went wrong": "Bir hata oluştu",
-  "Querly opens data and text files: CSV, Excel, JSON, TXT, Parquet, SQLite.": "Querly veri ve metin dosyalarını açar: CSV, Excel, JSON, TXT, Parquet, SQLite.",
-  "not a data file": "veri dosyası değil",
   'Notebooks': 'Not defterleri', 'Terminal': 'Terminal', 'Extensions': 'Eklentiler', 'Databases': 'Veritabanları',
   'New notebook': 'Yeni not defteri', 'Import': 'İçe aktar', 'Untitled notebook': 'Adsız not defteri',
   'No notebooks yet. Start with an example below.': 'Henüz not defteri yok. Aşağıdaki bir örnekle başlayın.',

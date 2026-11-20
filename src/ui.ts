@@ -162,3 +162,15 @@ export function fmtDate(t: number) {
     ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : d.toLocaleDateString([], { day: 'numeric', month: 'short', year: d.getFullYear() === today.getFullYear() ? undefined : 'numeric' });
 }
+
+/** Markdown from files people open is untrusted: drop scripts, frames, event handlers and javascript: links. */
+export function safeHtml(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('script, iframe, object, embed, style, link, meta, form, base').forEach((n) => n.remove());
+  doc.querySelectorAll('*').forEach((el) => {
+    for (const a of [...el.attributes]) {
+      if (/^on/i.test(a.name) || (/^(href|src|xlink:href|action|formaction)$/i.test(a.name) && /^\s*(javascript|data:text|vbscript)/i.test(a.value))) el.removeAttribute(a.name);
+    }
+  });
+  return doc.body.innerHTML;
+}

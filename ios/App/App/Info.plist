@@ -90,6 +90,10 @@
 				<string>public.tab-separated-values-text</string>
 				<string>public.delimited-values-text</string>
 				<string>public.plain-text</string>
+				<string>public.text</string>
+				<string>public.source-code</string>
+				<string>net.daringfireball.markdown</string>
+				<string>public.log</string>
 				<string>public.json</string>
 				<string>org.openxmlformats.spreadsheetml.sheet</string>
 				<string>com.heyobi.querly.parquet</string>

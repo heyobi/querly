@@ -40,7 +40,7 @@ def compose(raw: Path, title: str, sub: str, out: Path, dark: bool):
     """Same size as the raw screenshot (iPhone, iPad or iPhone Duo); type and margins scale with the width."""
     shot = Image.open(raw).convert('RGB')
     w, h = shot.size
-    k = w / 1206
+    k = min(w, h) / 1206 * (1 if h >= w else 0.8)  # landscape (iPhone Duo inner display): scale by height
     bg = gradient((30, 38, 92), (88, 64, 200), w, h) if dark else gradient((92, 132, 255), (120, 96, 245), w, h)
     canvas = bg.convert('RGBA')
     d = ImageDraw.Draw(canvas)

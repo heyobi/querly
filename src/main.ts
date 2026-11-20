@@ -310,10 +310,11 @@ async function openMarkdown(name: string) {
   const bytes = await engine.fileBytes(name);
   const text = bytes ? new TextDecoder().decode(bytes) : '';
   const f = files.find((x) => x.name === name);
-  modal(h('div', { class: 'md-view' },
+  // The file menu closes the Markdown page first, so Analyze, Load into a table and Rename show on top.
+  const close = modal(h('div', { class: 'md-view' },
     h('div', { class: 'md-head' },
       h('div', { class: 'md-title' }, name),
-      f && h('button', { class: 'md-more', 'aria-label': t('More'), onclick: () => fileActions(f, false) }, '•••')),
+      f && h('button', { class: 'md-more', 'aria-label': t('More'), onclick: () => { close(); fileActions(f, false); } }, '•••')),
     h('div', { class: 'md-body', html: safeHtml(marked.parse(text, { async: false }) as string) })));
 }
 
@@ -1131,12 +1132,14 @@ async function boot() {
     CapApp.addListener('appStateChange', (s) => { if (s.isActive) void refreshFiles().then(() => { if (route.tab === 'files' && !route.notebook) render(); }); }).catch(() => {});
   }
   void initShell();
+  // Screenshot builds only (VITE_SHOTS=1): the App Store tour; the branch and module are dropped otherwise.
+  if (import.meta.env.VITE_SHOTS) void import('./shots').then((m) => m.startTour());
   void initPro().then(() => !route.notebook && render());
   engine.start().catch((e) => { console.error(e); toast(t('DuckDB did not start — see Database'), 'err'); });
 }
 
 // Automated checks (WebKit via Playwright) reach the engine through this hook; only with ?selftest in the URL.
-if (new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __openFile: openFile, __go: go, __openSample: openSample, __setPro: setPro, __analyze: notebookFromFile });
+if (import.meta.env.VITE_SHOTS || new URLSearchParams(location.search).has('selftest')) Object.assign(window, { __engine: engine, __lessons: LESSONS, __samples: CORE_SAMPLES, __importBlobs: importBlobs, __openFile: openFile, __go: go, __openSample: openSample, __setPro: setPro, __analyze: notebookFromFile });
 
 engine.onState((s) => { if (s.status !== 'starting' && route.tab === 'database' && !route.notebook) render(); });
 engine.onMeta(() => { if (route.tab === 'database' && !route.notebook && !document.querySelector('.modal-back, .sheet-back')) render(); });

@@ -1,0 +1,36 @@
+name: App Store screenshots
+
+on:
+  workflow_dispatch:
+
+jobs:
+  shots:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - uses: actions/cache@v5
+        with:
+          path: .cache/duckdb-ext
+          key: duckdb-ext-${{ hashFiles('scripts/duckdb-assets.mjs') }}
+      - name: Build the web app with the screenshot tour and sync into the iOS project
+        run: VITE_SHOTS=1 npm run build && npx cap sync ios
+      - name: Build for the simulator
+        run: |
+          xcodebuild build \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO | tail -n 60
+      - name: Take the screenshots
+        run: bash scripts/sim-shots.sh shots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: shots/

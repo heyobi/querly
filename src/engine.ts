@@ -393,6 +393,9 @@ export async function exportQuery(sql: string, format: 'csv' | 'parquet' | 'json
     await db!.registerEmptyFileBuffer(name);
     const opts = copyOptions ?? (format === 'csv' ? '(HEADER, DELIMITER \',\')' : format === 'parquet' ? '(FORMAT parquet, COMPRESSION zstd)' : format === 'json' ? '(FORMAT json, ARRAY true)' : '(FORMAT xlsx, HEADER true)');
     const body = sql.trim().replace(/;\s*$/, '');
+    // The writers live in bundled extensions that are not autoloaded: load the one this format needs first.
+    const ext = format === 'xlsx' ? 'excel' : format === 'json' ? 'json' : format === 'parquet' ? 'parquet' : '';
+    if (ext) await conn!.query(`LOAD ${ext}`).catch(() => {});
     try {
       await conn!.query(`COPY (${body}) TO '${name}' ${opts}`);
       const bytes = await db!.copyFileToBuffer(name);

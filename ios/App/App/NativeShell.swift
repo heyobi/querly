@@ -291,6 +291,7 @@ struct FilesView: View {
                 }
                 ForEach(shown) { f in
                     Button { model.send("open", f.name) } label: { FileRow(file: f, model: model) }
+                        .tint(.primary)
                         .contextMenu { menu(for: f) } preview: { FilePreview(file: f, model: model) }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button(role: .destructive) { deleting = f } label: { Label(model.t("Delete"), systemImage: "trash") }

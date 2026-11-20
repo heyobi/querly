@@ -132,13 +132,15 @@ export function openViewer(file: string, hooks: ViewerHooks, asText = false) {
           if (n.length && n[0] > 1 && n.every((x) => x === n[0])) fmt = { delim: ' ', quote: '"', escape: '"', header: false, encoding: 'utf-8' };
         }
       }
+      // Notes, logs and code: one column called "line".
+      const readSrc = () => (lines ? `(SELECT column0 AS line FROM read_csv(${src}, ${opts()}))` : `read_csv(${src}, ${opts()})`);
       const opts = () => `all_varchar = true, header = ${fmt!.header}, delim = ${lit(fmt!.delim)}, quote = ${lit(fmt!.quote)}, escape = ${lit(fmt!.escape)}, null_padding = true, strict_mode = false, encoding = ${lit(fmt!.encoding)}`;
       try {
-        await create(`read_csv(${src}, ${opts()})`);
+        await create(readSrc());
       } catch (e) {
         if (!/unicode|utf-?8|encod/i.test((e as PgError).message) || fmt.encoding !== 'utf-8') throw e;
         fmt.encoding = 'latin-1'; // older Excel exports; saved back as UTF-8
-        await create(`read_csv(${src}, ${opts()})`);
+        await create(readSrc());
       }
     } else if (kind === 'json') {
       await create(`read_json_auto(${src})`);

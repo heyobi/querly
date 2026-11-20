@@ -141,7 +141,7 @@ td.json { color: var(--warn); }
 .nb-foot .primary { margin-left: auto; }
 
 /* sheets & dialogs */
-.sheet-back { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 50; display: flex; align-items: flex-end; justify-content: center; animation: fade .15s; }
+.sheet-back { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 58; display: flex; align-items: flex-end; justify-content: center; animation: fade .15s; }
 .sheet-back.center { align-items: center; }
 .sheet { width: min(560px, 100%); margin: 8px; margin-bottom: calc(8px + env(safe-area-inset-bottom)); display: grid; gap: 1px; border-radius: 16px; overflow: hidden; animation: up .2s; }
 .sheet-title { background: var(--surface); text-align: center; color: var(--muted); font-size: 13px; padding: 12px; }

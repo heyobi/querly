@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Querly: open CSV, Excel and JSON files on iPhone and iPad, with charts and DuckDB</title>
+<meta name="description" content="Open CSV, Excel (.xlsx), JSON, SQLite and Parquet files on iPhone and iPad. Table viewer, CSV editor, column stats, one-tap charts and maps, and DuckDB SQL notebooks, all offline. Made for iPhone Duo.">
+<meta name="keywords" content="open CSV on iPhone, CSV viewer iPhone, Excel viewer iPad, JSON viewer iOS, Parquet viewer iPhone, SQLite viewer iPhone, DuckDB iPhone, run DuckDB on iOS, charts from CSV iPhone, iPhone Duo apps">
+<link rel="canonical" href="https://heyobi.github.io/querly/">
+<link rel="icon" href="icon.png">
+<meta name="apple-itunes-app" content="app-id=6835789553">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Querly: open CSV, Excel and JSON files on iPhone and iPad, with charts and DuckDB">
+<meta property="og:description" content="Open CSV, Excel (.xlsx), JSON, SQLite and Parquet files on iPhone and iPad. Table viewer, CSV editor, column stats, one-tap charts and maps, and DuckDB SQL notebooks, all offline. Made for iPhone Duo.">
+<meta property="og:url" content="https://heyobi.github.io/querly/">
+<meta property="og:image" content="https://heyobi.github.io/querly/screens/iphone-1-chart.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Querly", "operatingSystem": "iOS, iPadOS", "applicationCategory": "BusinessApplication", "description": "Open CSV, Excel (.xlsx), JSON, SQLite and Parquet files on iPhone and iPad. Table viewer, CSV editor, column stats, one-tap charts and maps, and DuckDB SQL notebooks, all offline. Made for iPhone Duo.", "url": "https://apps.apple.com/app/id6835789553", "downloadUrl": "https://apps.apple.com/app/id6835789553", "image": "https://heyobi.github.io/querly/icon.png", "screenshot": ["https://heyobi.github.io/querly/screens/iphone-1-chart.jpg", "https://heyobi.github.io/querly/screens/iphone-2-files.jpg", "https://heyobi.github.io/querly/screens/iphone-3-viewer.jpg", "https://heyobi.github.io/querly/screens/iphone-4-map.jpg", "https://heyobi.github.io/querly/screens/iphone-5-stats.jpg", "https://heyobi.github.io/querly/screens/iphone-6-trend.jpg", "https://heyobi.github.io/querly/screens/iphone-7-log.jpg"], "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Person", "name": "heyobi", "url": "https://github.com/heyobi"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I open a CSV file on my iPhone?", "acceptedAnswer": {"@type": "Answer", "text": "In the Files app, touch and hold the CSV file and choose Open With › Querly, or use Share › Querly from Mail, Messages or Safari. It opens as a table you can sort, search, filter and edit."}}, {"@type": "Question", "name": "Can I open Excel, Parquet and SQLite files on iPhone or iPad?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Querly opens .xlsx, .parquet, .sqlite and .db files for free, as well as JSON, JSON Lines and compressed .csv.gz files."}}, {"@type": "Question", "name": "How do I make a chart from a CSV or Excel file on my phone?", "acceptedAnswer": {"@type": "Answer", "text": "Open the file in Querly and tap Analyze. Querly writes ready-made questions for the file and shows the answers as bar, line and scatter charts."}}, {"@type": "Question", "name": "How do I run DuckDB on my iPhone?", "acceptedAnswer": {"@type": "Answer", "text": "Install Querly. It runs DuckDB 1.5 (DuckDB-Wasm) on the device, offline, with SQL notebooks that query your files by name."}}, {"@type": "Question", "name": "Which DuckDB extensions work offline in Querly?", "acceptedAnswer": {"@type": "Answer", "text": "parquet, json, excel, icu, spatial, sqlite_scanner, fts, inet, vss, tpch, tpcds and autocomplete are bundled in the app."}}, {"@type": "Question", "name": "Does Querly work on iPad and iPhone Duo?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Querly is a native iPad app and is made for iPhone Duo, with a side-by-side layout on wide screens that splits at the hinge on iPhone Duo."}}, {"@type": "Question", "name": "Are my files uploaded anywhere?", "acceptedAnswer": {"@type": "Answer", "text": "No. Everything runs on your device; Querly makes no network requests and needs no account."}}]}</script>
+<style>
+:root{--bg:#fff;--fg:#14141a;--muted:#5b5b6b;--card:#f4f5f8;--line:#e3e5ec;--accent:#4f6bff}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0b10;--fg:#f2f2f6;--muted:#a4a4b4;--card:#16161e;--line:#262633;--accent:#7d93ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:40px 16px 64px}
+header{text-align:center}header img.icon{width:112px;height:112px;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.15;margin:18px 0 10px;letter-spacing:-.02em}
+.lead{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:720px;margin:0 auto 22px}
+.badge img{height:54px}
+.shots{display:flex;gap:14px;overflow-x:auto;padding:28px 0 8px;scroll-snap-type:x mandatory}
+.shots img{height:min(560px,70vh);border-radius:18px;scroll-snap-align:center;flex:none;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+h2{font-size:28px;margin:48px 0 12px;letter-spacing:-.01em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card b{display:block;margin-bottom:4px}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:10px 0}
+summary{font-weight:600;cursor:pointer}
+a{color:var(--accent)}code{font:15px ui-monospace,Menlo,monospace;background:var(--card);padding:1px 6px;border-radius:6px}
+.wide img{width:100%;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+footer{color:var(--muted);font-size:14px;margin-top:56px;text-align:center}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <img class="icon" src="icon.png" alt="Querly app icon" width="112" height="112">
+  <h1>Open CSV, Excel and JSON files on iPhone</h1>
+  <p class="lead">Querly opens CSV, Excel, JSON, SQLite and Parquet files on iPhone and iPad as a fast table, explains every column, and turns your data into charts in one tap. DuckDB runs on the device: no upload, no account. Made for iPhone Duo.</p>
+  <a class="badge" href="https://apps.apple.com/app/id6835789553"><img src="app-store-badge.svg" alt="Download Querly on the App Store"></a>
+</header>
+<div class="shots">
+    <img src="screens/iphone-1-chart.jpg" alt="Bar chart of totals by product, made from a CSV file" loading="lazy">
+    <img src="screens/iphone-2-files.jpg" alt="Files screen with CSV, Excel, JSON, Parquet and log files" loading="lazy">
+    <img src="screens/iphone-3-viewer.jpg" alt="Table viewer with an overview of the file" loading="lazy">
+    <img src="screens/iphone-4-map.jpg" alt="Cities from a CSV file on a map" loading="lazy">
+    <img src="screens/iphone-5-stats.jpg" alt="Column statistics with a histogram" loading="lazy">
+    <img src="screens/iphone-6-trend.jpg" alt="Monthly trend as a line chart" loading="lazy">
+    <img src="screens/iphone-7-log.jpg" alt="Log levels charted from a text file" loading="lazy">
+</div>
+<h2>Your files, understood</h2>
+<div class="grid">
+    <div class="card"><b>Opens almost anything</b>CSV, TSV, TXT, Excel (.xlsx), JSON, SQLite, Parquet and .csv.gz; logs and Markdown as text; photos and PDFs in Quick Look.</div>
+    <div class="card"><b>From the Files app</b>Touch and hold a file, choose Open With › Querly, or Share › Querly from Mail, Messages and Safari.</div>
+    <div class="card"><b>Table viewer and CSV editor</b>Sort, search and filter; edit cells, rows and columns and save back to Files without changing your file format.</div>
+    <div class="card"><b>Every column explained</b>Rows, columns and empty cells at a glance; tap a column for a histogram or its most common values.</div>
+    <div class="card"><b>Charts in one tap</b>Ready-made questions for each file, answered as bar, line and scatter charts you can share as images.</div>
+    <div class="card"><b>DuckDB SQL notebooks</b>DuckDB 1.5 on the device: query files by name, join them, PIVOT, window functions; parquet, excel, spatial and more bundled.</div>
+    <div class="card"><b>iPad and iPhone Duo</b>SQL beside the result on wide screens; on iPhone Duo the layout splits at the hinge.</div>
+    <div class="card"><b>Private</b>Everything runs on your device. No network access, no account, no tracking.</div>
+</div>
+<h2>Made for iPad and iPhone Duo</h2>
+<div class="wide"><img src="screens/duo-1-chart.jpg" alt="iPhone Duo half open: SQL on one side of the hinge, chart on the other" loading="lazy"></div>
+<p>On wide screens (iPad, the open iPhone Duo, an iPhone in landscape) notebooks put the SQL on the left and the result on the right, and files become a grid of cards. On iPhone Duo the split follows the hinge, half open or flat.</p>
+<div class="shots">
+    <img src="screens/ipad-2-files.jpg" alt="iPad: files as a grid of cards" loading="lazy">
+    <img src="screens/ipad-1-chart.jpg" alt="iPad: SQL beside the chart" loading="lazy">
+    <img src="screens/ipad-3-viewer.jpg" alt="iPad: table viewer" loading="lazy">
+</div>
+<h2>Questions</h2>
+  <details><summary>How do I open a CSV file on my iPhone?</summary><p>In the Files app, touch and hold the CSV file and choose Open With › Querly, or use Share › Querly from Mail, Messages or Safari. It opens as a table you can sort, search, filter and edit.</p></details>
+  <details><summary>Can I open Excel, Parquet and SQLite files on iPhone or iPad?</summary><p>Yes. Querly opens .xlsx, .parquet, .sqlite and .db files for free, as well as JSON, JSON Lines and compressed .csv.gz files.</p></details>
+  <details><summary>How do I make a chart from a CSV or Excel file on my phone?</summary><p>Open the file in Querly and tap Analyze. Querly writes ready-made questions for the file and shows the answers as bar, line and scatter charts.</p></details>
+  <details><summary>How do I run DuckDB on my iPhone?</summary><p>Install Querly. It runs DuckDB 1.5 (DuckDB-Wasm) on the device, offline, with SQL notebooks that query your files by name.</p></details>
+  <details><summary>Which DuckDB extensions work offline in Querly?</summary><p>parquet, json, excel, icu, spatial, sqlite_scanner, fts, inet, vss, tpch, tpcds and autocomplete are bundled in the app.</p></details>
+  <details><summary>Does Querly work on iPad and iPhone Duo?</summary><p>Yes. Querly is a native iPad app and is made for iPhone Duo, with a side-by-side layout on wide screens that splits at the hinge on iPhone Duo.</p></details>
+  <details><summary>Are my files uploaded anywhere?</summary><p>No. Everything runs on your device; Querly makes no network requests and needs no account.</p></details>
+<footer>
+  <p><a href="https://apps.apple.com/app/id6835789553">Querly on the App Store</a> · <a href="https://github.com/heyobi/querly">Source code on GitHub</a> · <a href="https://heyobi.github.io/pgnotebook/">Tuple: PostgreSQL on iPhone</a></p>
+  <p>Powered by DuckDB. Querly is independent and not affiliated with or endorsed by the DuckDB Foundation.</p>
+</footer>
+</main>
+</body>
+</html>

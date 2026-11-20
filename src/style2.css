@@ -354,3 +354,14 @@ body.in-viewer { overflow: hidden; }
 
 /* iPad and other large screens: everything a fifth larger, so tables and charts use the space and stay readable. */
 @media (min-width: 1000px) { html { zoom: 1.2; } }
+
+/* Wide screens (iPad, the open iPhone Duo): notebooks use the whole width, each SQL block shows its code on the
+   left and its result (table, chart, map) on the right, the way notebooks look on a tablet. */
+@media (min-width: 900px) {
+  .page.nb { max-width: 1500px; }
+  .cell.sql { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr); grid-template-rows: auto 1fr; align-items: start; }
+  .cell.sql > .cell-head, .cell.sql > .editor { grid-column: 1; }
+  .cell.sql > .out { grid-column: 2; grid-row: 1 / span 2; border-top: 0; border-left: 1px solid var(--line); align-self: stretch; border-radius: 0 var(--radius) var(--radius) 0; }
+  .cell.sql:has(> .out:empty) { grid-template-columns: minmax(0, 1fr); }
+  .cell.sql > .out:empty { display: none; }
+}

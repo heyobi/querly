@@ -268,6 +268,64 @@ struct FilesView: View {
     }
 
     var body: some View {
+        GeometryReader { geo in
+            if geo.size.width >= 700 { wideGrid } else { narrowList }
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Querly")
+        .searchable(text: $query, prompt: model.t("Search"))
+        .refreshable {
+            model.send("refresh", "")
+            try? await Task.sleep(nanoseconds: 500_000_000)
+        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { model.shell?.pickFiles() } label: { Image(systemName: "plus") }
+                    .accessibilityLabel(model.t("Open a file"))
+            }
+        }
+        .modifier(FileDialogs(model: model, renaming: $renaming, newName: $newName, deleting: $deleting))
+        .overlay(alignment: .bottom) { ToastView(model: model) }
+    }
+
+    /// iPad and the open iPhone Duo: the open card and tips side by side, files as a grid of cards.
+    private var wideGrid: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                HStack(alignment: .top, spacing: 18) {
+                    Button { model.shell?.pickFiles() } label: { OpenCard(model: model) }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label(model.t("Open files from other apps"), systemImage: "square.and.arrow.down.on.square").font(.headline)
+                        Text("1. " + model.t("In the Files app, touch and hold a file."))
+                        Text("2. " + model.t("Choose Open With, then Querly."))
+                        Text("3. " + model.t("In Mail, Messages or Safari, use Share › Querly."))
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                }
+                Text(model.t("Recent")).font(.title2.weight(.bold))
+                if shown.isEmpty {
+                    Text(model.t("Files you open appear here.")).foregroundStyle(.secondary)
+                }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 16)], spacing: 16) {
+                    ForEach(shown) { f in
+                        Button { model.send("open", f.name) } label: { FileCard(file: f, model: model) }
+                            .buttonStyle(.plain)
+                            .contextMenu { menu(for: f) } preview: { FilePreview(file: f, model: model) }
+                    }
+                }
+            }
+            .padding(.horizontal, 28)
+            .padding(.vertical, 12)
+        }
+    }
+
+    private var narrowList: some View {
         List {
             Section {
                 Button { model.shell?.pickFiles() } label: { OpenCard(model: model) }
@@ -319,45 +377,6 @@ struct FilesView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .frame(maxWidth: 760)
-        .frame(maxWidth: .infinity)
-        .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("Querly")
-        .searchable(text: $query, prompt: model.t("Search"))
-        .refreshable {
-            model.send("refresh", "")
-            try? await Task.sleep(nanoseconds: 500_000_000)
-        }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { model.shell?.pickFiles() } label: { Image(systemName: "plus") }
-                    .accessibilityLabel(model.t("Open a file"))
-            }
-        }
-        .confirmationDialog(
-            deleting.map { "\(model.t("Delete")) “\($0.name)”?" } ?? "",
-            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
-            titleVisibility: .visible,
-            presenting: deleting
-        ) { f in
-            Button(model.t("Delete"), role: .destructive) { model.send("delete", f.name) }
-            Button(model.t("Cancel"), role: .cancel) {}
-        } message: { _ in
-            Text(model.t("The file is removed from this iPhone. Tables you created from it are kept."))
-        }
-        .alert(model.t("Rename file"), isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
-            TextField(model.t("Name"), text: $newName)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-            Button(model.t("Rename")) {
-                if let f = renaming, !newName.trimmingCharacters(in: .whitespaces).isEmpty, newName != f.name {
-                    model.send("rename", f.name, newName.trimmingCharacters(in: .whitespaces))
-                }
-                renaming = nil
-            }
-            Button(model.t("Cancel"), role: .cancel) { renaming = nil }
-        }
-        .overlay(alignment: .bottom) { ToastView(model: model) }
     }
 
     @ViewBuilder
@@ -370,6 +389,69 @@ struct FilesView: View {
         Button { newName = f.name; renaming = f } label: { Label(model.t("Rename"), systemImage: "pencil") }
         Divider()
         Button(role: .destructive) { deleting = f } label: { Label(model.t("Delete"), systemImage: "trash") }
+    }
+}
+
+/// Delete confirmation and rename prompt, shared by the list and the grid.
+struct FileDialogs: ViewModifier {
+    @ObservedObject var model: FilesModel
+    @Binding var renaming: FileItem?
+    @Binding var newName: String
+    @Binding var deleting: FileItem?
+
+    func body(content: Content) -> some View {
+            content
+.confirmationDialog(
+            deleting.map { "\(model.t("Delete")) “\($0.name)”?" } ?? "",
+            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
+            titleVisibility: .visible,
+            presenting: deleting
+        ) { f in
+            Button(model.t("Delete"), role: .destructive) { model.send("delete", f.name) }
+            Button(model.t("Cancel"), role: .cancel) {}
+        } message: { _ in
+            Text(model.t("The file is removed from this iPhone. Tables you created from it are kept."))
+        }
+            .alert(model.t("Rename file"), isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            TextField(model.t("Name"), text: $newName)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button(model.t("Rename")) {
+                if let f = renaming, !newName.trimmingCharacters(in: .whitespaces).isEmpty, newName != f.name {
+                    model.send("rename", f.name, newName.trimmingCharacters(in: .whitespaces))
+                }
+                renaming = nil
+            }
+            Button(model.t("Cancel"), role: .cancel) { renaming = nil }
+        }
+    }
+}
+
+/// A file as a card on wide screens: thumbnail or type badge, name, size and table shape, first columns.
+struct FileCard: View {
+    let file: FileItem
+    @ObservedObject var model: FilesModel
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                Thumb(file: file, size: 54)
+                Spacer()
+                if file.pro {
+                    Text("PRO").font(.caption2.weight(.bold)).padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.orange.opacity(0.18), in: Capsule()).foregroundStyle(.orange)
+                }
+            }
+            Text(file.name).font(.headline).lineLimit(2).truncationMode(.middle)
+            Text(subtitle(file, model)).font(.footnote).foregroundStyle(.secondary).lineLimit(2)
+            if !file.columns.isEmpty {
+                Text(file.columns.prefix(5).joined(separator: " · "))
+                    .font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 168, alignment: .topLeading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 
